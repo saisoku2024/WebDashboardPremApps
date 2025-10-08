@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const filterProduk = document.getElementById("filterProduk");
   const exportBtn = document.getElementById("exportBtn");
 
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbywvaiZcdnuc3Ji9jqnZnAFW1RkHf8TAPAPDVs6D4ZnrFB_AOi7wuQeWMpdMPGJUuUPTA/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbyzpBt_7VpZo1yieGiMGH8gkWVEkynlzftU8JxlEsj-urZkq9lYVs2nFyTPxEu7UHyV/exec";
 
   let data = [];
 
