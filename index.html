@@ -4,11 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Web Dashboard Premium Apps – SAISOKU.ID</title>
-
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
 </head>
 
@@ -16,110 +12,67 @@
   <div class="wrap">
     <header class="header">
       <h1 class="brand"><span class="logo">Web Dashboard Premium Apps</span></h1>
-      <p class="tag">Realtime Tracker · Profit Counter · by SAISOKU.ID</p>
+      <p class="tag">Connected to Google Sheets · SAISOKU.ID</p>
     </header>
 
     <main class="grid">
-
-      <!-- 🧾 FORM INPUT -->
+      <!-- Input Data -->
       <div class="card">
-        <h2 class="card-title">Tambah Data Transaksi</h2>
+        <h2 class="card-title">Tambah Data</h2>
         <div class="fields">
-          <div class="field"><span>Nama Pembeli</span><input type="text" id="nama" placeholder="contoh: Arif Rahman" autocomplete="off"></div>
-          <div class="field"><span>No. WhatsApp</span><input type="text" id="wa" placeholder="0811xxxxxxx" autocomplete="off"></div>
-          <div class="field"><span>Katalog</span><input type="text" id="katalog" placeholder="Netflix / Viu / Prime Video"></div>
-          <div class="field"><span>Akun</span><input type="text" id="akun" placeholder="Email akun pelanggan"></div>
-          <div class="field"><span>Password</span><input type="text" id="password" placeholder="opsional"></div>
-          <div class="field"><span>Device</span>
-            <select id="device">
-              <option value="">Pilih Device</option>
-              <option>TV</option>
-              <option>HP</option>
-              <option>Laptop</option>
-              <option>All</option>
-            </select>
-          </div>
-          <div class="row">
-            <div class="field">
-              <span>Tanggal Beli</span>
-              <input type="date" id="tglBeli">
-            </div>
-            <div class="field">
-              <span>Durasi (hari)</span>
-              <input type="number" id="durasi" placeholder="30 / 60 / 90">
-            </div>
-          </div>
-          <div class="field">
-            <span>Buyer Type</span>
-            <select id="statusBuyer">
-              <option value="">Pilih Tipe</option>
-              <option value="Reguler">Reguler</option>
-              <option value="Reseller">Reseller</option>
-            </select>
-          </div>
-          <div class="row">
-            <div class="field"><span>Modal (Rp)</span><input type="number" id="modal" placeholder="29000"></div>
-            <div class="field"><span>Harga Jual (Rp)</span><input type="number" id="harga" placeholder="33900"></div>
-          </div>
-          <button class="btn" id="addBtn">+ Tambah Data</button>
+          <input id="nama" placeholder="Nama Pembeli">
+          <input id="wa" placeholder="No WhatsApp">
+          <input id="katalog" placeholder="Katalog (Netflix / Viu / Prime)">
+          <input id="akun" placeholder="Akun">
+          <input id="password" placeholder="Password">
+          <select id="device">
+            <option value="" disabled selected>Device</option>
+            <option>TV</option><option>HP</option><option>Laptop</option><option>All</option>
+          </select>
+          <input type="date" id="tglBeli">
+          <input id="durasi" placeholder="Durasi (Hari)">
+          <select id="statusBuyer">
+            <option value="Reguler">Reguler</option>
+            <option value="Reseller">Reseller</option>
+          </select>
+          <input id="modal" placeholder="Modal (Rp)">
+          <input id="harga" placeholder="Harga Jual (Rp)">
         </div>
+        <button id="addBtn" class="btn">Tambah</button>
       </div>
 
-      <!-- 📊 DATA TABEL -->
+      <!-- Data Table -->
       <div class="card">
         <h2 class="card-title">Data Penjualan</h2>
-        <div class="filter">
-          <label for="filterProduk">Filter Produk:</label>
-          <select id="filterProduk">
-            <option value="">Semua</option>
-            <option>Netflix</option>
-            <option>Viu</option>
-            <option>Prime Video</option>
-            <option>Disney+</option>
-            <option>YouTube Premium</option>
-          </select>
-        </div>
+        <select id="filterProduk" class="filter">
+          <option value="">Semua Produk</option>
+          <option value="Netflix">Netflix</option>
+          <option value="Viu">Viu</option>
+          <option value="Prime">Prime Video</option>
+        </select>
 
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Nama</th>
-                <th>Produk</th>
-                <th>Tanggal</th>
-                <th>Durasi</th>
-                <th>Modal</th>
-                <th>Harga</th>
-                <th>Profit</th>
-                <th>Status</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody">
-              <tr><td colspan="10" style="text-align:center; opacity:.6;">Memuat data...</td></tr>
-            </tbody>
-          </table>
-        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>No</th><th>Nama</th><th>Produk</th><th>Tanggal</th>
+              <th>Durasi</th><th>Modal</th><th>Harga</th><th>Profit</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
 
-        <!-- 🔢 SUMMARY -->
         <div class="summary">
-          <div><strong>Total Customer:</strong> <span id="totalCust">0</span></div>
-          <div><strong>Total Modal:</strong> <span id="totalModal">Rp 0</span></div>
-          <div><strong>Total Profit:</strong> <span id="totalProfit">Rp 0</span></div>
-        </div>
-
-        <div class="actions">
-          <button class="btn ghost" id="exportBtn">Export CSV</button>
+          <p>Total Modal: <span id="totalModal">Rp 0</span></p>
+          <p>Total Profit: <span id="totalProfit">Rp 0</span></p>
+          <p>Total Customer: <span id="totalCust">0</span></p>
+          <button id="exportBtn" class="btn ghost">Export CSV</button>
         </div>
       </div>
     </main>
 
-    <footer class="footer">
-      © <span id="year"></span> SAISOKU.ID · Powered by SIVA
-    </footer>
+    <footer class="footer">© <span id="year"></span> SAISOKU.ID · by SIVA</footer>
   </div>
 
-  <script src="script.js" defer></script>
+  <script src="script.js"></script>
 </body>
 </html>
