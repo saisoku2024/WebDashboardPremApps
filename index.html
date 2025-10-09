@@ -3,91 +3,123 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Saisoku Subscription Tracker · v0.1</title>
+  <title>Web Dashboard Premium Apps – SAISOKU.ID</title>
+
+  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
   <div class="wrap">
     <header class="header">
-      <h1 class="brand">Saisoku Subscription Tracker</h1>
-      <p class="tag">Dashboard Flat Dark Cyan · Auto Profit · Realtime Sync Ready</p>
+      <h1 class="brand"><span class="logo">Web Dashboard Premium Apps</span></h1>
+      <p class="tag">Realtime Tracker · Profit Counter · by SAISOKU.ID</p>
     </header>
 
     <main class="grid">
-      <!-- 🧍 INPUT FORM -->
-      <section class="card input-form">
-        <h2>Input Data Langganan</h2>
+
+      <!-- 🧾 FORM INPUT -->
+      <div class="card">
+        <h2 class="card-title">Tambah Data Transaksi</h2>
         <div class="fields">
-          <div class="field"><label>Nama Pembeli</label><input type="text" id="nama" placeholder="Nama lengkap"></div>
-          <div class="field"><label>No. WhatsApp</label><input type="text" id="wa" placeholder="08xxxxxxxxxx"></div>
-          <div class="field"><label>Katalog / Produk</label>
-            <select id="katalog">
-              <option value="">Pilih Produk</option>
-              <option>Netflix</option><option>Viu</option><option>Prime Video</option><option>Disney+</option><option>WeTV</option>
-            </select>
-          </div>
-          <div class="field"><label>Akun</label><input type="text" id="akun" placeholder="Email akun"></div>
-          <div class="field"><label>Password</label><input type="password" id="password" placeholder="Opsional"></div>
-          <div class="field"><label>Profile & PIN</label><input type="text" id="profile" placeholder="mis. Profile 1 / PIN 1234"></div>
-          <div class="field"><label>Device</label>
+          <div class="field"><span>Nama Pembeli</span><input type="text" id="nama" placeholder="contoh: Arif Rahman" autocomplete="off"></div>
+          <div class="field"><span>No. WhatsApp</span><input type="text" id="wa" placeholder="0811xxxxxxx" autocomplete="off"></div>
+          <div class="field"><span>Katalog</span><input type="text" id="katalog" placeholder="Netflix / Viu / Prime Video"></div>
+          <div class="field"><span>Akun</span><input type="text" id="akun" placeholder="Email akun pelanggan"></div>
+          <div class="field"><span>Password</span><input type="text" id="password" placeholder="opsional"></div>
+          <div class="field"><span>Device</span>
             <select id="device">
               <option value="">Pilih Device</option>
-              <option>TV</option><option>HP</option><option>Laptop</option><option>All</option>
+              <option>TV</option>
+              <option>HP</option>
+              <option>Laptop</option>
+              <option>All</option>
             </select>
           </div>
           <div class="row">
-            <div class="field"><label>Tanggal Beli</label><input type="date" id="tglBeli"></div>
-            <div class="field"><label>Durasi</label><input type="text" id="durasi" placeholder="mis. 30 Hari"></div>
+            <div class="field">
+              <span>Tanggal Beli</span>
+              <input type="date" id="tglBeli">
+            </div>
+            <div class="field">
+              <span>Durasi (hari)</span>
+              <input type="number" id="durasi" placeholder="30 / 60 / 90">
+            </div>
           </div>
-          <div class="field"><label>Status Buyer</label>
+          <div class="field">
+            <span>Buyer Type</span>
             <select id="statusBuyer">
-              <option value="">Pilih Status</option>
-              <option>Reguler</option><option>Reseller</option>
+              <option value="">Pilih Tipe</option>
+              <option value="Reguler">Reguler</option>
+              <option value="Reseller">Reseller</option>
             </select>
           </div>
           <div class="row">
-            <div class="field"><label>Modal (Rp)</label><input type="number" id="modal" placeholder="mis. 25000"></div>
-            <div class="field"><label>Harga Jual (Rp)</label><input type="number" id="harga" placeholder="mis. 33900"></div>
+            <div class="field"><span>Modal (Rp)</span><input type="number" id="modal" placeholder="29000"></div>
+            <div class="field"><span>Harga Jual (Rp)</span><input type="number" id="harga" placeholder="33900"></div>
           </div>
-          <button id="addBtn" class="btn">+ Tambah Data</button>
+          <button class="btn" id="addBtn">+ Tambah Data</button>
         </div>
-      </section>
+      </div>
 
-      <!-- 📊 DATA TABLE -->
-      <section class="card table-view">
-        <div class="table-header">
-          <h2>Data Langganan</h2>
-          <div class="actions">
-            <select id="filterProduk">
-              <option value="">Semua Produk</option>
-              <option>Netflix</option><option>Viu</option><option>Prime Video</option><option>Disney+</option><option>WeTV</option>
-            </select>
-            <button class="btn small" id="exportBtn">Export Excel</button>
-          </div>
+      <!-- 📊 DATA TABEL -->
+      <div class="card">
+        <h2 class="card-title">Data Penjualan</h2>
+        <div class="filter">
+          <label for="filterProduk">Filter Produk:</label>
+          <select id="filterProduk">
+            <option value="">Semua</option>
+            <option>Netflix</option>
+            <option>Viu</option>
+            <option>Prime Video</option>
+            <option>Disney+</option>
+            <option>YouTube Premium</option>
+          </select>
         </div>
-        <table id="subsTable">
-          <thead>
-            <tr>
-              <th>Nama</th><th>Produk</th><th>Tanggal Beli</th><th>Durasi</th>
-              <th>Modal</th><th>Harga</th><th>Profit</th><th>Status</th><th>Copy</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
 
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Produk</th>
+                <th>Tanggal</th>
+                <th>Durasi</th>
+                <th>Modal</th>
+                <th>Harga</th>
+                <th>Profit</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr><td colspan="10" style="text-align:center; opacity:.6;">Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 🔢 SUMMARY -->
         <div class="summary">
-          <div><span>Total Modal:</span> <strong id="totalModal">Rp 0</strong></div>
-          <div><span>Total Profit:</span> <strong id="totalProfit">Rp 0</strong></div>
-          <div><span>Total Pelanggan:</span> <strong id="totalCust">0</strong></div>
+          <div><strong>Total Customer:</strong> <span id="totalCust">0</span></div>
+          <div><strong>Total Modal:</strong> <span id="totalModal">Rp 0</span></div>
+          <div><strong>Total Profit:</strong> <span id="totalProfit">Rp 0</span></div>
         </div>
-      </section>
+
+        <div class="actions">
+          <button class="btn ghost" id="exportBtn">Export CSV</button>
+        </div>
+      </div>
     </main>
 
-    <footer class="footer">© 2025 SAISOKU.ID · Flat Dark Dashboard by SIVA</footer>
+    <footer class="footer">
+      © <span id="year"></span> SAISOKU.ID · Powered by SIVA
+    </footer>
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
