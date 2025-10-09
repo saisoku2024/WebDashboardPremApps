@@ -1,6 +1,6 @@
 // === Saisoku Dashboard v3.0 (Proxy Mode) ===
 document.addEventListener("DOMContentLoaded", () => {
-  const SHEET_URL = "/api/proxy"; // arahkan ke proxy.js
+  const SHEET_URL = "https://webdashboardpremapps.netlify.app/api/proxy";
 
   const addBtn = document.getElementById("addBtn");
   const tableBody = document.getElementById("tableBody");
