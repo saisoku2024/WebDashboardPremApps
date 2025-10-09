@@ -1,37 +1,46 @@
 // === Proxy Gateway untuk SAISOKU Dashboard ===
-// Fungsi ini meneruskan GET & POST ke Google Apps Script
+// Kompatibel dengan Netlify Functions (Node runtime)
+// by SIVA · saisoku.id
 
-export default async (req, res) => {
+export async function handler(event, context) {
   const target =
-    "https://script.google.com/macros/s/AKfycbwHlDDaRAp8rJ1oGiJXd2S8KQMs7CinvLIBj4FsCX_eI7OwLSJtbH-iR3qNwke5PQqJ/exec";
+    "https://script.google.com/macros/s/AKfycbwP-bsyxT_TJaVkTZzv5uNR2yd_bcvJ4V4gPF4dysiFf_lxBSd4VVekiSl_ulxjxp0H/exec";
 
-  // Set header CORS
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  // CORS Header
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).send("OK");
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 200, headers: corsHeaders, body: "OK" };
   }
 
   try {
     const init = {
-      method: req.method,
+      method: event.httpMethod,
       headers: { "Content-Type": "application/json" },
     };
 
-    if (req.method === "POST") {
-      let body = "";
-      for await (const chunk of req.body) body += chunk;
-      init.body = body;
+    if (event.httpMethod === "POST") {
+      init.body = event.body;
     }
 
     const response = await fetch(target, init);
     const text = await response.text();
 
-    res.status(response.status).send(text);
+    return {
+      statusCode: response.status,
+      headers: corsHeaders,
+      body: text,
+    };
   } catch (err) {
     console.error("Proxy Error:", err);
-    res.status(500).send("Proxy Error: " + err.message);
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: err.message }),
+    };
   }
-};
+}
