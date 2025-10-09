@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const filterProduk = document.getElementById("filterProduk");
   const exportBtn = document.getElementById("exportBtn");
 
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbzUM_fABwBUjbOM0w6BgoiXm8YepWzeIeKaNOQ5u1lXwZpyM2v1ybuOmAZL2zKEplgO/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbzxDj1PTsrfNDUIXz2d9aLy8tU3X8bNq_AupwZ6q3qElgoVBBUibGHmcFdpGSbe8h2Z/exec";
   let data = [];
 
   // === POST: Kirim data ke Google Sheets ===
