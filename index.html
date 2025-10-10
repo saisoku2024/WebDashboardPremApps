@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Web Dashboard Premium Apps – SAISOKU.ID</title>
 
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -30,9 +28,8 @@
           <input id="password" placeholder="Password (opsional)" />
           <input id="profile" placeholder="Profile & PIN (opsional)" />
 
-          <!-- Custom Device select -->
+          <!-- Device custom-select (NO external label) -->
           <div class="field-wrapper">
-            <label class="field-label">Device:</label>
             <div class="custom-select" id="device-select" data-placeholder="Device Type" role="application">
               <button type="button" class="select-toggle placeholder" aria-haspopup="listbox" aria-expanded="false">
                 <span class="label-text">Device Type</span>
@@ -53,7 +50,7 @@
             <input id="durasi" placeholder="Durasi (hari) – contoh 30" />
           </div>
 
-          <!-- NOTE: buyer-select is NOT wrapped in a <label> anymore -->
+          <!-- Buyer custom-select (not wrapped in label) -->
           <div class="field-inline">
             <div class="custom-select" id="buyer-select" data-placeholder="Tipe Buyer" role="application">
               <button type="button" class="select-toggle placeholder" aria-haspopup="listbox" aria-expanded="false">
@@ -103,9 +100,7 @@
                 <th>Modal</th><th>Harga</th><th>Profit</th><th>Tipe Buyer</th><th>Device</th><th>Action</th>
               </tr>
             </thead>
-            <tbody id="tableBody">
-              <!-- rows injected by JS -->
-            </tbody>
+            <tbody id="tableBody"></tbody>
           </table>
         </div>
 
@@ -120,9 +115,7 @@
     </footer>
   </div>
 
-  <!-- Toast -->
   <div id="toast" role="status" aria-live="polite"></div>
-
   <script src="script.js" defer></script>
 </body>
 </html>
