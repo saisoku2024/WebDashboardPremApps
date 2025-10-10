@@ -30,14 +30,15 @@
           <input id="password" placeholder="Password (opsional)" />
           <input id="profile" placeholder="Profile & PIN (opsional)" />
 
-          <label class="field-inline">
-            <select id="device">
-              <option value="All">Device: All</option>
-              <option value="TV">TV</option>
-              <option value="HP">HP</option>
-              <option value="Laptop">Laptop</option>
-            </select>
-          </label>
+          <div class="field-wrapper">
+  <label for="device-select" class="field-label">Device:</label>
+  <select id="device-select"> 
+    <option value="All">All</option> 
+    <option value="TV">TV</option>
+    <option value="HP">HP</option>
+    <option value="Laptop">Laptop</option>
+  </select>
+</div>
 
           <div class="row">
             <input id="tglBeli" type="date" placeholder="Tanggal Beli" />
