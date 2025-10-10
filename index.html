@@ -6,7 +6,7 @@
   <title>Web Dashboard Premium Apps – SAISOKU.ID</title>
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -30,19 +30,15 @@
           <input id="password" placeholder="Password (opsional)" />
           <input id="profile" placeholder="Profile & PIN (opsional)" />
 
-          <!-- Device custom dropdown -->
           <div class="field-wrapper">
-            <label for="device-value" class="field-label">Device:</label>
-
-            <div class="custom-select" id="device-select" data-placeholder="Device Type">
-              <button type="button" class="select-toggle" aria-haspopup="listbox" aria-expanded="false">Device Type</button>
-              <ul class="select-options" role="listbox" hidden>
-                <li role="option" data-value="TV">TV</li>
-                <li role="option" data-value="HP">HP</li>
-                <li role="option" data-value="Laptop">Laptop</li>
-              </ul>
-              <input type="hidden" id="device-value" name="device" value="">
-            </div>
+            <label for="device-select" class="field-label">Device:</label>
+            <select id="device-select" name="device" aria-label="Pilih Device">
+              <option value="" disabled selected>Pilih Device</option>
+              <option value="All">All</option>
+              <option value="TV">TV</option>
+              <option value="HP">HP</option>
+              <option value="Laptop">Laptop</option>
+            </select>
           </div>
 
           <div class="row">
@@ -50,17 +46,11 @@
             <input id="durasi" placeholder="Durasi (hari) – contoh 30" />
           </div>
 
-          <!-- Buyer Type custom dropdown (seperti Reguler/Reseller but click-to-open) -->
           <label class="field-inline">
-            <span class="field-label">Tipe Buyer:</span>
-            <div class="custom-select" id="buyer-select" data-placeholder="Tipe Buyer">
-              <button type="button" class="select-toggle" aria-haspopup="listbox" aria-expanded="false">Tipe Buyer</button>
-              <ul class="select-options" role="listbox" hidden>
-                <li role="option" data-value="Reguler">Reguler</li>
-                <li role="option" data-value="Reseller">Reseller</li>
-              </ul>
-              <input type="hidden" id="buyer-value" name="buyer" value="">
-            </div>
+            <select id="statusBuyer">
+              <option value="Reguler">Reguler</option>
+              <option value="Reseller">Reseller</option>
+            </select>
           </label>
 
           <input id="modal" type="number" placeholder="Modal (Rp)" />
@@ -86,36 +76,3 @@
           <div class="summary-inline">
             <span>Total Modal: <strong id="totalModal">Rp 0</strong></span>
             <span>Total Profit: <strong id="totalProfit">Rp 0</strong></span>
-            <span>Total Customer: <strong id="totalCust">0</strong></span>
-          </div>
-        </div>
-
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>No</th><th>Nama</th><th>Produk</th><th>Tanggal</th><th>Durasi</th>
-                <th>Modal</th><th>Harga</th><th>Profit</th><th>Tipe Buyer</th><th>Device</th><th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-          </table>
-        </div>
-
-        <div class="table-actions">
-          <button id="exportBtn" class="btn ghost">Export CSV</button>
-        </div>
-      </section>
-    </main>
-
-    <footer class="footer">
-      © <span id="year"></span> SAISOKU.ID · Dashboard UI by SIVA
-    </footer>
-  </div>
-
-  <!-- Toast -->
-  <div id="toast" role="status" aria-live="polite"></div>
-
-  <script src="script.js" defer></script>
-</body>
-</html>
