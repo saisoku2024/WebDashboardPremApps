@@ -6,7 +6,7 @@
   <title>Web Dashboard Premium Apps – SAISOKU.ID</title>
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -30,34 +30,34 @@
           <input id="password" placeholder="Password (opsional)" />
           <input id="profile" placeholder="Profile & PIN (opsional)" />
 
-          <!-- Device custom dropdown (pakai ini menggantikan device-select lama) -->
-<div class="field-wrapper">
-  <label class="field-label" for="device-value">Device:</label>
-  <div class="custom-select" id="device-select" data-placeholder="Device Type" role="application">
-    <button type="button" class="select-toggle placeholder" aria-haspopup="listbox" aria-expanded="false">Device Type</button>
-    <ul class="select-options" role="listbox" aria-label="Pilih Device">
-      <li role="option" data-value="All" tabindex="0">All</li>
-      <li role="option" data-value="TV" tabindex="0">TV</li>
-      <li role="option" data-value="HP" tabindex="0">HP</li>
-      <li role="option" data-value="Laptop" tabindex="0">Laptop</li>
-    </ul>
-    <input type="hidden" id="device-value" name="device" value="">
-  </div>
-</div>
+          <!-- Device custom dropdown -->
+          <div class="field-wrapper">
+            <label for="device-value" class="field-label">Device:</label>
+
+            <div class="custom-select" id="device-select" data-placeholder="Device Type">
+              <button type="button" class="select-toggle" aria-haspopup="listbox" aria-expanded="false">Device Type</button>
+              <ul class="select-options" role="listbox" hidden>
+                <li role="option" data-value="TV">TV</li>
+                <li role="option" data-value="HP">HP</li>
+                <li role="option" data-value="Laptop">Laptop</li>
+              </ul>
+              <input type="hidden" id="device-value" name="device" value="">
+            </div>
+          </div>
 
           <div class="row">
-            <input id="tglBeli" type="date" />
+            <input id="tglBeli" type="date" placeholder="Tanggal Beli" />
             <input id="durasi" placeholder="Durasi (hari) – contoh 30" />
           </div>
 
-          <!-- Buyer Type custom dropdown -->
+          <!-- Buyer Type custom dropdown (seperti Reguler/Reseller but click-to-open) -->
           <label class="field-inline">
             <span class="field-label">Tipe Buyer:</span>
-            <div class="custom-select" id="buyer-select" data-placeholder="Tipe Buyer" role="application">
-              <button type="button" class="select-toggle placeholder" aria-haspopup="listbox" aria-expanded="false">Tipe Buyer</button>
-              <ul class="select-options" role="listbox" aria-label="Pilih Tipe Buyer">
-                <li role="option" data-value="Reguler" tabindex="0">Reguler</li>
-                <li role="option" data-value="Reseller" tabindex="0">Reseller</li>
+            <div class="custom-select" id="buyer-select" data-placeholder="Tipe Buyer">
+              <button type="button" class="select-toggle" aria-haspopup="listbox" aria-expanded="false">Tipe Buyer</button>
+              <ul class="select-options" role="listbox" hidden>
+                <li role="option" data-value="Reguler">Reguler</li>
+                <li role="option" data-value="Reseller">Reseller</li>
               </ul>
               <input type="hidden" id="buyer-value" name="buyer" value="">
             </div>
