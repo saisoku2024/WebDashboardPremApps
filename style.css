@@ -11,23 +11,22 @@
   --radius:10px;
 }
 
+/* base */
 *{box-sizing:border-box;font-family:"Poppins",system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
-body{
-  margin:0;background:linear-gradient(180deg,#020617 0%, #071022 100%);color:var(--text);
-  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
-}
+body{margin:0;background:linear-gradient(180deg,#020617 0%, #071022 100%);color:var(--text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;padding:22px}
 
-.wrap{max-width:1100px;margin:28px auto;padding:20px;}
+/* container */
+.wrap{max-width:1100px;margin:0 auto}
 .header{margin-bottom:18px}
 .brand{font-family:"Orbitron",sans-serif;font-size:18px;margin:0;color:var(--accent)}
 .tag{margin:4px 0 0;color:var(--muted);font-size:13px}
 
-/* grid */
+/* grid/cards */
 .grid{display:grid;grid-template-columns:420px 1fr;gap:18px;align-items:start}
 .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,0.03)}
 .card-title{margin:0 0 12px;font-size:16px}
 
-/* inputs */
+/* fields & inputs */
 .fields input[type="text"], .fields input[type="number"], .fields input[type="date"], .fields input{
   width:100%;padding:12px 14px;margin:8px 0;border-radius:var(--radius);border:1px solid var(--input-border);
   background:var(--input-bg);color:var(--text);font-size:14px;
@@ -35,26 +34,32 @@ body{
 .row{display:flex;gap:10px}
 .row input{flex:1}
 
-/* native select styling */
+/* selects fallback styling (native) */
 .field-wrapper select, .field-inline select {
-  width:100%; padding:12px 14px; margin:8px 0; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text); font-size:14px;
-  -webkit-appearance: none; -moz-appearance: none; appearance: none;
+  display:block;width:100%; padding:12px 14px; margin:8px 0; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text); font-size:14px;
 }
 
-/* small caret for native selects using background image */
-.field-wrapper select {
-  background-image: linear-gradient(45deg, transparent 50%, var(--text) 50%), linear-gradient(135deg, var(--text) 50%, transparent 50%);
-  background-position: calc(100% - 18px) calc(1em + 2px), calc(100% - 13px) calc(1em + 2px);
-  background-size: 6px 6px, 6px 6px;
-  background-repeat: no-repeat;
-  padding-right:36px;
+/* custom select styling */
+.custom-select{position:relative;display:block;width:100%;margin:8px 0}
+.select-toggle{
+  width:100%;padding:12px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--muted);text-align:left;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
 }
+.select-toggle.placeholder{color:var(--muted)}
+.custom-select.open .select-toggle{box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+.select-options{
+  display:none;position:absolute;left:0;right:0;margin-top:8px;background:var(--card);border:1px solid rgba(255,255,255,0.03);border-radius:10px;padding:6px;z-index:9999;max-height:220px;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,0.6);
+}
+.custom-select.open .select-options{display:block}
+.select-options li{padding:10px 12px;border-radius:8px;color:var(--text);cursor:pointer}
+.select-options li:hover, .select-options li:focus{background:rgba(255,255,255,0.03);outline:none}
 
-/* buttons */
+/* actions and buttons */
+.actions-row{display:flex;gap:10px;margin-top:12px;align-items:center}
 .btn{padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:600}
-.btn.small{padding:6px 8px;font-size:13px;border-radius:8px}
 .btn.primary{background:var(--btn-primary-bg);color:#021018}
 .btn.ghost{background:transparent;border:1px solid var(--btn-ghost-border);color:var(--text)}
+.btn.small{padding:6px 8px;font-size:13px;border-radius:8px}
 
 /* summary */
 .summary-inline{display:flex;gap:16px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:13px}
@@ -65,10 +70,11 @@ body{
 .data-table th, .data-table td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,0.02);text-align:left}
 .data-table thead th{background:transparent;color:var(--muted);font-weight:600}
 
-/* footer */
-.footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+/* toast */
+#toast{position:fixed;right:20px;bottom:22px;background:linear-gradient(180deg, rgba(10,180,150,0.12), rgba(10,120,100,0.08));color:var(--text);padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 26px rgba(0,0,0,0.6);opacity:0;transform:translateY(10px);transition:opacity .18s ease, transform .18s ease;z-index:99999}
+#toast.show{opacity:1;transform:translateY(0)}
+
 .muted{color:var(--muted);display:block;margin-top:8px;font-size:13px}
-.actions-row{display:flex;gap:10px;margin-top:12px;align-items:center}
 
 /* responsive */
 @media(max-width:940px){
