@@ -53,8 +53,8 @@
             <input id="durasi" placeholder="Durasi (hari) – contoh 30" />
           </div>
 
-          <!-- Custom Buyer select -->
-          <label class="field-inline">
+          <!-- NOTE: buyer-select is NOT wrapped in a <label> anymore -->
+          <div class="field-inline">
             <div class="custom-select" id="buyer-select" data-placeholder="Tipe Buyer" role="application">
               <button type="button" class="select-toggle placeholder" aria-haspopup="listbox" aria-expanded="false">
                 <span class="label-text">Tipe Buyer</span>
@@ -66,7 +66,7 @@
               </ul>
               <input type="hidden" id="buyer-value" name="buyer" />
             </div>
-          </label>
+          </div>
 
           <input id="modal" type="number" placeholder="Modal (Rp)" />
           <input id="harga" type="number" placeholder="Harga Jual (Rp)" />
