@@ -31,14 +31,14 @@
           <input id="profile" placeholder="Profile & PIN (opsional)" />
 
           <div class="field-wrapper">
-  <label for="device-select" class="field-label">Device:</label>
-  <select id="device-select"> 
-    <option value="All">All</option> 
-    <option value="TV">TV</option>
-    <option value="HP">HP</option>
-    <option value="Laptop">Laptop</option>
-  </select>
-</div>
+            <label for="device-select" class="field-label">Device:</label>
+            <select id="device-select" name="device" aria-label="Pilih Device">
+              <option value="" disabled selected>Pilih Device</option>
+              <option value="TV">TV</option>
+              <option value="HP">HP</option>
+              <option value="Laptop">Laptop</option>
+            </select>
+          </div>
 
           <div class="row">
             <input id="tglBeli" type="date" placeholder="Tanggal Beli" />
@@ -85,29 +85,4 @@
             <thead>
               <tr>
                 <th>No</th><th>Nama</th><th>Produk</th><th>Tanggal</th><th>Durasi</th>
-                <th>Modal</th><th>Harga</th><th>Profit</th><th>Status</th><th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody">
-              <!-- rows injected by JS -->
-            </tbody>
-          </table>
-        </div>
-
-        <div class="table-actions">
-          <button id="exportBtn" class="btn ghost">Export CSV</button>
-        </div>
-      </section>
-    </main>
-
-    <footer class="footer">
-      © <span id="year"></span> SAISOKU.ID · Dashboard UI by SIVA
-    </footer>
-  </div>
-
-  <!-- Toast -->
-  <div id="toast" role="status" aria-live="polite"></div>
-
-  <script src="script.js" defer></script>
-</body>
-</html>
+                <th>Modal</th><th>Harga</th><th>Profit</th><th>Status</th><th>D
