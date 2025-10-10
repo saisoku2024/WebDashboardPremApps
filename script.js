@@ -227,9 +227,7 @@
   }
 
   // small derived values example (keperluan UI)
-  function updateDerived() {
-    // placeholder: can compute derived values here (we keep minimal)
-  }
+  function updateDerived() {}
 
   // --- micro interactions: ripple effect for .ripple buttons ---
   function attachRipple() {
