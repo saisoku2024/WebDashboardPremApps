@@ -35,6 +35,21 @@ body{
 .row{display:flex;gap:10px}
 .row input{flex:1}
 
+/* native select styling */
+.field-wrapper select, .field-inline select {
+  width:100%; padding:12px 14px; margin:8px 0; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text); font-size:14px;
+  -webkit-appearance: none; -moz-appearance: none; appearance: none;
+}
+
+/* small caret for native selects using background image */
+.field-wrapper select {
+  background-image: linear-gradient(45deg, transparent 50%, var(--text) 50%), linear-gradient(135deg, var(--text) 50%, transparent 50%);
+  background-position: calc(100% - 18px) calc(1em + 2px), calc(100% - 13px) calc(1em + 2px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right:36px;
+}
+
 /* buttons */
 .btn{padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:600}
 .btn.small{padding:6px 8px;font-size:13px;border-radius:8px}
@@ -49,11 +64,6 @@ body{
 .data-table{width:100%;border-collapse:collapse;font-size:13px}
 .data-table th, .data-table td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,0.02);text-align:left}
 .data-table thead th{background:transparent;color:var(--muted);font-weight:600}
-
-/* custom select styles (basic for native select) */
-.field-wrapper select {
-  width:100%; padding:12px 14px; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text);
-}
 
 /* footer */
 .footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
