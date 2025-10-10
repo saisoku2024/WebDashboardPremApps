@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Web Dashboard Premium Apps – SAISOKU.ID</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-</head>
 
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
 <body>
   <div class="wrap">
     <header class="header">
@@ -16,63 +18,95 @@
     </header>
 
     <main class="grid">
-      <!-- Input Data -->
-      <div class="card">
+      <!-- LEFT: Form -->
+      <section class="card form-card">
         <h2 class="card-title">Tambah Data</h2>
+
         <div class="fields">
-          <input id="nama" placeholder="Nama Pembeli">
-          <input id="wa" placeholder="No WhatsApp">
-          <input id="katalog" placeholder="Katalog (Netflix / Viu / Prime)">
-          <input id="akun" placeholder="Akun">
-          <input id="password" placeholder="Password">
-          <select id="device">
-            <option value="" disabled selected>Device</option>
-            <option>TV</option><option>HP</option><option>Laptop</option><option>All</option>
-          </select>
-          <input type="date" id="tglBeli">
-          <input id="durasi" placeholder="Durasi (Hari)">
-          <select id="statusBuyer">
-            <option value="Reguler">Reguler</option>
-            <option value="Reseller">Reseller</option>
-          </select>
-          <input id="modal" placeholder="Modal (Rp)">
-          <input id="harga" placeholder="Harga Jual (Rp)">
+          <input id="nama" placeholder="Nama" />
+          <input id="wa" placeholder="No WhatsApp" />
+          <input id="katalog" placeholder="Katalog / Produk (mis. Netflix)" />
+          <input id="akun" placeholder="Akun (mis. email)" />
+          <input id="password" placeholder="Password (opsional)" />
+          <input id="profile" placeholder="Profile & PIN (opsional)" />
+
+          <label class="field-inline">
+            <select id="device">
+              <option value="All">Device: All</option>
+              <option value="TV">TV</option>
+              <option value="HP">HP</option>
+              <option value="Laptop">Laptop</option>
+            </select>
+          </label>
+
+          <div class="row">
+            <input id="tglBeli" type="date" placeholder="Tanggal Beli" />
+            <input id="durasi" placeholder="Durasi (hari) – contoh 30" />
+          </div>
+
+          <label class="field-inline">
+            <select id="statusBuyer">
+              <option value="Reguler">Reguler</option>
+              <option value="Reseller">Reseller</option>
+            </select>
+          </label>
+
+          <input id="modal" type="number" placeholder="Modal (Rp)" />
+          <input id="harga" type="number" placeholder="Harga Jual (Rp)" />
+
+          <div class="actions-row">
+            <button id="addBtn" class="btn primary">Tambah</button>
+            <button id="resetBtnForm" class="btn ghost" type="button">Reset</button>
+          </div>
+
+          <small class="muted">Setelah <strong>Tambah</strong> berhasil, form akan otomatis dikosongkan.</small>
         </div>
-        <button id="addBtn" class="btn">Tambah</button>
-      </div>
+      </section>
 
-      <!-- Data Table -->
-      <div class="card">
+      <!-- RIGHT: Table -->
+      <section class="card table-card">
         <h2 class="card-title">Data Penjualan</h2>
-        <select id="filterProduk" class="filter">
-          <option value="">Semua Produk</option>
-          <option value="Netflix">Netflix</option>
-          <option value="Viu">Viu</option>
-          <option value="Prime">Prime Video</option>
-        </select>
 
-        <table>
-          <thead>
-            <tr>
-              <th>No</th><th>Nama</th><th>Produk</th><th>Tanggal</th>
-              <th>Durasi</th><th>Modal</th><th>Harga</th><th>Profit</th><th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
+        <div class="toolbar">
+          <select id="filterProduk">
+            <option value="">Semua Produk</option>
+            <!-- opt populate via script if you want -->
+          </select>
+          <div class="summary-inline">
+            <span>Total Modal: <strong id="totalModal">Rp 0</strong></span>
+            <span>Total Profit: <strong id="totalProfit">Rp 0</strong></span>
+            <span>Total Customer: <strong id="totalCust">0</strong></span>
+          </div>
+        </div>
 
-        <div class="summary">
-          <p>Total Modal: <span id="totalModal">Rp 0</span></p>
-          <p>Total Profit: <span id="totalProfit">Rp 0</span></p>
-          <p>Total Customer: <span id="totalCust">0</span></p>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>No</th><th>Nama</th><th>Produk</th><th>Tanggal</th><th>Durasi</th>
+                <th>Modal</th><th>Harga</th><th>Profit</th><th>Status</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- rows injected by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-actions">
           <button id="exportBtn" class="btn ghost">Export CSV</button>
         </div>
-      </div>
+      </section>
     </main>
 
-    <footer class="footer">© <span id="year"></span> SAISOKU.ID · by SIVA</footer>
+    <footer class="footer">
+      © <span id="year"></span> SAISOKU.ID · Dashboard UI by SIVA
+    </footer>
   </div>
 
-  <script src="script.js"></script>
+  <!-- Toast -->
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script src="script.js" defer></script>
 </body>
 </html>
