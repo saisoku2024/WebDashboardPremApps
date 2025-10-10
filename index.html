@@ -30,20 +30,20 @@
           <input id="password" placeholder="Password (opsional)" />
           <input id="profile" placeholder="Profile & PIN (opsional)" />
 
-          <!-- Device custom dropdown -->
-          <div class="field-wrapper">
-            <label class="field-label" for="device-value">Device:</label>
-            <div class="custom-select" id="device-select" data-placeholder="Device Type" role="application">
-              <button type="button" class="select-toggle placeholder" aria-haspopup="listbox" aria-expanded="false">Device Type</button>
-              <ul class="select-options" role="listbox" aria-label="Pilih Device">
-                <li role="option" data-value="TV" tabindex="0">All</li>
-                <li role="option" data-value="TV" tabindex="0">TV</li>
-                <li role="option" data-value="HP" tabindex="0">HP</li>
-                <li role="option" data-value="Laptop" tabindex="0">Laptop</li>
-              </ul>
-              <input type="hidden" id="device-value" name="device" value="">
-            </div>
-          </div>
+          <!-- Device custom dropdown (pakai ini menggantikan device-select lama) -->
+<div class="field-wrapper">
+  <label class="field-label" for="device-value">Device:</label>
+  <div class="custom-select" id="device-select" data-placeholder="Device Type" role="application">
+    <button type="button" class="select-toggle placeholder" aria-haspopup="listbox" aria-expanded="false">Device Type</button>
+    <ul class="select-options" role="listbox" aria-label="Pilih Device">
+      <li role="option" data-value="All" tabindex="0">All</li>
+      <li role="option" data-value="TV" tabindex="0">TV</li>
+      <li role="option" data-value="HP" tabindex="0">HP</li>
+      <li role="option" data-value="Laptop" tabindex="0">Laptop</li>
+    </ul>
+    <input type="hidden" id="device-value" name="device" value="">
+  </div>
+</div>
 
           <div class="row">
             <input id="tglBeli" type="date" />
