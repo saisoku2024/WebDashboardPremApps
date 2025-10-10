@@ -1,79 +1,162 @@
-// script-debug.js - wrapped with error capture & init logs
-(function () {
-  try {
-    console.info('[script-debug] loading script.js');
-    const SELECT_IDS = ['device-select', 'buyer-select'];
-    const selects = [];
+// --- custom dropdown helper ---
+function setupCustomSelect(containerId) {
+  const wrap = document.getElementById(containerId);
+  if (!wrap) return;
+  const toggle = wrap.querySelector('.select-toggle');
+  const list = wrap.querySelector('.select-options');
+  const hidden = wrap.querySelector('input[type="hidden"]');
+  const placeholder = wrap.dataset.placeholder || 'Pilih';
 
-    function escapeHtml(t=''){ return String(t).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
+  // init placeholder
+  toggle.textContent = placeholder;
 
-    function setupCustomSelect(containerId) {
-      const wrap = document.getElementById(containerId);
-      if (!wrap) { console.warn('[setupCustomSelect] not found', containerId); return null; }
-      const toggle = wrap.querySelector('.select-toggle');
-      const list = wrap.querySelector('.select-options');
-      let hidden = wrap.querySelector('input[type="hidden"]');
-      const placeholder = wrap.dataset.placeholder || 'Pilih';
+  // toggle dropdown
+  toggle.addEventListener('click', (e) => {
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    if (expanded) close();
+    else open();
+    e.stopPropagation();
+  });
 
-      if (!hidden) {
-        hidden = document.createElement('input'); hidden.type='hidden';
-        hidden.id = (containerId + '-value').replace(/[^a-z0-9\-]/gi,'');
-        hidden.name = hidden.id; wrap.appendChild(hidden);
-        console.info(`[setupCustomSelect] created hidden input for ${containerId} -> #${hidden.id}`);
+  // option click
+  list.querySelectorAll('li[role="option"]').forEach(li => {
+    li.addEventListener('click', (ev) => {
+      const v = li.dataset.value || li.textContent.trim();
+      hidden.value = v;
+      toggle.textContent = li.textContent.trim();
+      close();
+    });
+  });
+
+  // open / close functions
+  function open() {
+    list.hidden = false;
+    toggle.setAttribute('aria-expanded', 'true');
+    // optional: focus first item
+    const first = list.querySelector('li[role="option"]');
+    if (first) first.focus();
+  }
+  function close() {
+    list.hidden = true;
+    toggle.setAttribute('aria-expanded', 'false');
+  }
+
+  // close on outside click
+  document.addEventListener('click', (ev) => {
+    if (!wrap.contains(ev.target)) close();
+  });
+
+  // close on Esc
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') close();
+  });
+
+  // allow keyboard selection (Enter) when option focused
+  list.querySelectorAll('li[role="option"]').forEach(li => {
+    li.tabIndex = 0;
+    li.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter' || ev.key === ' ') {
+        li.click();
       }
-      if (!toggle || !list) { console.warn('[setupCustomSelect] missing subelements in', containerId); return null; }
+    });
+  });
+}
 
-      toggle.textContent = placeholder; toggle.classList.add('placeholder'); toggle.setAttribute('aria-expanded','false');
-      const options = Array.from(list.querySelectorAll('li[role="option"]'));
-      options.forEach(li => { if(!li.hasAttribute('tabindex')) li.setAttribute('tabindex','0'); });
+// Initialize selects
+document.addEventListener('DOMContentLoaded', () => {
+  setupCustomSelect('device-select');
+  setupCustomSelect('buyer-select');
 
-      toggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        selects.forEach(s=>{ if(s.wrap !== wrap) s.wrap.classList.remove('open'); });
-        wrap.classList.toggle('open');
-        toggle.setAttribute('aria-expanded', wrap.classList.contains('open') ? 'true' : 'false');
-      });
+  // basic form add
+  const addBtn = document.getElementById('addBtn');
+  addBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    const nama = document.getElementById('nama').value.trim();
+    const produk = document.getElementById('katalog').value.trim();
+    const tanggal = document.getElementById('tglBeli').value;
+    const durasi = document.getElementById('durasi').value;
+    const modal = document.getElementById('modal').value || 0;
+    const harga = document.getElementById('harga').value || 0;
+    const device = document.getElementById('device-value').value || '-';
+    const buyer = document.getElementById('buyer-value').value || '-';
 
-      options.forEach(li=>{
-        li.addEventListener('click', (ev)=> {
-          ev.stopPropagation();
-          const value = li.dataset.value || li.textContent.trim();
-          hidden.value = value;
-          toggle.textContent = li.textContent.trim();
-          toggle.classList.remove('placeholder');
-          wrap.classList.remove('open');
-          toggle.setAttribute('aria-expanded','false');
-          console.log(`[select] ${containerId} =>`, value);
-        });
-        li.addEventListener('keydown', ev => { if(ev.key==='Enter' || ev.key===' ') { ev.preventDefault(); li.click(); }});
-      });
-
-      return { id:containerId, wrap, toggle, list, hidden, options };
+    if (!nama || !produk) {
+      alert('Nama dan Katalog wajib diisi.');
+      return;
     }
 
-    function attachGlobalCloseHandler() {
-      document.addEventListener('click', (e)=> {
-        selects.forEach(s=>{
-          if(!s.wrap.contains(e.target)) {
-            s.wrap.classList.remove('open'); s.toggle.setAttribute('aria-expanded','false');
-            if(!s.hidden.value){ s.toggle.textContent = s.wrap.dataset.placeholder || 'Pilih'; s.toggle.classList.add('placeholder'); }
-          }
-        });
-      }, {capture:true});
-      document.addEventListener('keydown', ev => { if(ev.key==='Escape') selects.forEach(s=>{ s.wrap.classList.remove('open'); s.toggle.setAttribute('aria-expanded','false'); }); });
-    }
+    // append row
+    const tbody = document.getElementById('tableBody');
+    const row = document.createElement('tr');
+    const profit = Number(harga) - Number(modal);
+    row.innerHTML = `
+      <td>${tbody.children.length + 1}</td>
+      <td>${escapeHtml(nama)}</td>
+      <td>${escapeHtml(produk)}</td>
+      <td>${tanggal || '-'}</td>
+      <td>${durasi || '-'}</td>
+      <td>Rp ${Number(modal).toLocaleString()}</td>
+      <td>Rp ${Number(harga).toLocaleString()}</td>
+      <td>Rp ${Number(profit).toLocaleString()}</td>
+      <td>${escapeHtml(buyer)}</td>
+      <td>${escapeHtml(device)}</td>
+      <td><button class="btn small remove-row">Hapus</button></td>
+    `;
+    tbody.appendChild(row);
 
-    document.addEventListener('DOMContentLoaded', () => {
-      try {
-        SELECT_IDS.forEach(id => { const s = setupCustomSelect(id); if(s) selects.push(s); });
-        attachGlobalCloseHandler();
-        console.info('[script-debug] custom selects initialized:', selects.map(s=>s.id));
-      } catch(innerErr) { console.error('[script-debug] init inner error', innerErr); }
-      // minimal rest of form code (kept intentionally short; copy your original add/reset/export code here)
-      // ... (you can paste original add/reset/export functions here)
+    // attach remove handler
+    row.querySelector('.remove-row').addEventListener('click', () => {
+      row.remove();
+      refreshRowNumbers();
     });
 
-  } catch (err) {
-    console.error('[script-debug] top-level error', err);
+    // reset form
+    resetForm();
+  });
+
+  document.getElementById('resetBtnForm').addEventListener('click', (e) => {
+    e.preventDefault();
+    resetForm();
+  });
+
+  // small helpers
+  function resetForm() {
+    const fields = ['nama','wa','katalog','akun','password','profile','tglBeli','durasi','modal','harga'];
+    fields.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    // reset custom selects to placeholder
+    const deviceWrap = document.getElementById('device-select');
+    const buyerWrap = document.getElementById('buyer-select');
+    if (deviceWrap) {
+      deviceWrap.querySelector('input[type="hidden"]').value = '';
+      deviceWrap.querySelector('.select-toggle').textContent = deviceWrap.dataset.placeholder || 'Device Type';
+    }
+    if (buyerWrap) {
+      buyerWrap.querySelector('input[type="hidden"]').value = '';
+      buyerWrap.querySelector('.select-toggle').textContent = buyerWrap.dataset.placeholder || 'Tipe Buyer';
+    }
   }
-})();
+
+  function refreshRowNumbers(){
+    const rows = document.querySelectorAll('#tableBody tr');
+    rows.forEach((r,i) => {
+      r.children[0].textContent = i+1;
+    });
+  }
+
+  // escape html to avoid injection
+  function escapeHtml(text) {
+    return text
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'",'&#039;');
+  }
+
+  // set year footer
+  const y = new Date().getFullYear();
+  document.getElementById('year').textContent = y;
+});
