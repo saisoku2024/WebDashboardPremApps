@@ -1,74 +1,48 @@
-/* style.css — SAISOKU Dashboard (compact + neon theme + toast + responsive) */
-:root{
-  --bg:#070814; --panel:#0e1022; --panel2:#12142b; --text:#dbf7ff;
-  --muted:#8aaec1; --neon:#66fff1; --pink:#ff5edb; --accent:#00ffd5;
-  --ring:#65ffe9; --border: rgba(102,255,241,.18);
-  --glass: rgba(255,255,255,0.03);
+/* custom select small styles (paste to style.css) */
+.custom-select {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  max-width: 320px;
+  margin-top: 6px;
 }
 
-*{box-sizing:border-box}
-html,body{height:100%; margin:0; font-family:Poppins,Inter,system-ui,Arial,sans-serif; background:
-  radial-gradient(60% 60% at 20% 0%, #0f1830 0%, transparent 60%),
-  var(--bg); color:var(--text); -webkit-font-smoothing:antialiased}
-
-/* layout */
-.wrap{max-width:1200px;margin:28px auto;padding:18px}
-.header{ text-align:center; margin-bottom:18px }
-.brand .logo{ font-family:Orbitron,Poppins; font-size:28px; font-weight:700;
-  background:linear-gradient(90deg,var(--neon),var(--pink));
-  -webkit-background-clip:text;background-clip:text;color:transparent; text-shadow:0 4px 30px rgba(102,255,241,.06) }
-.tag{color:var(--muted); font-size:13px; margin-top:6px}
-
-/* grid */
-main.grid{display:grid; grid-template-columns: 420px 1fr; gap:18px; align-items:start}
-.card{background: linear-gradient(180deg, rgba(18,20,43,.88), rgba(14,16,34,.88));
-  border-radius:14px; border:1px solid var(--border); padding:16px; box-shadow:0 12px 30px rgba(0,0,0,.5)}
-.card-title{font-family:Orbitron,Poppins; font-weight:700; margin:0 0 12px; color:var(--neon); text-shadow:0 0 8px rgba(102,255,241,.06)}
-
-/* form */
-.fields{display:flex;flex-direction:column;gap:10px}
-.fields input, .fields select, .fields textarea{
-  background:var(--panel); color:var(--text); border:1px solid rgba(255,255,255,.04);
-  padding:12px 14px; border-radius:10px; outline:none;
+.custom-select .select-toggle {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(0,0,0,0.15);
+  color: #e6f7ff;
+  cursor: pointer;
+  font-family: inherit;
 }
-.fields input:focus, .fields select:focus{ box-shadow:0 0 0 8px rgba(102,255,241,.04); border-color:var(--ring) }
 
-/* row */
-.row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-.actions-row{display:flex; gap:10px; align-items:center}
-.muted{font-size:12px;color:var(--muted)}
+.custom-select .select-options {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: #071022;
+  border: 1px solid rgba(255,255,255,0.06);
+  margin-top: 6px;
+  border-radius: 8px;
+  list-style: none;
+  padding: 6px 4px;
+  z-index: 50;
+  max-height: 180px;
+  overflow-y: auto;
+}
 
-/* buttons */
-.btn{cursor:pointer; border:none; padding:10px 14px; border-radius:10px; font-weight:700}
-.btn.primary{background:linear-gradient(90deg,var(--neon),var(--accent)); color:#001214; box-shadow:0 8px 30px rgba(0,255,213,.08)}
-.btn.ghost{background:transparent; color:var(--text); border:1px solid rgba(255,255,255,.04)}
-.btn.small{padding:6px 8px; font-size:13px}
+.custom-select .select-options li {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  color: #cfefff;
+}
 
-/* table */
-.table-wrap{overflow:auto; max-height:520px}
-.data-table{width:100%; border-collapse:collapse; font-size:13px}
-.data-table thead th{ position:sticky; top:0; background:rgba(8,10,20,.6); padding:8px; text-align:left; color:var(--muted)}
-.data-table tbody td{padding:10px 8px; border-top:1px dashed rgba(255,255,255,.03); vertical-align:middle}
-.data-table tbody tr td:first-child{width:34px}
-.status-active{color:#00ffb2; font-weight:700}
-.status-expired{color:#ff7b7b; font-weight:700}
-
-/* toolbar & summary */
-.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:12px}
-.summary-inline span{display:inline-block;margin-left:12px;color:var(--muted);font-size:13px}
-
-/* footer */
-.footer{text-align:center;color:var(--muted);margin-top:18px;font-size:13px}
-
-/* toast */
-#toast{position:fixed; right:18px; bottom:18px; z-index:9999; min-width:220px; max-width:420px;
-  padding:12px 14px; border-radius:10px; font-weight:700; color:#002; background:linear-gradient(90deg,#bfffe7,#c3fff7);
-  box-shadow:0 12px 40px rgba(0,0,0,.6); opacity:0; transform:translateY(6px); transition:all .18s ease}
-#toast.ok{ background: linear-gradient(90deg,var(--neon),var(--accent)); color:#001214 }
-#toast.err{ background: linear-gradient(90deg,#ff9b9b,#ffbdbd); color:#200 }
-
-/* responsive */
-@media (max-width: 980px) {
-  main.grid{grid-template-columns: 1fr; padding-bottom:40px}
-  .table-wrap{max-height:360px}
+.custom-select .select-options li:hover,
+.custom-select .select-options li:focus {
+  background: rgba(255,255,255,0.03);
+  outline: none;
 }
