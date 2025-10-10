@@ -30,16 +30,22 @@
           <input id="password" placeholder="Password (opsional)" />
           <input id="profile" placeholder="Profile & PIN (opsional)" />
 
-          <!-- Native Device select -->
+          <!-- Custom Device select -->
           <div class="field-wrapper">
-            <label for="device-select" class="field-label">Device:</label>
-            <select id="device-select" name="device" aria-label="Pilih Device">
-              <option value="" disabled selected>Device Type</option>
-              <option value="All">All</option>
-              <option value="TV">TV</option>
-              <option value="HP">HP</option>
-              <option value="Laptop">Laptop</option>
-            </select>
+            <label class="field-label">Device:</label>
+            <div class="custom-select" id="device-select" data-placeholder="Device Type" role="application">
+              <button type="button" class="select-toggle placeholder" aria-haspopup="listbox" aria-expanded="false">
+                <span class="label-text">Device Type</span>
+                <svg class="caret" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <ul class="select-options" role="listbox" aria-label="Pilih Device">
+                <li role="option" data-value="All" tabindex="0">All</li>
+                <li role="option" data-value="TV" tabindex="0">TV</li>
+                <li role="option" data-value="HP" tabindex="0">HP</li>
+                <li role="option" data-value="Laptop" tabindex="0">Laptop</li>
+              </ul>
+              <input type="hidden" id="device-value" name="device" />
+            </div>
           </div>
 
           <div class="row">
@@ -47,20 +53,26 @@
             <input id="durasi" placeholder="Durasi (hari) – contoh 30" />
           </div>
 
-          <!-- Native Buyer select -->
+          <!-- Custom Buyer select -->
           <label class="field-inline">
-            <select id="statusBuyer" aria-label="Tipe Buyer">
-              <option value="" disabled selected>Tipe Buyer</option>
-              <option value="Reguler">Reguler</option>
-              <option value="Reseller">Reseller</option>
-            </select>
+            <div class="custom-select" id="buyer-select" data-placeholder="Tipe Buyer" role="application">
+              <button type="button" class="select-toggle placeholder" aria-haspopup="listbox" aria-expanded="false">
+                <span class="label-text">Tipe Buyer</span>
+                <svg class="caret" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <ul class="select-options" role="listbox" aria-label="Pilih Tipe Buyer">
+                <li role="option" data-value="Reguler" tabindex="0">Reguler</li>
+                <li role="option" data-value="Reseller" tabindex="0">Reseller</li>
+              </ul>
+              <input type="hidden" id="buyer-value" name="buyer" />
+            </div>
           </label>
 
           <input id="modal" type="number" placeholder="Modal (Rp)" />
           <input id="harga" type="number" placeholder="Harga Jual (Rp)" />
 
           <div class="actions-row">
-            <button id="addBtn" class="btn primary">Tambah</button>
+            <button id="addBtn" class="btn primary ripple">Tambah</button>
             <button id="resetBtnForm" class="btn ghost" type="button">Reset</button>
           </div>
 
