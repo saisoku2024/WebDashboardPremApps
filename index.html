@@ -1,30 +1,9 @@
-<!doctype html>
-<html lang="id">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SAISOKU.ID — Dashboard Prem App</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<header class="top">
-<h1>SAISOKU.ID — Dashboard Prem App</h1>
-<p class="subtitle">Kelola akun & transaksi premium — cepat, rapi, siap di-deploy ke GitHub Pages</p>
-</header>
+// FILE: index.html
 
 
-<main class="container">
-<section class="form-card">
-<form id="entryForm">
-<div class="row">
-<label>Nama Pembeli <input id="buyerName" required></label>
-<label>No WA <input id="buyerWA" inputmode="numeric" placeholder="628..." required></label>
-</div>
-
-
-<div class="row">
-<label>Katalog
-<select id="catalog">
+<div class="field">
+<select id="catalog" class="select">
+<option value="">Pilih Produk</option>
 <option>Netflix</option>
 <option>Viu Premium</option>
 <option>Prime Video</option>
@@ -33,27 +12,81 @@
 <option>Youtube Premium</option>
 <option>BeIN Connect</option>
 </select>
-</label>
-
-
-<label>Durasi (hari)
-<input id="duration" type="number" min="1" value="30">
-</label>
 </div>
 
 
-<div class="row">
-<label>Akun <input id="account" required></label>
-<label>Password <input id="password"></label>
+<div class="field"><input id="account" placeholder="Akun (mis. email)"></div>
+<div class="field"><input id="password" placeholder="Password (opsional)"></div>
+<div class="field"><input id="profilePin" placeholder="Profile & PIN (opsional)"></div>
+
+
+<div class="two">
+<div class="field"><select id="device"><option>Device Type</option><option>HP</option><option>Smart TV</option><option>Laptop</option><option>Tablet</option><option>All</option></select></div>
+<div class="field"><select id="buyerType"><option>Tipe Buyer</option><option>Reguler</option><option>Reseller</option></select></div>
 </div>
 
 
-<div class="row">
-<label>Profile & PIN <input id="profilePin"></label>
-<label>Device / Tipe Buyer
-<input list="devices" id="device" placeholder="Ketik untuk cari...">
-<datalist id="devices">
-<option value="HP">
-<option value="Smart TV">
-<option value="Laptop">
+<div class="two">
+<div class="field date-wrapper"><input id="dateBuy" type="date"><div class="date-hint">mm/dd/yyyy</div></div>
+<div class="field"><input id="duration" type="number" min="1" placeholder="Durasi (hari)" value="30"></div>
+</div>
+
+
+<div class="field"><input id="modal" inputmode="numeric" placeholder="Modal (Rp)"></div>
+<div class="field"><input id="payment" inputmode="numeric" placeholder="Harga Jual (Rp)"></div>
+
+
+<div class="actions">
+<button type="submit" class="btn primary">Tambah</button>
+<button type="button" id="resetBtn" class="btn ghost">Reset</button>
+<button type="button" id="exportCsv" class="btn secondary">Export CSV</button>
+</div>
+</form>
+</aside>
+
+
+<section class="panel table-panel">
+<div class="panel-top">
+<div class="filters">
+<select id="filterProduct"><option value="">Semua Produk</option><option>Netflix</option><option>Viu Premium</option><option>Prime Video</option></select>
+</div>
+<div class="summary">
+<div>Total Modal <div class="num" id="sumModal">Rp 0</div></div>
+<div>Total Profit <div class="num" id="sumProfit">Rp 0</div></div>
+<div>Total Customer <div class="num" id="sumCust">0</div></div>
+</div>
+</div>
+
+
+<h2 class="sr-only">Data Penjualan</h2>
+<div class="table-wrap">
+<table id="entriesTable" class="entries">
+<thead>
+<tr>
+<th>No</th>
+<th>Nama</th>
+<th>Produk</th>
+<th>Tanggal</th>
+<th>Durasi</th>
+<th>Modal</th>
+<th>Harga</th>
+<th>Profit</th>
+<th>Tipe Buyer</th>
+<th>Device</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+</section>
+</main>
+
+
+<div id="toast" class="toast" aria-live="polite"></div>
+<footer class="footer">Made with ♥ — SAISOKU.ID</footer>
+
+
+<script src="script.js"></script>
+</body>
 </html>
