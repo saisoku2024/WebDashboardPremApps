@@ -1,38 +1,30 @@
-:root{
---bg: #0f1724;
---card: #0b1220;
---muted: #9aa4b2;
---accent: #ef4444; /* merah Saisoku */
---accent-2: #111827;
---glass: rgba(255,255,255,0.04);
-}
-*{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
-body{margin:0;background:linear-gradient(180deg,#071024 0%, #08122a 100%);color:#e6eef8;min-height:100vh}
-.top{padding:18px 24px;border-bottom:1px solid rgba(255,255,255,0.03)}
-.top h1{margin:0;font-size:20px}
-.subtitle{margin:4px 0 0;color:var(--muted)}
-.container{display:grid;grid-template-columns:360px 1fr;gap:18px;padding:18px}
-.form-card, .table-card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
-.form-card label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
-.row{display:flex;gap:10px;margin-bottom:12px}
-.row input, .row select{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:var(--glass);color:inherit}
-.actions{display:flex;gap:8px;align-items:center}
-.btn{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
-.btn.primary{background:var(--accent);color:white}
-.btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+// FILE: style.css
+.top{padding:18px 28px;border-bottom:1px solid rgba(255,255,255,0.03)}
+.brand h1{margin:0;font-size:18px}
+.brand .sub{color:var(--muted);font-size:13px;margin-top:6px}
+.wrap{display:grid;grid-template-columns:360px 1fr;gap:20px;padding:20px}
+.panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.02)}
+.form-panel h2{margin:0 0 12px 0;font-size:16px}
+.field{margin-bottom:12px}
+.field input, .field select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--white);outline:none;font-size:14px}
+.select{background:rgba(255,255,255,0.02)}
+.two{display:flex;gap:10px}
+.date-wrapper{position:relative}
+.date-hint{position:absolute;right:12px;top:10px;color:var(--muted);font-size:12px}
+.actions{display:flex;gap:10px;margin-top:6px}
+.btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+.btn.primary{background:var(--accent);color:#032024}
+.btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
 .btn.ghost{background:transparent;color:var(--muted);border:1px dashed rgba(255,255,255,0.03)}
-.table-card h2{margin-top:0}
+.table-panel .panel-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.filters select{padding:8px 10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted)}
+.summary{display:flex;gap:14px;color:var(--muted);font-size:13px}
+.summary .num{color:var(--white);font-weight:700;margin-top:6px}
+.table-wrap{overflow:auto;max-height:64vh}
 table{width:100%;border-collapse:collapse;font-size:13px}
-thead th{color:var(--muted);text-align:left;padding:8px;border-bottom:1px solid rgba(255,255,255,0.03)}
-tbody td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.02)}
-.stats{margin-bottom:8px;color:var(--muted);font-size:13px}
-.toast{position:fixed;right:20px;bottom:20px;background:#0b1220;padding:12px 16px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.6);display:none}
-.footer{text-align:center;padding:12px;color:var(--muted);opacity:0.9}
-.date-buttons{display:flex;gap:6px}
-.date-buttons button{padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--muted);cursor:pointer}
-.table-actions{display:flex;gap:6px}
-.copy-btn{padding:6px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--muted);cursor:pointer}
-
-
-/* responsive */
-@media(max-width:980px){.container{grid-template-columns:1fr;padding:12px}}
+thead th{position:sticky;top:0;background:transparent;padding:10px;text-align:left;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.03)}
+tbody td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.02);color:var(--white)}
+.table-panel h2{margin-top:0}
+.toast{position:fixed;right:20px;bottom:20px;background:#071022;padding:12px 16px;border-radius:10px;display:none;color:var(--white);box-shadow:0 8px 22px rgba(0,0,0,0.6)}
+.footer{text-align:center;padding:14px;color:var(--muted);opacity:0.9}
+@media(max-width:980px){.wrap{grid-template-columns:1fr}.filters{margin-bottom:8px}}
