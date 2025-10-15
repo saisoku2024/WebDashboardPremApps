@@ -1,121 +1,371 @@
-<!DOCTYPE html>
+<!-- Project: Refund Calculator (Neon Purple)
+Files: index.html, style.css, app.js  -->
+
+<!-- ======================= index.html ======================= -->
+<!doctype html>
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Web Dashboard Premium Apps – SAISOKU.ID</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Refund Calculator • SAISOKU.ID</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="wrap">
-    <header class="header">
-      <h1 class="brand"><span class="logo">Web Dashboard Premium Apps</span></h1>
-      <p class="tag">Connected to Google Sheets · SAISOKU.ID</p>
+    <header>
+      <a class="brand" href="#" aria-label="Home">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>RUMUS REFUND</h1>
+          <small>Chessy Calculation System</small>
+        </div>
+      </a>
+      <span class="badge">● Neon Purple • v2</span>
     </header>
 
-    <main class="grid">
-      <!-- LEFT: Form -->
-      <section class="card form-card">
-        <h2 class="card-title">Tambah Data</h2>
+    <div class="grid">
+      <section class="panel">
+        <h2>Refund Calculator</h2>
+        <p class="lead">Hitung estimasi refund secara <em>pro‑rata</em> berdasarkan hari terpakai. Cocok untuk paket 7/15/30/90 hari. Dukungan biaya admin & pembulatan otomatis.</p>
 
-        <div class="fields">
-          <input id="nama" placeholder="Nama" />
-          <input id="wa" placeholder="No WhatsApp" />
-          <input id="katalog" placeholder="Katalog / Produk (mis. Netflix)" />
-          <input id="akun" placeholder="Akun (mis. email)" />
-          <input id="password" placeholder="Password (opsional)" />
-          <input id="profile" placeholder="Profile & PIN (opsional)" />
+        <div class="mini" style="margin:10px 0 6px">
+          <div class="chip">Tipografi: <b>Orbitron</b> + Space Grotesk</div>
+          <div class="chip">Glow: Fuchsia + Violet</div>
+          <div class="chip">Rounding: 1 / 100 / 1.000</div>
+        </div>
 
-          <!-- Device custom-select (no external label) -->
-          <div class="field-wrapper">
-            <div class="custom-select" id="device-select" data-placeholder="Device Type" role="application" aria-haspopup="listbox" aria-expanded="false">
-              <button type="button" class="select-toggle placeholder" aria-label="Device Type">
-                <span class="label-text">Device Type</span>
-                <svg class="caret" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <ul class="select-options" role="listbox" aria-label="Pilih Device">
-                <li role="option" data-value="All" tabindex="0">All</li>
-                <li role="option" data-value="TV" tabindex="0">TV</li>
-                <li role="option" data-value="HP" tabindex="0">HP</li>
-                <li role="option" data-value="Laptop" tabindex="0">Laptop</li>
-              </ul>
-              <input type="hidden" id="device-value" name="device" />
+        <div class="kv" style="margin-top:10px">
+          <div>Formula default</div>
+          <div><b>Refund = Max(0, (SisaHari / Durasi) × Harga − BiayaAdmin)</b></div>
+        </div>
+      </section>
+
+      <section class="panel glow">
+        <form id="calc">
+          <div class="row">
+            <div>
+              <label for="wa">Nomor WhatsApp</label>
+              <input id="wa" name="wa" placeholder="0812xxxxxxx" autocomplete="tel" inputmode="numeric">
+            </div>
+            <div>
+              <label for="produk">Nama Produk</label>
+              <input id="produk" name="produk" placeholder="Netflix / Viu / dsb" value="Netflix">
             </div>
           </div>
 
           <div class="row">
-            <input id="tglBeli" type="date" placeholder="Tanggal Beli" />
-            <input id="durasi" placeholder="Durasi (hari) – contoh 30" />
-          </div>
-
-          <!-- Buyer custom-select -->
-          <div class="field-inline">
-            <div class="custom-select" id="buyer-select" data-placeholder="Tipe Buyer" role="application" aria-haspopup="listbox" aria-expanded="false">
-              <button type="button" class="select-toggle placeholder" aria-label="Tipe Buyer">
-                <span class="label-text">Tipe Buyer</span>
-                <svg class="caret" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <ul class="select-options" role="listbox" aria-label="Pilih Tipe Buyer">
-                <li role="option" data-value="Reguler" tabindex="0">Reguler</li>
-                <li role="option" data-value="Reseller" tabindex="0">Reseller</li>
-              </ul>
-              <input type="hidden" id="buyer-value" name="buyer" />
+            <div>
+              <label for="email">Email Akun</label>
+              <input id="email" name="email" type="email" placeholder="nama@email.com">
+            </div>
+            <div>
+              <label for="harga">Harga (Rp)</label>
+              <input id="harga" name="harga" placeholder="33990" inputmode="numeric" required>
+              <div class="hint">Masukkan angka saja, tanpa titik/koma.</div>
             </div>
           </div>
 
-          <input id="modal" type="number" placeholder="Modal (Rp)" />
-          <input id="harga" type="number" placeholder="Harga Jual (Rp)" />
-
-          <div class="actions-row">
-            <button id="addBtn" class="btn primary ripple">Tambah</button>
-            <button id="resetBtnForm" class="btn ghost" type="button">Reset</button>
+          <div class="row">
+            <div>
+              <label for="mulai">Tanggal Mulai Langganan</label>
+              <input id="mulai" name="mulai" type="date" required>
+            </div>
+            <div>
+              <label for="kendala">Tanggal Kendala</label>
+              <input id="kendala" name="kendala" type="date" required>
+            </div>
           </div>
 
-          <small class="muted">Setelah <strong>Tambah</strong> berhasil, form akan otomatis dikosongkan.</small>
-        </div>
-      </section>
+          <div class="row">
+            <div>
+              <label for="durasi">Durasi Paket (hari)</label>
+              <select id="durasi" name="durasi">
+                <option value="7">7</option>
+                <option value="15">15</option>
+                <option value="30" selected>30</option>
+                <option value="31">31</option>
+                <option value="90">90</option>
+                <option value="custom">Custom…</option>
+              </select>
+            </div>
+            <div id="durasiCustomWrap" style="display:none">
+              <label for="durasiCustom">Durasi Custom</label>
+              <input id="durasiCustom" placeholder="Isi jumlah hari, mis. 45" inputmode="numeric">
+            </div>
+          </div>
 
-      <!-- RIGHT: Table -->
-      <section class="card table-card">
-        <h2 class="card-title">Data Penjualan</h2>
+          <div class="row">
+            <div>
+              <label for="admin">Biaya Admin (Rp)</label>
+              <input id="admin" placeholder="0" inputmode="numeric" value="0">
+            </div>
+            <div>
+              <label for="round">Pembulatan</label>
+              <select id="round">
+                <option value="1">Ke 1 Rupiah (Tanpa pembulatan)</option>
+                <option value="100">Ke 100 Rupiah</option>
+                <option value="1000" selected>Ke 1.000 Rupiah</option>
+              </select>
+            </div>
+          </div>
 
-        <div class="toolbar">
-          <select id="filterProduk">
-            <option value="">Semua Produk</option>
-          </select>
-          <div class="summary-inline">
-            <span>Total Modal: <strong id="totalModal">Rp 0</strong></span>
-            <span>Total Profit: <strong id="totalProfit">Rp 0</strong></span>
-            <span>Total Customer: <strong id="totalCust">0</strong></span>
+          <div class="actions">
+            <button class="btn" type="submit">Hitung Refund</button>
+            <button class="btn ghost" type="button" id="resetBtn">Reset</button>
+          </div>
+        </form>
+
+        <div id="out" class="result" style="display:none; margin-top:14px">
+          <h3>Hasil Perhitungan</h3>
+          <div class="kv"><div>Hari Terpakai</div><div id="used"><b>-</b></div></div>
+          <div class="kv"><div>Sisa Hari</div><div id="left"><b>-</b></div></div>
+          <div class="kv"><div>Estimasi Refund</div><div id="refund"><b>-</b></div></div>
+          <div class="kv"><div>Rincian</div><div id="detail">-</div></div>
+          <div class="actions">
+            <button class="btn" id="copyBtn" type="button">Salin Rincian</button>
+            <button class="btn ghost" id="waBtn" type="button">Kirim ke WhatsApp</button>
           </div>
         </div>
-
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>No</th><th>Nama</th><th>Produk</th><th>Tanggal</th><th>Durasi</th>
-                <th>Modal</th><th>Harga</th><th>Profit</th><th>Tipe Buyer</th><th>Device</th><th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-          </table>
-        </div>
-
-        <div class="table-actions">
-          <button id="exportBtn" class="btn ghost">Export CSV</button>
-        </div>
       </section>
-    </main>
+    </div>
 
-    <footer class="footer">
-      © <span id="year"></span> SAISOKU.ID · Dashboard UI by SIVA
+    <footer>
+      © <span id="y"></span> SAISOKU.ID • Estimator non‑binding. Nilai akhir mengikuti kebijakan toko/platform.
     </footer>
   </div>
 
-  <div id="toast" role="status" aria-live="polite"></div>
   <script src="script.js" defer></script>
 </body>
 </html>
+
+
+/* ======================= style.css ======================= */
+:root{
+  --font-display: "Orbitron", system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-body: "Space Grotesk", Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  /* Neon Purple Theme */
+  --bg: #06060d;
+  --surface: #0c0b18;
+  --surface-2: #0f0e1f;
+  --text: #EAE6FF;
+  --muted: #B9B4D9;
+  --primary: #d946ef;  /* fuchsia */
+  --primary-2: #a855f7; /* violet */
+  --accent: #22d3ee;   /* cyan */
+  --ok: #34d399;       /* green */
+  --warn: #f59e0b;     /* amber */
+  --danger: #f43f5e;   /* rose */
+  --radius: 18px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:var(--font-body); color:var(--text);
+  background:
+    radial-gradient(70rem 70rem at -20% 120%, rgba(168,85,247,.12), transparent 45%),
+    radial-gradient(60rem 60rem at 120% -10%, rgba(217,70,239,.16), transparent 50%),
+    linear-gradient(180deg, #0b0a15 0%, #05040b 70%);
+}
+
+.wrap{max-width:980px; margin:0 auto; padding:28px 18px 64px}
+
+header{display:flex; justify-content:space-between; align-items:center; gap:16px; padding-bottom:20px; border-bottom:1px solid rgba(217,70,239,.25)}
+.brand{display:flex; align-items:center; gap:14px; text-decoration:none; color:var(--text)}
+.logo{width:46px;height:46px;border-radius:14px;background: conic-gradient(from 180deg, var(--primary), var(--primary-2), var(--accent), var(--primary)); box-shadow: 0 0 40px rgba(217,70,239,.35), inset 0 0 18px rgba(255,255,255,.12)}
+.brand h1{font-family:var(--font-display); margin:0; font-size:20px; letter-spacing:1.6px; text-transform:uppercase}
+.brand small{display:block; color:var(--muted); margin-top:2px; font-size:12px; letter-spacing:2px; text-transform:uppercase}
+
+.badge{display:inline-flex; align-items:center; gap:10px; padding:8px 12px; border-radius:999px; background:linear-gradient(180deg, rgba(217,70,239,.16), rgba(168,85,247,.12)); border:1px solid rgba(217,70,239,.28); color:var(--text); text-transform:uppercase; font-size:12px; letter-spacing:1px}
+
+.grid{display:grid; grid-template-columns:1.1fr .9fr; gap:28px; align-items:start; margin-top:24px}
+
+.panel{background: linear-gradient(180deg, rgba(17, 12, 34, .75), rgba(10, 8, 22, .92)); border:1px solid rgba(217,70,239,.25); border-radius: var(--radius); padding: 18px; box-shadow: 0 30px 100px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.04) inset}
+.panel.glow{box-shadow: 0 0 0 1px rgba(255,255,255,.05) inset, 0 0 60px rgba(217,70,239,.25), 0 30px 100px rgba(0,0,0,.5)}
+
+h2{font-family:var(--font-display); font-size: clamp(26px, 4vw, 42px); margin:0 0 4px; letter-spacing:1.2px; text-transform:uppercase}
+.lead{color:var(--muted); margin:0 0 16px}
+
+form{display:grid; gap:14px}
+.row{display:grid; gap:14px; grid-template-columns:1fr 1fr}
+label{font-size:12px; color:var(--muted); letter-spacing:1px; text-transform:uppercase}
+input, select, textarea{width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(217,70,239,.22); background: rgba(13,10,26,.85); color: var(--text); outline:none; transition: box-shadow .2s ease, border-color .2s ease}
+input::placeholder{color:#978fbd}
+input:focus, select:focus, textarea:focus{box-shadow: 0 0 0 2px rgba(217,70,239,.25), 0 0 0 7px rgba(168,85,247,.08); border-color: rgba(217,70,239,.45)}
+
+.hint{font-size:12px; color:var(--muted)}
+
+.actions{display:flex; gap:12px; align-items:center; margin-top:6px}
+.btn{appearance:none; border:none; cursor:pointer; padding:12px 16px; border-radius:12px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:#0b0616; background:linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow: 0 14px 30px rgba(168,85,247,.38), inset 0 -10px 18px rgba(0,0,0,.18); transition: transform .06s ease, filter .2s ease}
+.btn:hover{filter: brightness(1.05)}
+.btn:active{transform: translateY(1px)}
+.btn.ghost{background:transparent; border:1px solid rgba(217,70,239,.35); color:var(--text)}
+
+.result{display:grid; gap:10px}
+.result h3{font-family:var(--font-display); margin:6px 0 0; letter-spacing:1px; text-transform:uppercase}
+.kv{display:grid; grid-template-columns:1.2fr 1fr; gap:8px; padding:10px 12px; border-radius:12px; background:linear-gradient(180deg, rgba(25,18,48,.55), rgba(15,10,32,.6)); border:1px dashed rgba(217,70,239,.35)}
+.kv b{color:#fff}
+
+.mini{display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px}
+.mini .chip{padding:8px 10px; border-radius:10px; font-size:12px; color:var(--text); background:rgba(217,70,239,.12); border:1px solid rgba(217,70,239,.28)}
+
+footer{margin-top:42px; padding-top:18px; border-top:1px solid rgba(217,70,239,.22); color:var(--muted); font-size:12px}
+
+@media (max-width: 920px){ .grid{grid-template-columns:1fr} .row{grid-template-columns:1fr} }
+
+
+/* ======================= script.js ======================= */
+const el = sel => document.querySelector(sel);
+const nf = new Intl.NumberFormat('id-ID');
+
+function parseIntSafe(v){
+  if(!v) return 0; return parseInt(String(v).replace(/[^0-9]/g,''), 10) || 0;
+}
+
+function roundTo(num, step){
+  if(step <= 1) return Math.round(num);
+  return Math.round(num / step) * step;
+}
+
+function daysBetween(a,b){
+  // Inclusive usage: 1 hari jika mulai==kendala
+  const d1 = new Date(a + 'T00:00:00');
+  const d2 = new Date(b + 'T00:00:00');
+  const ms = d2 - d1; // may be negative
+  const diff = Math.floor(ms / (1000*60*60*24));
+  return diff + 1; // inclusive
+}
+
+function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+
+// Elements
+const form = el('#calc');
+const out = el('#out');
+const usedEl = el('#used');
+const leftEl = el('#left');
+const refundEl = el('#refund');
+const detailEl = el('#detail');
+
+const durasi = el('#durasi');
+const durasiCustomWrap = el('#durasiCustomWrap');
+const durasiCustom = el('#durasiCustom');
+
+durasi.addEventListener('change', () => {
+  durasiCustomWrap.style.display = durasi.value === 'custom' ? 'block' : 'none';
+});
+
+el('#resetBtn').addEventListener('click', ()=>{
+  form.reset(); out.style.display='none'; localStorage.removeItem('refundCalc');
+});
+
+// Persist simple values
+const persistKeys = ['wa','produk','email','harga','mulai','kendala','admin'];
+persistKeys.forEach(k=>{
+  const node = el('#'+k);
+  if(node){ node.addEventListener('input', saveLocal); }
+});
+
+function saveLocal(){
+  const data = Object.fromEntries(persistKeys.map(k=>[k, el('#'+k)?.value || '']));
+  data.durasi = durasi.value; data.durasiCustom = durasiCustom.value; data.round = el('#round').value;
+  localStorage.setItem('refundCalc', JSON.stringify(data));
+}
+
+(function loadLocal(){
+  try{
+    const data = JSON.parse(localStorage.getItem('refundCalc') || '{}');
+    Object.keys(data).forEach(k=>{ const node = el('#'+k); if(node) node.value = data[k]; });
+    if(durasi.value==='custom') durasiCustomWrap.style.display='block';
+  }catch(_){}
+})();
+
+form.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const price = parseIntSafe(el('#harga').value);
+  const start = el('#mulai').value; const issue = el('#kendala').value;
+  const roundStep = parseIntSafe(el('#round').value) || 1;
+  const admin = parseIntSafe(el('#admin').value);
+
+  // duration
+  let duration = durasi.value === 'custom' ? parseIntSafe(durasiCustom.value) : parseIntSafe(durasi.value);
+  if(!duration || duration<1){ alert('Masukkan durasi paket yang valid.'); return; }
+  if(!start || !issue){ alert('Tanggal mulai & tanggal kendala wajib diisi.'); return; }
+
+  const used = daysBetween(start, issue);
+  if(used <= 0){ alert('Tanggal kendala harus sama atau setelah tanggal mulai.'); return; }
+
+  const usedClamped = clamp(used, 0, duration);
+  const left = Math.max(0, duration - usedClamped);
+
+  const refundable = Math.max(0, (left / duration) * price - admin);
+  const refundableRounded = Math.max(0, roundTo(refundable, roundStep));
+
+  // Output
+  usedEl.innerHTML = `<b>${usedClamped} hari</b>`;
+  leftEl.innerHTML = `<b>${left} hari</b>`;
+  refundEl.innerHTML = `<b>Rp ${nf.format(refundableRounded)}</b>`;
+
+  const detail = [
+    `Harga: Rp ${nf.format(price)}`,
+    `Durasi Paket: ${duration} hari`,
+    `Dipakai: ${usedClamped} hari`,
+    `Sisa: ${left} hari (${Math.round((left/duration)*100)}%)`,
+    `Biaya Admin: Rp ${nf.format(admin)}`,
+    `Rounding: ${nf.format(roundStep)}`
+  ].join(' • ');
+  detailEl.textContent = detail;
+
+  out.style.display = 'grid';
+  saveLocal();
+});
+
+// Copy & WhatsApp share
+el('#copyBtn').addEventListener('click', ()=>{
+  const txt = `RUMUS REFUND — ${new Date().toLocaleString('id-ID')}
+`+
+    `Produk: ${el('#produk').value}
+`+
+    `Harga: Rp ${nf.format(parseIntSafe(el('#harga').value))}
+`+
+    `Mulai: ${el('#mulai').value} | Kendala: ${el('#kendala').value}
+`+
+    `Durasi: ${(durasi.value==='custom'? durasiCustom.value: durasi.value)} hari
+`+
+    detailEl.textContent.replace(/ • /g, '
+')+`
+
+`+
+    `Estimasi Refund: ${refundEl.textContent}`;
+  navigator.clipboard.writeText(txt).then(()=>{ alert('Rincian disalin.'); });
+});
+
+el('#waBtn').addEventListener('click', ()=>{
+  const phoneRaw = el('#wa').value.trim();
+  const phone = parseIntSafe(phoneRaw) ? '62'+ String(phoneRaw).replace(/^0+/, '') : '';
+  const message = encodeURIComponent(
+    `Halo Admin, saya ingin konfirmasi estimasi refund.
+
+`+
+    `Produk: ${el('#produk').value}
+`+
+    `Email: ${el('#email').value}
+`+
+    `Harga: Rp ${nf.format(parseIntSafe(el('#harga').value))}
+`+
+    `Mulai: ${el('#mulai').value} | Kendala: ${el('#kendala').value}
+`+
+    `Durasi: ${(durasi.value==='custom'? durasiCustom.value: durasi.value)} hari
+`+
+    `Hasil: ${refundEl.textContent}
+`+
+    `Rincian: ${detailEl.textContent}`
+  );
+  const url = phone ? `https://wa.me/${phone}?text=${message}` : `https://wa.me/?text=${message}`;
+  window.open(url, '_blank');
+});
+
+// Year footer
+el('#y').textContent = new Date().getFullYear();
