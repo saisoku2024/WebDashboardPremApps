@@ -1,20 +1,19 @@
-<!-- ======================= index.html ======================= -->
 <!doctype html>
 <html lang="id">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Refund Calculator • SAISOKU.ID</title>
+  <title>RUMUS REFUND • SAISOKU.ID</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=1.1" />
 </head>
 <body>
   <div class="wrap">
     <header>
-      <a class="brand" href="#" aria-label="Home">
-        <div class="logo" aria-hidden="true"></div>
+      <a class="brand" href="#">
+        <div class="logo"></div>
         <div>
           <h1>RUMUS REFUND</h1>
           <small>Chessy Calculation System</small>
@@ -26,18 +25,8 @@
     <div class="grid">
       <section class="panel">
         <h2>Refund Calculator</h2>
-        <p class="lead">Hitung estimasi refund secara <em>pro‑rata</em> berdasarkan hari terpakai. Cocok untuk paket 7/15/30/90 hari. Dukungan biaya admin & pembulatan otomatis.</p>
-
-        <div class="mini" style="margin:10px 0 6px">
-          <div class="chip">Tipografi: <b>Orbitron</b> + Space Grotesk</div>
-          <div class="chip">Glow: Fuchsia + Violet</div>
-          <div class="chip">Rounding: 1 / 100 / 1.000</div>
-        </div>
-
-        <div class="kv" style="margin-top:10px">
-          <div>Formula default</div>
-          <div><b>Refund = Max(0, (SisaHari / Durasi) × Harga − BiayaAdmin)</b></div>
-        </div>
+        <p class="lead">Hitung estimasi refund <em>pro-rata</em>. Dukungan biaya admin & pembulatan.</p>
+        <div class="kv" style="margin-top:10px"><div>Formula</div><div><b>Max(0, (SisaHari/Durasi) × Harga − BiayaAdmin)</b></div></div>
       </section>
 
       <section class="panel glow">
@@ -45,41 +34,49 @@
           <div class="row">
             <div>
               <label for="wa">Nomor WhatsApp</label>
-              <input id="wa" name="wa" placeholder="0812xxxxxxx" autocomplete="tel" inputmode="numeric">
+              <input id="wa" placeholder="0812xxxxxxx" inputmode="numeric" autocomplete="tel">
             </div>
             <div>
-              <label for="produk">Nama Produk</label>
-              <input id="produk" name="produk" placeholder="Netflix / Viu / dsb" value="Netflix">
+              <label for="produk">Produk (preset) — ketik untuk cari</label>
+              <input id="produk" list="productList" placeholder="Tulis atau pilih" value="Netflix">
+              <datalist id="productList">
+                <option value="Netflix"></option>
+                <option value="Viu Premium"></option>
+                <option value="YouTube Premium"></option>
+                <option value="Spotify Premium"></option>
+                <option value="Prime Video"></option>
+                <option value="beIN CONNECT"></option>
+              </datalist>
             </div>
           </div>
 
           <div class="row">
             <div>
               <label for="email">Email Akun</label>
-              <input id="email" name="email" type="email" placeholder="nama@email.com">
+              <input id="email" type="email" placeholder="nama@email.com">
             </div>
             <div>
               <label for="harga">Harga (Rp)</label>
-              <input id="harga" name="harga" placeholder="33990" inputmode="numeric" required>
-              <div class="hint">Masukkan angka saja, tanpa titik/koma.</div>
+              <input id="harga" placeholder="33990" inputmode="numeric" required>
+              <div class="hint">Ketik angka saja; otomatis diformat Rupiah.</div>
             </div>
           </div>
 
           <div class="row">
             <div>
-              <label for="mulai">Tanggal Mulai Langganan</label>
-              <input id="mulai" name="mulai" type="date" required>
+              <label for="mulai">Tanggal Mulai</label>
+              <input id="mulai" type="date" required>
             </div>
             <div>
               <label for="kendala">Tanggal Kendala</label>
-              <input id="kendala" name="kendala" type="date" required>
+              <input id="kendala" type="date" required>
             </div>
           </div>
 
           <div class="row">
             <div>
               <label for="durasi">Durasi Paket (hari)</label>
-              <select id="durasi" name="durasi">
+              <select id="durasi">
                 <option value="7">7</option>
                 <option value="15">15</option>
                 <option value="30" selected>30</option>
@@ -90,7 +87,7 @@
             </div>
             <div id="durasiCustomWrap" style="display:none">
               <label for="durasiCustom">Durasi Custom</label>
-              <input id="durasiCustom" placeholder="Isi jumlah hari, mis. 45" inputmode="numeric">
+              <input id="durasiCustom" placeholder="mis. 45" inputmode="numeric">
             </div>
           </div>
 
@@ -102,7 +99,7 @@
             <div>
               <label for="round">Pembulatan</label>
               <select id="round">
-                <option value="1">Ke 1 Rupiah (Tanpa pembulatan)</option>
+                <option value="1">Ke 1 Rupiah</option>
                 <option value="100">Ke 100 Rupiah</option>
                 <option value="1000" selected>Ke 1.000 Rupiah</option>
               </select>
@@ -129,12 +126,9 @@
       </section>
     </div>
 
-    <footer>
-      © <span id="y"></span> SAISOKU.ID • Estimator non‑binding. Nilai akhir mengikuti kebijakan toko/platform.
-    </footer>
+    <footer>© <span id="y"></span> SAISOKU.ID • Estimator non-binding.</footer>
   </div>
 
-  <script src="script.js" defer></script>
+  <script src="script.js?v=1.1" defer></script>
 </body>
 </html>
-
