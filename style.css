@@ -1,43 +1,53 @@
-==================== style.css ====================
 :root{
---font-display: "Orbitron", system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
---font-body: "Space Grotesk", Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
---bg:#06060d; --surface:#0c0b18; --text:#EAE6FF; --muted:#B9B4D9;
---primary:#d946ef; --primary-2:#a855f7; --accent:#22d3ee; --radius:18px;
+  --font-display:"Orbitron",system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  --font-body:"Space Grotesk",Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  --bg:#06060d; --surface:#0c0b18; --text:#EAE6FF; --muted:#B9B4D9;
+  --primary:#d946ef; --primary-2:#a855f7; --accent:#22d3ee; --radius:18px;
 }
 *{box-sizing:border-box} html,body{height:100%}
-body{margin:0;font-family:var(--font-body);color:var(--text);background:
-radial-gradient(70rem 70rem at -20% 120%, rgba(168,85,247,.12), transparent 45%),
-radial-gradient(60rem 60rem at 120% -10%, rgba(217,70,239,.16), transparent 50%),
-linear-gradient(180deg, #0b0a15 0%, #05040b 70%);}
+body{
+  margin:0;font-family:var(--font-body);color:var(--text);
+  background:radial-gradient(70rem 70rem at -20% 120%, rgba(168,85,247,.12), transparent 45%),
+             radial-gradient(60rem 60rem at 120% -10%, rgba(217,70,239,.16), transparent 50%),
+             linear-gradient(180deg,#0b0a15 0%,#05040b 70%);
+}
 .wrap{max-width:980px;margin:0 auto;padding:28px 18px 64px}
 header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-bottom:20px;border-bottom:1px solid rgba(217,70,239,.25)}
 .brand{display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--text)}
-.logo{width:46px;height:46px;border-radius:14px;background:conic-gradient(from 180deg,var(--primary),var(--primary-2),var(--accent),var(--primary));box-shadow:0 0 40px rgba(217,70,239,.35), inset 0 0 18px rgba(255,255,255,.12)}
+.logo{width:46px;height:46px;border-radius:14px;background:conic-gradient(from 180deg,var(--primary),var(--primary-2),var(--accent),var(--primary));
+  box-shadow:0 0 40px rgba(217,70,239,.35), inset 0 0 18px rgba(255,255,255,.12)}
 .brand h1{font-family:var(--font-display);margin:0;font-size:20px;letter-spacing:1.6px;text-transform:uppercase}
 .brand small{display:block;color:var(--muted);margin-top:2px;font-size:12px;letter-spacing:2px;text-transform:uppercase}
 .badge{display:inline-flex;align-items:center;gap:10px;padding:8px 12px;border-radius:999px;background:linear-gradient(180deg,rgba(217,70,239,.16),rgba(168,85,247,.12));border:1px solid rgba(217,70,239,.28);font-size:12px}
+
 .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:start;margin-top:24px}
-.panel{background:linear-gradient(180deg,rgba(17,12,34,.75),rgba(10,8,22,.92));border:1px solid rgba(217,70,239,.25);border-radius:var(--radius);padding:18px;box-shadow:0 30px 100px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.04) inset}
+.panel{background:linear-gradient(180deg,rgba(17,12,34,.75),rgba(10,8,22,.92));border:1px solid rgba(217,70,239,.25);
+  border-radius:var(--radius);padding:18px;box-shadow:0 30px 100px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.04) inset}
 .panel.glow{box-shadow:0 0 0 1px rgba(255,255,255,.05) inset,0 0 60px rgba(217,70,239,.25),0 30px 100px rgba(0,0,0,.5)}
 h2{font-family:var(--font-display);font-size:clamp(26px,4vw,42px);margin:0 0 4px;letter-spacing:1.2px;text-transform:uppercase}
 .lead{color:var(--muted);margin:0 0 16px}
+
 form{display:grid;gap:14px}
 .row{display:grid;gap:14px;grid-template-columns:1fr 1fr}
 label{font-size:12px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
-input,select,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(217,70,239,.22);background:rgba(13,10,26,.85);color:var(--text);outline:none;transition:box-shadow .2s,border-color .2s}
+input,select,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(217,70,239,.22);
+  background:rgba(13,10,26,.85);color:var(--text);outline:none;transition:box-shadow .2s,border-color .2s}
 input::placeholder{color:#978fbd}
 input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px rgba(217,70,239,.25),0 0 0 7px rgba(168,85,247,.08);border-color:rgba(217,70,239,.45)}
 .hint{font-size:12px;color:var(--muted)}
+
 .actions{display:flex;gap:12px;align-items:center;margin-top:6px}
-.btn{appearance:none;border:none;cursor:pointer;padding:12px 16px;border-radius:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#0b0616;background:linear-gradient(135deg,var(--primary),var(--primary-2));box-shadow:0 14px 30px rgba(168,85,247,.38), inset 0 -10px 18px rgba(0,0,0,.18);transition:transform .06s,filter .2s}
+.btn{appearance:none;border:none;cursor:pointer;padding:12px 16px;border-radius:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;
+  color:#0b0616;background:linear-gradient(135deg,var(--primary),var(--primary-2));
+  box-shadow:0 14px 30px rgba(168,85,247,.38), inset 0 -10px 18px rgba(0,0,0,.18);transition:transform .06s,filter .2s}
 .btn:hover{filter:brightness(1.05)} .btn:active{transform:translateY(1px)}
 .btn.ghost{background:transparent;border:1px solid rgba(217,70,239,.35);color:var(--text)}
+
 .result{display:grid;gap:10px}
 .result h3{font-family:var(--font-display);margin:6px 0 0;letter-spacing:1px;text-transform:uppercase}
-.kv{display:grid;grid-template-columns:1.2fr 1fr;gap:8px;padding:10px 12px;border-radius:12px;background:linear-gradient(180deg,rgba(25,18,48,.55),rgba(15,10,32,.6));border:1px dashed rgba(217,70,239,.35)}
+.kv{display:grid;grid-template-columns:1.2fr 1fr;gap:8px;padding:10px 12px;border-radius:12px;
+  background:linear-gradient(180deg,rgba(25,18,48,.55),rgba(15,10,32,.6));border:1px dashed rgba(217,70,239,.35)}
 .kv b{color:#fff}
-.mini{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
-.mini .chip{padding:8px 10px;border-radius:10px;font-size:12px;color:var(--text);background:rgba(217,70,239,.12);border:1px solid rgba(217,70,239,.28)}
+
 footer{margin-top:42px;padding-top:18px;border-top:1px solid rgba(217,70,239,.22);color:var(--muted);font-size:12px}
 @media (max-width:920px){.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}}
