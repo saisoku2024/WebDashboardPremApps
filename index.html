@@ -1,128 +1,59 @@
 <!doctype html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RUMUS REFUND • SAISOKU.ID</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=1.2" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SAISOKU.ID — Dashboard Prem App</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <a class="brand" href="#">
-        <div class="logo"></div>
-        <div>
-          <h1>RUMUS REFUND</h1>
-          <small>Chessy Calculation System</small>
-        </div>
-      </a>
-      <span class="badge">● Neon Purple • v2</span>
-    </header>
+<header class="top">
+<h1>SAISOKU.ID — Dashboard Prem App</h1>
+<p class="subtitle">Kelola akun & transaksi premium — cepat, rapi, siap di-deploy ke GitHub Pages</p>
+</header>
 
-    <div class="grid">
-      <section class="panel">
-        <h2>Refund Calculator</h2>
-        <p class="lead">Hitung estimasi refund <em>pro-rata</em>. Dukungan biaya admin & pembulatan.</p>
-        <div class="kv" style="margin-top:10px">
-          <div>Formula</div>
-          <div><b>Max(0, (SisaHari/Durasi) × Harga − BiayaAdmin)</b></div>
-        </div>
-      </section>
 
-      <section class="panel glow">
-        <form id="calc">
-          <div class="row">
-            <div>
-              <label for="wa">Nomor WhatsApp</label>
-              <input id="wa" placeholder="0812xxxxxxx" inputmode="numeric" autocomplete="tel">
-            </div>
-            <div>
-              <label for="produk">Nama Produk</label>
-              <input id="produk" placeholder="Netflix / Viu / dsb" value="Netflix">
-            </div>
-          </div>
+<main class="container">
+<section class="form-card">
+<form id="entryForm">
+<div class="row">
+<label>Nama Pembeli <input id="buyerName" required></label>
+<label>No WA <input id="buyerWA" inputmode="numeric" placeholder="628..." required></label>
+</div>
 
-          <div class="row">
-            <div>
-              <label for="email">Email Akun</label>
-              <input id="email" type="email" placeholder="nama@email.com">
-            </div>
-            <div>
-              <label for="harga">Harga (Rp)</label>
-              <input id="harga" placeholder="33990" inputmode="numeric" required>
-              <div class="hint">Ketik angka saja; akan diformat Rupiah.</div>
-            </div>
-          </div>
 
-          <div class="row">
-            <div>
-              <label for="mulai">Tanggal Mulai</label>
-              <input id="mulai" type="date" required>
-            </div>
-            <div>
-              <label for="kendala">Tanggal Kendala</label>
-              <input id="kendala" type="date" required>
-            </div>
-          </div>
+<div class="row">
+<label>Katalog
+<select id="catalog">
+<option>Netflix</option>
+<option>Viu Premium</option>
+<option>Prime Video</option>
+<option>Disney+</option>
+<option>Spotify</option>
+<option>Youtube Premium</option>
+<option>BeIN Connect</option>
+</select>
+</label>
 
-          <div class="row">
-            <div>
-              <label for="durasi">Durasi Paket (hari)</label>
-              <select id="durasi">
-                <option value="7">7</option>
-                <option value="15">15</option>
-                <option value="30" selected>30</option>
-                <option value="31">31</option>
-                <option value="90">90</option>
-                <option value="custom">Custom…</option>
-              </select>
-            </div>
-            <div id="durasiCustomWrap" style="display:none">
-              <label for="durasiCustom">Durasi Custom</label>
-              <input id="durasiCustom" placeholder="mis. 45" inputmode="numeric">
-            </div>
-          </div>
 
-          <div class="row">
-            <div>
-              <label for="admin">Biaya Admin (Rp)</label>
-              <input id="admin" placeholder="0" inputmode="numeric" value="0">
-            </div>
-            <div>
-              <label for="round">Pembulatan</label>
-              <select id="round">
-                <option value="1">Ke 1 Rupiah</option>
-                <option value="100">Ke 100 Rupiah</option>
-                <option value="1000" selected>Ke 1.000 Rupiah</option>
-              </select>
-            </div>
-          </div>
+<label>Durasi (hari)
+<input id="duration" type="number" min="1" value="30">
+</label>
+</div>
 
-          <div class="actions">
-            <button class="btn" type="submit">Hitung Refund</button>
-            <button class="btn ghost" type="button" id="resetBtn">Reset</button>
-          </div>
-        </form>
 
-        <div id="out" class="result" style="display:none; margin-top:14px">
-          <h3>Hasil Perhitungan</h3>
-          <div class="kv"><div>Hari Terpakai</div><div id="used"><b>-</b></div></div>
-          <div class="kv"><div>Sisa Hari</div><div id="left"><b>-</b></div></div>
-          <div class="kv"><div>Estimasi Refund</div><div id="refund"><b>-</b></div></div>
-          <div class="kv"><div>Rincian</div><div id="detail">-</div></div>
-          <div class="actions">
-            <button class="btn" id="copyBtn" type="button">Salin Rincian</button>
-            <button class="btn ghost" id="waBtn" type="button">Kirim ke WhatsApp</button>
-          </div>
-        </div>
-      </section>
-    </div>
+<div class="row">
+<label>Akun <input id="account" required></label>
+<label>Password <input id="password"></label>
+</div>
 
-    <footer>© <span id="y"></span> SAISOKU.ID • Estimator non-binding.</footer>
-  </div>
-  <script src="script.js?v=1.2" defer></script>
-</body>
+
+<div class="row">
+<label>Profile & PIN <input id="profilePin"></label>
+<label>Device / Tipe Buyer
+<input list="devices" id="device" placeholder="Ketik untuk cari...">
+<datalist id="devices">
+<option value="HP">
+<option value="Smart TV">
+<option value="Laptop">
 </html>
