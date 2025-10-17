@@ -34,7 +34,17 @@ a{color:inherit;text-decoration:none}
 /* Form */
 .fields{display:flex;flex-direction:column;gap:12px}
 .field{display:flex;flex-direction:column;gap:6px}
-.field label{font-size:13px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+
+/* Label: gunakan block supaya tidak memaksa lebar input (menghindari overflow) */
+.field label{
+  display:block;
+  text-align:left;
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+
+/* Required mark */
 .req{color:#ff9b9b;font-weight:600;font-size:12px;margin-left:6px}
 
 /* Inputs full width and responsive shrink */
@@ -42,16 +52,40 @@ a{color:inherit;text-decoration:none}
 .field input[type="password"],
 .field input[type="date"],
 .field input[type="number"],
+.field input[type="tel"],
 .field select{
-  padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--white);outline:none;font-size:14px;transition:all .12s ease;width:100%;min-width:0;
+  padding:12px 14px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.04);
+  background:transparent;
+  color:var(--white);
+  outline:none;
+  font-size:14px;
+  transition:all .12s ease;
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
 }
 .field input::placeholder{color:rgba(255,255,255,0.28)}
 .field input:focus, .field select:focus{box-shadow:0 4px 14px rgba(6,182,212,0.06);border-color:rgba(6,182,212,0.16)}
 
 /* Row handling: allow shrink to avoid overflow */
 .row{display:flex;gap:10px;align-items:flex-start}
-.row .field{flex:1;min-width:0}
+.row .field{flex:1 1 0%;min-width:0;box-sizing:border-box}
 .row.two .field{min-width:0}
+
+/* Specific for date input (some browsers enforce min width) */
+input[type="date"]{
+  min-width:0 !important;
+  max-width:100%;
+  width:100%;
+}
+
+/* If there is right-side addon (icon), it should not force overflow */
+.field .addon{flex:0 0 auto}
+
+/* Slightly smaller inner padding for tight fit */
+.field input, .field select{padding:10px 12px}
 
 /* Buttons */
 .form-actions{display:flex;gap:10px;margin-top:6px;align-items:center}
