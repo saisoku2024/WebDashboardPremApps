@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SAISOKU.ID — Dashboard Premium Apps</title>
 
-  <!-- Styles (timpa file style.css dengan yang saya kirim sebelumnya) -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -38,6 +35,8 @@
 
           <div class="field">
             <label for="katalog">Katalog / Produk <span class="req">*</span></label>
+            <!-- native select (always present). If JS runs it will convert to custom-select,
+                 otherwise native select stays visible (dark styled by CSS below). -->
             <select id="katalog" name="katalog" aria-label="Katalog Produk">
               <option value="">Pilih Produk</option>
               <option value="Netflix">Netflix</option>
@@ -97,11 +96,11 @@
           <div class="row two">
             <div class="field">
               <label for="modal">Modal (Rp)</label>
-              <input id="modal" name="modal" type="number" inputmode="numeric" min="0" placeholder="mis. 25000" />
+              <input id="modal" name="modal" type="text" inputmode="numeric" placeholder="mis. 25000" />
             </div>
             <div class="field">
               <label for="harga">Harga Jual (Rp)</label>
-              <input id="harga" name="harga" type="number" inputmode="numeric" min="0" placeholder="mis. 33900" />
+              <input id="harga" name="harga" type="text" inputmode="numeric" placeholder="mis. 33900" />
             </div>
           </div>
 
@@ -121,16 +120,17 @@
           </div>
 
           <div class="controls">
-            <label class="filter-label">
-              <select id="filterProduk" name="filterProduk" aria-label="Filter Produk">
-                <option value="">Semua Produk</option>
-                <option value="Netflix">Netflix</option>
-                <option value="Viu">Viu</option>
-                <option value="Prime Video">Prime Video</option>
-                <option value="Disney+">Disney+</option>
-                <option value="WeTV">WeTV</option>
-              </select>
-            </label>
+            <select id="filterProduk" name="filterProduk" aria-label="Filter Produk">
+              <option value="">Semua Produk</option>
+              <option value="Netflix">Netflix</option>
+              <option value="Viu">Viu</option>
+              <option value="Prime Video">Prime Video</option>
+              <option value="Disney+">Disney+</option>
+              <option value="WeTV">WeTV</option>
+            </select>
+
+            <input id="searchInput" type="search" placeholder="Cari nama / WA..." aria-label="Cari transaksi" />
+
             <button id="exportBtn" class="btn small teal" type="button">Export Excel</button>
           </div>
         </div>
@@ -165,10 +165,7 @@
     <footer class="footer">© 2025 SAISOKU.ID · Flat Dark Dashboard by SIVA</footer>
   </div>
 
-  <!-- toast -->
   <div id="toast" class="toast" aria-live="polite"></div>
-
-  <!-- Script (timpa script.js dengan versi terakhir yang saya kirim) -->
   <script src="script.js"></script>
 </body>
 </html>
