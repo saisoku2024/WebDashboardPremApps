@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SAISOKU.ID — Dashboard Premium Apps</title>
 
+  <!-- Styles (timpa file style.css dengan yang saya kirim sebelumnya) -->
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap" rel="stylesheet">
 </head>
-
 <body>
   <div class="wrap">
     <header class="header">
@@ -22,75 +24,84 @@
       <!-- INPUT FORM -->
       <aside class="card input-form" aria-labelledby="input-title">
         <h2 id="input-title">Input Data Langganan</h2>
+
         <form id="entryForm" class="fields" autocomplete="off" novalidate>
           <div class="field">
             <label for="nama">Nama Pembeli <span class="req">*</span></label>
-            <input type="text" id="nama" placeholder="Nama lengkap" required>
+            <input id="nama" name="nama" type="text" placeholder="Nama lengkap" required />
           </div>
 
           <div class="field">
             <label for="wa">No. WhatsApp <span class="req">*</span></label>
-            <input type="text" id="wa" placeholder="08xxxxxxxxxx" inputmode="tel" required>
+            <input id="wa" name="wa" type="text" inputmode="tel" placeholder="08xxxxxxxxxx" required />
           </div>
 
           <div class="field">
             <label for="katalog">Katalog / Produk <span class="req">*</span></label>
-            <select id="katalog">
+            <select id="katalog" name="katalog" aria-label="Katalog Produk">
               <option value="">Pilih Produk</option>
-              <option>Netflix</option><option>Viu</option><option>Prime Video</option><option>Disney+</option><option>WeTV</option>
+              <option value="Netflix">Netflix</option>
+              <option value="Viu">Viu</option>
+              <option value="Prime Video">Prime Video</option>
+              <option value="Disney+">Disney+</option>
+              <option value="WeTV">WeTV</option>
             </select>
           </div>
 
           <div class="field">
             <label for="akun">Akun</label>
-            <input type="text" id="akun" placeholder="Email akun / username">
+            <input id="akun" name="akun" type="text" placeholder="Email akun / username" />
           </div>
 
           <div class="field">
             <label for="password">Password</label>
-            <input type="password" id="password" placeholder="Opsional">
+            <input id="password" name="password" type="password" placeholder="Opsional" />
           </div>
 
           <div class="field">
             <label for="profile">Profile & PIN</label>
-            <input type="text" id="profile" placeholder="mis. Profile 1 / PIN 1234">
+            <input id="profile" name="profile" type="text" placeholder="mis. Profile 1 / PIN 1234" />
           </div>
 
           <div class="field">
             <label for="device">Device</label>
-            <select id="device">
+            <select id="device" name="device" aria-label="Device">
               <option value="">Pilih Device</option>
-              <option>TV</option><option>HP</option><option>Laptop</option><option>All</option>
+              <option value="TV">TV</option>
+              <option value="HP">HP</option>
+              <option value="Laptop">Laptop</option>
+              <option value="All">All</option>
             </select>
           </div>
 
           <div class="row two">
             <div class="field">
               <label for="tglBeli">Tanggal Beli</label>
-              <input type="date" id="tglBeli">
+              <input id="tglBeli" name="tglBeli" type="date" />
             </div>
             <div class="field">
               <label for="durasi">Durasi</label>
-              <input type="text" id="durasi" placeholder="mis. 30 Hari">
+              <input id="durasi" name="durasi" type="text" placeholder="mis. 30 Hari" />
             </div>
           </div>
 
           <div class="field">
             <label for="statusBuyer">Status Buyer</label>
-            <select id="statusBuyer">
+            <select id="statusBuyer" name="statusBuyer" aria-label="Status Buyer">
               <option value="">Pilih Status</option>
-              <option>Reguler</option><option>Reseller</option>
+              <option value="Reguler">Reguler</option>
+              <option value="Reseller">Reseller</option>
             </select>
           </div>
 
           <div class="row two">
             <div class="field">
               <label for="modal">Modal (Rp)</label>
-              <input type="number" id="modal" placeholder="mis. 25000" inputmode="numeric" min="0">
+              <input id="modal" name="modal" type="number" inputmode="numeric" min="0" placeholder="mis. 25000" />
             </div>
             <div class="field">
               <label for="harga">Harga Jual (Rp)</label>
-              <input type="number" id="harga" placeholder="mis. 33900" inputmode="numeric" min="0">
+              <input id="harga" name="harga" type="number" inputmode="numeric" min="0" placeholder="mis. 33900" />
             </div>
           </div>
 
@@ -111,26 +122,35 @@
 
           <div class="controls">
             <label class="filter-label">
-              <select id="filterProduk" aria-label="Filter produk">
+              <select id="filterProduk" name="filterProduk" aria-label="Filter Produk">
                 <option value="">Semua Produk</option>
-                <option>Netflix</option><option>Viu</option><option>Prime Video</option><option>Disney+</option><option>WeTV</option>
+                <option value="Netflix">Netflix</option>
+                <option value="Viu">Viu</option>
+                <option value="Prime Video">Prime Video</option>
+                <option value="Disney+">Disney+</option>
+                <option value="WeTV">WeTV</option>
               </select>
             </label>
-            <button id="exportBtn" class="btn small teal">Export Excel</button>
+            <button id="exportBtn" class="btn small teal" type="button">Export Excel</button>
           </div>
         </div>
 
         <div class="table-wrap">
-          <table id="subsTable">
+          <table id="subsTable" role="table">
             <thead>
               <tr>
-                <th>Nama</th><th>Produk</th><th>Tanggal Beli</th><th>Durasi</th>
-                <th>Modal</th><th>Harga</th><th>Profit</th><th>Status</th><th>Aksi</th>
+                <th>Nama</th>
+                <th>Produk</th>
+                <th>Tanggal Beli</th>
+                <th>Durasi</th>
+                <th>Modal</th>
+                <th>Harga</th>
+                <th>Profit</th>
+                <th>Status</th>
+                <th>Aksi</th>
               </tr>
             </thead>
-            <tbody id="tableBody">
-              <!-- empty state handled by script -->
-            </tbody>
+            <tbody id="tableBody"></tbody>
           </table>
         </div>
 
@@ -148,6 +168,7 @@
   <!-- toast -->
   <div id="toast" class="toast" aria-live="polite"></div>
 
+  <!-- Script (timpa script.js dengan versi terakhir yang saya kirim) -->
   <script src="script.js"></script>
 </body>
 </html>
