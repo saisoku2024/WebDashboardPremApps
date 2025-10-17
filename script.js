@@ -8,19 +8,15 @@ document.addEventListener('DOMContentLoaded', function () {
   const form = $('entryForm');
   const namaEl = $('nama');
   const waEl = $('wa');
-  const katalogEl = $('katalog');
   const akunEl = $('akun');
   const passEl = $('password');
   const profileEl = $('profile');
-  const deviceEl = $('device');
   const tglEl = $('tglBeli');
   const durasiEl = $('durasi');
-  const statusEl = $('statusBuyer');
   const modalEl = $('modal');
   const hargaEl = $('harga');
   const addBtn = $('addBtn');
   const resetBtn = $('resetBtn');
-  const filterProduk = $('filterProduk');
   const exportBtn = $('exportBtn');
   const tableBody = $('tableBody');
   const totalModalEl = $('totalModal');
@@ -28,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const totalCustEl = $('totalCust');
   const toastEl = $('toast');
 
-  if (!namaEl || !waEl || !katalogEl || !tableBody) {
+  if (!namaEl || !waEl || !tableBody) {
     console.warn('Beberapa elemen DOM tidak ditemukan — script dihentikan sementara.');
     return;
   }
@@ -48,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let currentRenderList = [];
 
   // show temporary toast
-  function showToast(msg, ms = 1700) {
+  function showToast(msg, ms = 1600) {
     if (!toastEl) return;
     toastEl.textContent = msg;
     toastEl.style.display = 'block';
@@ -63,7 +59,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function render() {
     const all = load();
-    const filtro = filterProduk && filterProduk.value ? filterProduk.value : '';
+    const filterSel = document.getElementById('filterProduk');
+    const filtro = filterSel && filterSel.value ? filterSel.value : '';
     tableBody.innerHTML = '';
     currentRenderList = [];
 
@@ -120,20 +117,23 @@ document.addEventListener('DOMContentLoaded', function () {
       ev.preventDefault();
       const nama = namaEl.value.trim();
       const wa = waEl.value.trim();
-      const katalog = katalogEl.value;
+      const katalogSel = document.getElementById('katalog');
+      const deviceSel = document.getElementById('device');
+      const statusSel = document.getElementById('statusBuyer');
+      const katalog = katalogSel ? katalogSel.value : '';
+      const device = deviceSel ? deviceSel.value : '';
       const akun = akunEl ? akunEl.value.trim() : '';
       const password = passEl ? passEl.value : '';
       const profile = profileEl ? profileEl.value.trim() : '';
-      const device = deviceEl ? deviceEl.value : '';
       const tglBeli = (tglEl && tglEl.value) ? tglEl.value : isoToday();
       const durasi = durasiEl ? durasiEl.value.trim() : '';
-      const statusBuyer = statusEl ? statusEl.value : '';
+      const statusBuyer = statusSel ? statusSel.value : '';
       const modal = modalEl ? onlyDigits(modalEl.value) : '';
       const harga = hargaEl ? onlyDigits(hargaEl.value) : '';
 
       if (!nama) { namaEl.focus(); showToast('Nama harus diisi'); return; }
       if (!wa) { waEl.focus(); showToast('No. WhatsApp harus diisi'); return; }
-      if (!katalog) { katalogEl.focus(); showToast('Pilih produk'); return; }
+      if (!katalog) { showToast('Pilih produk'); return; }
 
       addBtn.disabled = true;
       addBtn.textContent = 'Menyimpan...';
@@ -188,4 +188,179 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // table actions (delegate)
-  tableBod
+  tableBody.addEventListener('click', function (e) {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const idx = Number(btn.dataset.idx);
+    const action = btn.dataset.action;
+    if (Number.isNaN(idx)) return;
+    const entry = currentRenderList[idx];
+    if (!entry) return;
+    const { row, originalIndex } = entry;
+
+    if (action === 'copy') {
+      const text = `Akun: ${row.akun || '-'}\nPassword: ${row.password || '-'}\nProfile/PIN: ${row.profile || '-'}\nDevice: ${row.device || '-'}`;
+      navigator.clipboard?.writeText(text).then(() => {
+        btn.textContent = '✓';
+        setTimeout(() => btn.textContent = 'Copy', 900);
+      }).catch(() => showToast('Gagal menyalin ke clipboard'));
+    } else if (action === 'delete') {
+      if (!confirm('Hapus transaksi ini?')) return;
+      const all = load();
+      all.splice(originalIndex, 1);
+      save(all);
+      render();
+      showToast('Transaksi dihapus');
+    }
+  });
+
+  // export CSV
+  if (exportBtn) {
+    exportBtn.addEventListener('click', function () {
+      const all = load();
+      if (!all.length) { showToast('Tidak ada data untuk diekspor'); return; }
+      const header = ['Nama','WA','Produk','Durasi','Akun','Password','Profile','Device','Pembayaran','Modal','Tanggal','Created'];
+      const rows = all.map(r => [r.nama, r.wa, r.katalog, r.durasi, r.akun, r.password, r.profile, r.device, r.harga, r.modal, r.tglBeli, r.created]);
+      const csv = [header, ...rows].map(r => r.map(c => `"${String(c || '').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'saisoku_subs.csv'; a.click();
+      URL.revokeObjectURL(url);
+      showToast('CSV diekspor');
+    });
+  }
+
+  // filter change
+  const filterSel = document.getElementById('filterProduk');
+  if (filterSel) filterSel.addEventListener('change', render);
+
+  /* ========== Robust Custom Select (replace native selects) ========== */
+  (function createCustomSelects(){
+    // convert all selects on page except those already converted
+    const selects = Array.from(document.querySelectorAll('select'));
+    selects.forEach(sel => {
+      // skip if already converted
+      if (sel.dataset.customized === '1') return;
+
+      // create wrapper
+      const wrapper = document.createElement('div');
+      wrapper.className = 'custom-select-wrapper';
+
+      // make original invisible but present (for forms)
+      sel.classList.add('custom-select-hidden');
+      sel.dataset.customized = '1';
+
+      // create visible control
+      const control = document.createElement('div');
+      control.className = 'custom-select';
+      const label = document.createElement('div');
+      label.className = 'label';
+      label.textContent = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : (sel.getAttribute('placeholder') || 'Pilih');
+      const caret = document.createElement('div');
+      caret.className = 'caret';
+      caret.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23e6eef8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+      control.appendChild(label);
+      control.appendChild(caret);
+
+      // create options container
+      const opts = document.createElement('div');
+      opts.className = 'custom-options';
+      opts.style.display = 'none';
+
+      // build options
+      Array.from(sel.options).forEach((o,i) => {
+        const item = document.createElement('div');
+        item.className = 'custom-option';
+        item.textContent = o.text;
+        item.dataset.index = i;
+        if (o.disabled) item.setAttribute('aria-disabled','true');
+        if (sel.selectedIndex === i) item.classList.add('active');
+        item.addEventListener('click', (ev) => {
+          if (o.disabled) return;
+          // update original select
+          sel.selectedIndex = i;
+          sel.dispatchEvent(new Event('change',{bubbles:true}));
+          // update UI label
+          label.textContent = o.text;
+          // mark active
+          opts.querySelectorAll('.custom-option').forEach(x=>x.classList.remove('active'));
+          item.classList.add('active');
+          // close
+          opts.style.display = 'none';
+          control.classList.remove('open');
+        });
+        opts.appendChild(item);
+      });
+
+      // attach toggle
+      control.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = control.classList.toggle('open');
+        opts.style.display = isOpen ? 'block' : 'none';
+        if (isOpen) {
+          // ensure the active option is visible
+          const active = opts.querySelector('.custom-option.active');
+          if (active) { active.scrollIntoView({ block: 'nearest' }); }
+        }
+      });
+
+      // close on outside click
+      document.addEventListener('click', (e) => {
+        if (!wrapper.contains(e.target)) {
+          opts.style.display = 'none';
+          control.classList.remove('open');
+        }
+      });
+
+      // keyboard navigation
+      control.tabIndex = 0;
+      control.addEventListener('keydown', (e) => {
+        const visible = opts.style.display === 'block';
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); control.click(); return; }
+        if (e.key === 'Escape') { opts.style.display='none'; control.classList.remove('open'); return; }
+        if (!visible && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+          control.click();
+          return;
+        }
+        if (visible && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+          e.preventDefault();
+          const items = Array.from(opts.querySelectorAll('.custom-option'));
+          if (!items.length) return;
+          const currentIndex = items.findIndex(it => it.classList.contains('active'));
+          let nextIndex = currentIndex;
+          if (e.key === 'ArrowDown') nextIndex = Math.min(items.length-1, currentIndex+1);
+          if (e.key === 'ArrowUp') nextIndex = Math.max(0, currentIndex-1);
+          if (currentIndex === -1) nextIndex = 0;
+          items.forEach(it=>it.classList.remove('active'));
+          items[nextIndex].classList.add('active');
+          items[nextIndex].scrollIntoView({ block: 'nearest' });
+        }
+        if (visible && e.key === 'Enter') {
+          const active = opts.querySelector('.custom-option.active');
+          if (active) active.click();
+        }
+      });
+
+      // when original select value changes (programmatically), update label
+      sel.addEventListener('change', () => {
+        const i = sel.selectedIndex;
+        if (i >= 0 && sel.options[i]) {
+          label.textContent = sel.options[i].text;
+          // update active classes
+          opts.querySelectorAll('.custom-option').forEach(x=>x.classList.remove('active'));
+          const item = opts.querySelector(`.custom-option[data-index="${i}"]`);
+          if (item) item.classList.add('active');
+        }
+      });
+
+      // assemble & insert
+      wrapper.appendChild(sel);
+      wrapper.appendChild(control);
+      wrapper.appendChild(opts);
+      sel.parentNode.insertBefore(wrapper, sel.nextSibling);
+    });
+  })();
+
+  // initial render
+  render();
+});
