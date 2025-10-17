@@ -4,7 +4,6 @@
   --card: #0b131b;
   --muted: #9fb0c6;
   --accent-cyan: #06b6d4;
-  --accent-cyan-2: #0ea5a0;
   --white: #e6eef8;
   --glass: rgba(255,255,255,0.03);
 }
@@ -29,7 +28,7 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,'Segoe 
 .table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .table-header .actions{display:flex;gap:8px;align-items:center}
 .table-view .actions select{padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted)}
-.table-wrap{overflow:auto}
+.table-wrap{overflow:auto;max-height:60vh}
 table{width:100%;border-collapse:collapse;font-size:13px}
 thead th{position:sticky;top:0;background:transparent;padding:10px;text-align:left;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.03)}
 tbody td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.02);color:var(--white)}
