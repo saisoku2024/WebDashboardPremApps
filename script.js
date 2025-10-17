@@ -4,7 +4,8 @@ const APPS_SCRIPT_URL = ''; // contoh: 'https://script.google.com/macros/s/XXX/e
 document.addEventListener('DOMContentLoaded', function () {
   const $ = id => document.getElementById(id);
 
-  const form = $('entryForm');           // <-- ambil form
+  // form & DOM
+  const form = $('entryForm');
   const namaEl = $('nama');
   const waEl = $('wa');
   const katalogEl = $('katalog');
@@ -32,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
     return;
   }
 
+  // utils
   const onlyDigits = s => String(s || '').replace(/[^0-9]/g, '');
   const formatRupiah = n => (Number(n) || 0).toLocaleString('id-ID');
   const isoToday = () => new Date().toISOString().slice(0, 10);
@@ -45,6 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   let currentRenderList = [];
 
+  // show temporary toast
   function showToast(msg, ms = 1700) {
     if (!toastEl) return;
     toastEl.textContent = msg;
@@ -106,16 +109,15 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
-    if (totalModalEl) totalModalEl.textContent = 'Rp ' + formatRupiah(sumModal);
-    if (totalProfitEl) totalProfitEl.textContent = 'Rp ' + formatRupiah(sumProfit);
-    if (totalCustEl) totalCustEl.textContent = uniqueWA.size;
+    totalModalEl.textContent = 'Rp ' + formatRupiah(sumModal);
+    totalProfitEl.textContent = 'Rp ' + formatRupiah(sumProfit);
+    totalCustEl.textContent = uniqueWA.size;
   }
 
-  // ------- FORM SUBMIT (lebih reliable daripada button click) -------
+  // form submit handler (add entry)
   if (form) {
     form.addEventListener('submit', function(ev) {
       ev.preventDefault();
-      // trigger same logic as addEntry
       const nama = namaEl.value.trim();
       const wa = waEl.value.trim();
       const katalog = katalogEl.value;
@@ -173,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // ------- RESET BUTTON -------
+  // reset button
   if (resetBtn && form) {
     resetBtn.addEventListener('click', function(e){
       e.preventDefault();
@@ -186,50 +188,4 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // table actions (delegate)
-  tableBody.addEventListener('click', function (e) {
-    const btn = e.target.closest('button');
-    if (!btn) return;
-    const idx = Number(btn.dataset.idx);
-    const action = btn.dataset.action;
-    if (Number.isNaN(idx)) return;
-    const entry = currentRenderList[idx];
-    if (!entry) return;
-    const { row, originalIndex } = entry;
-
-    if (action === 'copy') {
-      const text = `Akun: ${row.akun || '-'}\nPassword: ${row.password || '-'}\nProfile/PIN: ${row.profile || '-'}\nDevice: ${row.device || '-'}`;
-      navigator.clipboard?.writeText(text).then(() => {
-        btn.textContent = '✓';
-        setTimeout(() => btn.textContent = 'Copy', 900);
-      }).catch(() => showToast('Gagal menyalin ke clipboard'));
-    } else if (action === 'delete') {
-      if (!confirm('Hapus transaksi ini?')) return;
-      const all = load();
-      all.splice(originalIndex, 1);
-      save(all);
-      render();
-      showToast('Transaksi dihapus');
-    }
-  });
-
-  // export
-  if (exportBtn) {
-    exportBtn.addEventListener('click', function () {
-      const all = load();
-      if (!all.length) { showToast('Tidak ada data untuk diekspor'); return; }
-      const header = ['Nama','WA','Produk','Durasi','Akun','Password','Profile','Device','Pembayaran','Modal','Tanggal','Created'];
-      const rows = all.map(r => [r.nama, r.wa, r.katalog, r.durasi, r.akun, r.password, r.profile, r.device, r.harga, r.modal, r.tglBeli, r.created]);
-      const csv = [header, ...rows].map(r => r.map(c => `"${String(c || '').replace(/"/g,'""')}"`).join(',')).join('\r\n');
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'saisoku_subs.csv'; a.click();
-      URL.revokeObjectURL(url);
-      showToast('CSV diekspor');
-    });
-  }
-
-  if (filterProduk) filterProduk.addEventListener('change', render);
-
-  // initial render
-  render();
-});
+  tableBod
