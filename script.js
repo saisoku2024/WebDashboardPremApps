@@ -246,9 +246,11 @@ document.addEventListener('DOMContentLoaded', function () {
       const wrapper = document.createElement('div');
       wrapper.className = 'custom-select-wrapper';
 
-      // make original invisible but present (for forms)
+      // make original invisible/off-screen but keep it in DOM (for forms)
       sel.classList.add('custom-select-hidden');
       sel.dataset.customized = '1';
+      sel.setAttribute('aria-hidden','true');
+      try { sel.tabIndex = -1; } catch(e){}
 
       // create visible control
       const control = document.createElement('div');
@@ -298,9 +300,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const isOpen = control.classList.toggle('open');
         opts.style.display = isOpen ? 'block' : 'none';
         if (isOpen) {
-          // ensure the active option is visible
           const active = opts.querySelector('.custom-option.active');
-          if (active) { active.scrollIntoView({ block: 'nearest' }); }
+          if (active) active.scrollIntoView({ block: 'nearest' });
         }
       });
 
