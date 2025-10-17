@@ -1,8 +1,7 @@
-// CONFIG: jika pakai Apps Script / endpoint, masukkan URL di sini:
+// CONFIG: isi APPS_SCRIPT_URL jika mau sinkron ke Google Sheets
 const APPS_SCRIPT_URL = ''; // contoh: 'https://script.google.com/macros/s/XXX/exec'
 
 document.addEventListener('DOMContentLoaded', function () {
-  // DOM refs (guard: jika salah satu null => stop gracefully)
   const get = id => document.getElementById(id);
   const namaEl = get('nama');
   const waEl = get('wa');
@@ -29,26 +28,18 @@ document.addEventListener('DOMContentLoaded', function () {
     return;
   }
 
-  // utils
   const onlyDigits = s => String(s || '').replace(/[^0-9]/g, '');
   const formatRupiah = n => (Number(n) || 0).toLocaleString('id-ID');
   const isoToday = () => new Date().toISOString().slice(0, 10);
 
-  // init
   if (tglEl && !tglEl.value) tglEl.value = isoToday();
 
-  // storage helpers
   const STORAGE_KEY = 'saisoku_subs';
-  const load = () => {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } 
-    catch (e) { return []; }
-  };
+  const load = () => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch (e) { return []; } };
   const save = arr => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
 
-  // current rendered list (array of {row, originalIndex}) to map actions reliably
   let currentRenderList = [];
 
-  // render
   function render() {
     const all = load();
     const filtro = filterProduk && filterProduk.value ? filterProduk.value : '';
@@ -59,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function () {
     let sumProfit = 0;
     const uniqueWA = new Set();
 
-    // build list of rows that WILL be rendered
     all.forEach((row, originalIndex) => {
       if (filtro && row.katalog !== filtro) return;
       currentRenderList.push({ row, originalIndex });
@@ -101,7 +91,6 @@ document.addEventListener('DOMContentLoaded', function () {
     return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   }
 
-  // add entry (validate)
   if (addBtn) {
     addBtn.addEventListener('click', function (e) {
       e.preventDefault();
@@ -132,7 +121,6 @@ document.addEventListener('DOMContentLoaded', function () {
       save(all);
       render();
 
-      // kirim ke Apps Script jika URL dikonfigurasi (optional)
       if (APPS_SCRIPT_URL) {
         fetch(APPS_SCRIPT_URL, {
           method: 'POST',
@@ -143,19 +131,17 @@ document.addEventListener('DOMContentLoaded', function () {
             buyerType: statusBuyer, paymentNum: Number(harga) || 0, modalNum: Number(modal) || 0, dateBuy: tglBeli
           })
         }).then(res => {
-          // optional feedback
           console.log('Sheets sync result', res);
         }).catch(err => console.warn('Sync to Sheets failed', err));
       }
 
-      // reset form to defaults
+      // reset
       namaEl.value = ''; waEl.value = ''; katalogEl.value = ''; if (akunEl) akunEl.value = ''; if (passEl) passEl.value = '';
       if (profileEl) profileEl.value = ''; if (deviceEl) deviceEl.value = ''; if (durasiEl) durasiEl.value = '30';
       if (modalEl) modalEl.value = ''; if (hargaEl) hargaEl.value = ''; if (tglEl) tglEl.value = isoToday();
     });
   }
 
-  // table actions (copy / delete)
   if (tableBody) {
     tableBody.addEventListener('click', function (e) {
       const btn = e.target.closest('button');
@@ -177,7 +163,6 @@ document.addEventListener('DOMContentLoaded', function () {
       } else if (action === 'delete') {
         if (!confirm('Hapus transaksi ini?')) return;
         const all = load();
-        // remove by originalIndex to keep correct mapping
         all.splice(originalIndex, 1);
         save(all);
         render();
@@ -185,7 +170,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // export CSV (exports ALL data)
   if (exportBtn) {
     exportBtn.addEventListener('click', function () {
       const all = load();
@@ -202,9 +186,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // filter change
   if (filterProduk) filterProduk.addEventListener('change', render);
 
-  // initial render
   render();
 });
