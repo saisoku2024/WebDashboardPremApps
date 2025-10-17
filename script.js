@@ -4,6 +4,7 @@ const APPS_SCRIPT_URL = ''; // contoh: 'https://script.google.com/macros/s/XXX/e
 document.addEventListener('DOMContentLoaded', function () {
   const $ = id => document.getElementById(id);
 
+  const form = $('entryForm');           // <-- ambil form
   const namaEl = $('nama');
   const waEl = $('wa');
   const katalogEl = $('katalog');
@@ -44,8 +45,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   let currentRenderList = [];
 
-  // show temporary toast
-  function showToast(msg, ms = 1800) {
+  function showToast(msg, ms = 1700) {
+    if (!toastEl) return;
     toastEl.textContent = msg;
     toastEl.style.display = 'block';
     toastEl.style.opacity = 1;
@@ -67,7 +68,6 @@ document.addEventListener('DOMContentLoaded', function () {
     let sumProfit = 0;
     const uniqueWA = new Set();
 
-    // prepare list
     all.forEach((row, originalIndex) => {
       if (filtro && row.katalog !== filtro) return;
       currentRenderList.push({ row, originalIndex });
@@ -106,82 +106,84 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
-    totalModalEl.textContent = 'Rp ' + formatRupiah(sumModal);
-    totalProfitEl.textContent = 'Rp ' + formatRupiah(sumProfit);
-    totalCustEl.textContent = uniqueWA.size;
+    if (totalModalEl) totalModalEl.textContent = 'Rp ' + formatRupiah(sumModal);
+    if (totalProfitEl) totalProfitEl.textContent = 'Rp ' + formatRupiah(sumProfit);
+    if (totalCustEl) totalCustEl.textContent = uniqueWA.size;
   }
 
-  // add entry
-  function addEntry(ev) {
-    ev.preventDefault();
-    const nama = namaEl.value.trim();
-    const wa = waEl.value.trim();
-    const katalog = katalogEl.value;
-    const akun = akunEl ? akunEl.value.trim() : '';
-    const password = passEl ? passEl.value : '';
-    const profile = profileEl ? profileEl.value.trim() : '';
-    const device = deviceEl ? deviceEl.value : '';
-    const tglBeli = (tglEl && tglEl.value) ? tglEl.value : isoToday();
-    const durasi = durasiEl ? durasiEl.value.trim() : '';
-    const statusBuyer = statusEl ? statusEl.value : '';
-    const modal = modalEl ? onlyDigits(modalEl.value) : '';
-    const harga = hargaEl ? onlyDigits(hargaEl.value) : '';
+  // ------- FORM SUBMIT (lebih reliable daripada button click) -------
+  if (form) {
+    form.addEventListener('submit', function(ev) {
+      ev.preventDefault();
+      // trigger same logic as addEntry
+      const nama = namaEl.value.trim();
+      const wa = waEl.value.trim();
+      const katalog = katalogEl.value;
+      const akun = akunEl ? akunEl.value.trim() : '';
+      const password = passEl ? passEl.value : '';
+      const profile = profileEl ? profileEl.value.trim() : '';
+      const device = deviceEl ? deviceEl.value : '';
+      const tglBeli = (tglEl && tglEl.value) ? tglEl.value : isoToday();
+      const durasi = durasiEl ? durasiEl.value.trim() : '';
+      const statusBuyer = statusEl ? statusEl.value : '';
+      const modal = modalEl ? onlyDigits(modalEl.value) : '';
+      const harga = hargaEl ? onlyDigits(hargaEl.value) : '';
 
-    // simple validation
-    if (!nama) { namaEl.focus(); showToast('Nama harus diisi'); return; }
-    if (!wa) { waEl.focus(); showToast('No. WhatsApp harus diisi'); return; }
-    if (!katalog) { katalogEl.focus(); showToast('Pilih produk'); return; }
+      if (!nama) { namaEl.focus(); showToast('Nama harus diisi'); return; }
+      if (!wa) { waEl.focus(); showToast('No. WhatsApp harus diisi'); return; }
+      if (!katalog) { katalogEl.focus(); showToast('Pilih produk'); return; }
 
-    addBtn.disabled = true;
-    addBtn.textContent = 'Menyimpan...';
+      addBtn.disabled = true;
+      addBtn.textContent = 'Menyimpan...';
 
-    const entry = {
-      nama, wa, katalog, akun, password, profile, device,
-      tglBeli, durasi, statusBuyer, modal: modal, harga: harga, created: new Date().toISOString()
-    };
+      const entry = {
+        nama, wa, katalog, akun, password, profile, device,
+        tglBeli, durasi, statusBuyer, modal: modal, harga: harga, created: new Date().toISOString()
+      };
 
-    const all = load();
-    all.push(entry);
-    save(all);
-    render();
+      const all = load();
+      all.push(entry);
+      save(all);
+      render();
 
-    // optional sync
-    if (APPS_SCRIPT_URL) {
-      fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          buyerName: nama, buyerWA: wa, catalog: katalog, duration: durasi,
-          account: akun, password: password, profilePin: profile, device: device,
-          buyerType: statusBuyer, paymentNum: Number(harga)||0, modalNum: Number(modal)||0, dateBuy: tglBeli
-        })
-      }).then(()=>{/* ignore */}).catch(()=>{/* ignore */});
-    }
+      // optional sync (fire-and-forget)
+      if (APPS_SCRIPT_URL) {
+        fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            buyerName: nama, buyerWA: wa, catalog: katalog, duration: durasi,
+            account: akun, password: password, profilePin: profile, device: device,
+            buyerType: statusBuyer, paymentNum: Number(harga)||0, modalNum: Number(modal)||0, dateBuy: tglBeli
+          })
+        }).catch(()=>{/* ignore */});
+      }
 
-    // UI feedback & reset
-    setTimeout(() => {
-      addBtn.disabled = false;
-      addBtn.textContent = '+ Tambah Data';
-      showToast('Transaksi ditambahkan');
-      // reset subset of form
-      namaEl.value=''; waEl.value=''; katalogEl.value=''; akunEl.value=''; passEl.value=''; profileEl.value=''; deviceEl.value=''; durasiEl.value='30 Hari'; modalEl.value=''; hargaEl.value=''; if(tglEl) tglEl.value = isoToday();
-      // scroll to table for visual confirmation
-      document.querySelector('.table-view').scrollIntoView({ behavior: 'smooth' });
-    }, 350);
-  }
-
-  // reset
-  if (resetBtn) {
-    resetBtn.addEventListener('click', function () {
-      const confirmed = confirm('Reset form? Semua input akan kosong.');
-      if (!confirmed) return;
-      document.getElementById('entryForm').reset();
-      if (tglEl) tglEl.value = isoToday();
-      if (durasiEl) durasiEl.value = '30 Hari';
+      setTimeout(() => {
+        addBtn.disabled = false;
+        addBtn.textContent = '+ Tambah Data';
+        showToast('Transaksi ditambahkan');
+        // reset form values
+        form.reset();
+        if (tglEl) tglEl.value = isoToday();
+        if (durasiEl) durasiEl.value = '30 Hari';
+        // bring user's attention to table
+        document.querySelector('.table-view').scrollIntoView({ behavior: 'smooth' });
+      }, 300);
     });
   }
 
-  if (addBtn) addBtn.addEventListener('click', addEntry);
+  // ------- RESET BUTTON -------
+  if (resetBtn && form) {
+    resetBtn.addEventListener('click', function(e){
+      e.preventDefault();
+      if (!confirm('Reset form? Semua input akan kosong.')) return;
+      form.reset();
+      if (tglEl) tglEl.value = isoToday();
+      if (durasiEl) durasiEl.value = '30 Hari';
+      showToast('Form direset');
+    });
+  }
 
   // table actions (delegate)
   tableBody.addEventListener('click', function (e) {
@@ -226,7 +228,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // filter
   if (filterProduk) filterProduk.addEventListener('change', render);
 
   // initial render
