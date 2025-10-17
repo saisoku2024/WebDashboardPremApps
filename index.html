@@ -3,69 +3,120 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Saisoku Subscription Tracker · v0.1</title>
+  <title>SAISOKU.ID — Dashboard Premium Apps</title>
 
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap" rel="stylesheet">
 </head>
 
 <body>
   <div class="wrap">
     <header class="header">
-      <h1 class="brand">Web Dashboard Premium Apps – SAISOKU.ID</h1>
-      <p class="tag">Form Input Sales • Riwayat Transaksi • Ringkasan Modal & Profit</p>
+      <div class="brand-wrap">
+        <h1 class="brand">Web Dashboard Premium Apps – SAISOKU.ID</h1>
+        <p class="tag">Form Input Sales • Riwayat Transaksi • Ringkasan Modal & Profit</p>
+      </div>
     </header>
 
     <main class="grid">
-      <!-- 🧍 INPUT FORM -->
-      <section class="card input-form">
-        <h2>Input Data Langganan</h2>
-        <div class="fields">
-          <div class="field"><label>Nama Pembeli</label><input type="text" id="nama" placeholder="Nama lengkap"></div>
-          <div class="field"><label>No. WhatsApp</label><input type="text" id="wa" placeholder="08xxxxxxxxxx"></div>
-          <div class="field"><label>Katalog / Produk</label>
-            <select id="katalog">
+      <!-- INPUT FORM -->
+      <aside class="card input-form" aria-labelledby="input-title">
+        <h2 id="input-title">Input Data Langganan</h2>
+        <form id="entryForm" class="fields" autocomplete="off" novalidate>
+          <div class="field">
+            <label for="nama">Nama Pembeli <span class="req">*</span></label>
+            <input type="text" id="nama" placeholder="Nama lengkap" required>
+          </div>
+
+          <div class="field">
+            <label for="wa">No. WhatsApp <span class="req">*</span></label>
+            <input type="text" id="wa" placeholder="08xxxxxxxxxx" inputmode="tel" required>
+          </div>
+
+          <div class="field">
+            <label for="katalog">Katalog / Produk <span class="req">*</span></label>
+            <select id="katalog" required>
               <option value="">Pilih Produk</option>
               <option>Netflix</option><option>Viu</option><option>Prime Video</option><option>Disney+</option><option>WeTV</option>
             </select>
           </div>
-          <div class="field"><label>Akun</label><input type="text" id="akun" placeholder="Email akun"></div>
-          <div class="field"><label>Password</label><input type="password" id="password" placeholder="Opsional"></div>
-          <div class="field"><label>Profile & PIN</label><input type="text" id="profile" placeholder="mis. Profile 1 / PIN 1234"></div>
-          <div class="field"><label>Device</label>
+
+          <div class="field">
+            <label for="akun">Akun</label>
+            <input type="text" id="akun" placeholder="Email akun / username">
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Opsional">
+          </div>
+
+          <div class="field">
+            <label for="profile">Profile & PIN</label>
+            <input type="text" id="profile" placeholder="mis. Profile 1 / PIN 1234">
+          </div>
+
+          <div class="field">
+            <label for="device">Device</label>
             <select id="device">
               <option value="">Pilih Device</option>
               <option>TV</option><option>HP</option><option>Laptop</option><option>All</option>
             </select>
           </div>
-          <div class="row">
-            <div class="field"><label>Tanggal Beli</label><input type="date" id="tglBeli"></div>
-            <div class="field"><label>Durasi</label><input type="text" id="durasi" placeholder="mis. 30 Hari"></div>
+
+          <div class="row two">
+            <div class="field">
+              <label for="tglBeli">Tanggal Beli</label>
+              <input type="date" id="tglBeli">
+            </div>
+            <div class="field">
+              <label for="durasi">Durasi</label>
+              <input type="text" id="durasi" placeholder="mis. 30 Hari">
+            </div>
           </div>
-          <div class="field"><label>Status Buyer</label>
+
+          <div class="field">
+            <label for="statusBuyer">Status Buyer</label>
             <select id="statusBuyer">
               <option value="">Pilih Status</option>
               <option>Reguler</option><option>Reseller</option>
             </select>
           </div>
-          <div class="row">
-            <div class="field"><label>Modal (Rp)</label><input type="number" id="modal" placeholder="mis. 25000"></div>
-            <div class="field"><label>Harga Jual (Rp)</label><input type="number" id="harga" placeholder="mis. 33900"></div>
-          </div>
-          <button id="addBtn" class="btn">+ Tambah Data</button>
-        </div>
-      </section>
 
-      <!-- 📊 DATA TABLE -->
-      <section class="card table-view">
+          <div class="row two">
+            <div class="field">
+              <label for="modal">Modal (Rp)</label>
+              <input type="number" id="modal" placeholder="mis. 25000" inputmode="numeric" min="0">
+            </div>
+            <div class="field">
+              <label for="harga">Harga Jual (Rp)</label>
+              <input type="number" id="harga" placeholder="mis. 33900" inputmode="numeric" min="0">
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button id="addBtn" class="btn primary" type="submit">+ Tambah Data</button>
+            <button id="resetBtn" class="btn ghost" type="button">Reset</button>
+          </div>
+        </form>
+      </aside>
+
+      <!-- DATA TABLE -->
+      <section class="card table-view" aria-labelledby="table-title">
         <div class="table-header">
-          <h2>Data Langganan</h2>
-          <div class="actions">
-            <select id="filterProduk">
-              <option value="">Semua Produk</option>
-              <option>Netflix</option><option>Viu</option><option>Prime Video</option><option>Disney+</option><option>WeTV</option>
-            </select>
-            <button class="btn small" id="exportBtn">Export Excel</button>
+          <div>
+            <h2 id="table-title">Data Langganan</h2>
+            <p class="muted small">Pantau transaksi, profit, dan export laporan.</p>
+          </div>
+
+          <div class="controls">
+            <label class="filter-label">
+              <select id="filterProduk" aria-label="Filter produk">
+                <option value="">Semua Produk</option>
+                <option>Netflix</option><option>Viu</option><option>Prime Video</option><option>Disney+</option><option>WeTV</option>
+              </select>
+            </label>
+            <button id="exportBtn" class="btn small teal">Export Excel</button>
           </div>
         </div>
 
@@ -77,7 +128,9 @@
                 <th>Modal</th><th>Harga</th><th>Profit</th><th>Status</th><th>Aksi</th>
               </tr>
             </thead>
-            <tbody id="tableBody"></tbody>
+            <tbody id="tableBody">
+              <!-- empty state handled by script -->
+            </tbody>
           </table>
         </div>
 
@@ -91,6 +144,9 @@
 
     <footer class="footer">© 2025 SAISOKU.ID · Flat Dark Dashboard by SIVA</footer>
   </div>
+
+  <!-- toast -->
+  <div id="toast" class="toast" aria-live="polite"></div>
 
   <script src="script.js"></script>
 </body>
