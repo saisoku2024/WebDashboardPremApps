@@ -1,10 +1,10 @@
-// script.js - final tweaks (header stats + button style updates)
-const APPS_SCRIPT_URL = ''; // optional sync endpoint
+// script.js - final tweaks requested
+const APPS_SCRIPT_URL = '';
 
 document.addEventListener('DOMContentLoaded', () => {
   const $ = id => document.getElementById(id);
 
-  // DOM elements
+  // DOM refs
   const form = $('entryForm');
   const namaEl = $('nama');
   const waEl = $('wa');
@@ -27,15 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const addCatalogBtn = $('addCatalogBtn');
   const newCatalogInput = $('newCatalogInput');
 
-  // header stat DOM
-  const headerTotalModal = $('headerTotalModal');
-  const headerTotalProfit = $('headerTotalProfit');
-  const headerTotalCust = $('headerTotalCust');
+  const kpiRevenue = $('kpi-revenue');
+  const kpiProfit = $('kpi-profit');
+  const kpiActive = $('kpi-active');
 
-  if (!form || !tableBody) {
-    console.warn('Core elements not found. Script stopped.');
-    return;
-  }
+  if (!form || !tableBody) return;
 
   // helpers
   const isoToday = () => new Date().toISOString().slice(0,10);
@@ -44,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const STORAGE_KEY = 'saisoku_subs';
   const CATALOG_KEY = 'saisoku_catalogs';
 
-  function showToast(msg='', ms=1400){
+  function showToast(msg='', ms=1200){
     if(!toastEl) return;
     toastEl.textContent = msg;
     toastEl.style.display = 'block';
@@ -54,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
 
-  // storage helpers
+  // storage
   const load = ()=> { try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); }catch(e){return[];} };
   const save = arr => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
   const defaultCatalogs = [
@@ -81,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try { localStorage.setItem(CATALOG_KEY, JSON.stringify(arr.slice().sort((a,b)=> a.localeCompare(b,'id',{sensitivity:'base'})))); } catch(e){}
   };
 
-  // --- custom-select management (same as previous robust impl) ---
+  // custom select management (same robust approach)
   if(!window._saisoku_docclick) {
     document.addEventListener('click', ()=> {
       document.querySelectorAll('.custom-select.open').forEach(open => {
@@ -111,8 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const selects = Array.from(document.querySelectorAll('select'));
       selects.forEach(sel => {
         if(sel.dataset.customized === '1') return;
-        const wrapper = document.createElement('div');
-        wrapper.className = 'custom-select-wrapper';
+        const wrapper = document.createElement('div'); wrapper.className = 'custom-select-wrapper';
         sel.parentNode.insertBefore(wrapper, sel.nextSibling);
         wrapper.appendChild(sel);
         sel.classList.add('custom-select-hidden');
@@ -190,12 +185,10 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.appendChild(control);
         wrapper.appendChild(opts);
       });
-    } catch(e) {
-      console.error('createCustomSelects error', e);
-    }
+    } catch(e) { console.error('createCustomSelects', e); }
   };
 
-  // populate native selects (katalog + filter)
+  // populate selects
   function populateSelects(){
     destroyCustomSelects();
     const catalogs = loadCatalogs();
@@ -209,10 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
       placeholder.textContent = 'Pilih Produk';
       selK.appendChild(placeholder);
       catalogs.forEach(c => {
-        const o = document.createElement('option');
-        o.value = c;
-        o.textContent = c;
-        selK.appendChild(o);
+        const o = document.createElement('option'); o.value = c; o.textContent = c; selK.appendChild(o);
       });
     }
 
@@ -223,10 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
       placeholder.textContent = 'Semua Produk';
       selF.appendChild(placeholder);
       catalogs.forEach(c => {
-        const o = document.createElement('option');
-        o.value = c;
-        o.textContent = c;
-        selF.appendChild(o);
+        const o = document.createElement('option'); o.value = c; o.textContent = c; selF.appendChild(o);
       });
     }
 
@@ -244,7 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
     populateSelects();
     return true;
   }
-
   if (addCatalogBtn && newCatalogInput) {
     addCatalogBtn.addEventListener('click', () => {
       const v = newCatalogInput.value || '';
@@ -253,14 +239,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (ok) { showToast('Produk ditambahkan'); newCatalogInput.value = ''; }
       else showToast('Produk sudah ada atau tidak valid');
     });
-    newCatalogInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { e.preventDefault(); addCatalogBtn.click(); }
-    });
+    newCatalogInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addCatalogBtn.click(); } });
   }
 
-  // --- table rendering + controls
+  // render table & KPIs
   let currentRenderList = [];
-
   function render() {
     const all = load();
     const filterSel = $('filterProduk');
@@ -272,7 +255,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let sumModal = 0;
     let sumProfit = 0;
+    let todayRevenue = 0;
     const uniqueWA = new Set();
+    const today = isoToday();
 
     all.forEach((row, originalIndex) => {
       if (!row) return;
@@ -283,12 +268,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (hay.indexOf(q) === -1) return;
       }
       currentRenderList.push({ row, originalIndex });
+
       const modal = Number(row.modal) || 0;
       const harga = Number(row.harga) || 0;
       const profit = harga - modal;
+
       sumModal += modal;
       sumProfit += profit;
       if (row.wa) uniqueWA.add(row.wa);
+
+      // revenue for today: sum harga where tglBeli == today
+      if (row.tglBeli === today) todayRevenue += harga;
     });
 
     if (!currentRenderList.length) {
@@ -313,8 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <td>Rp ${formatRupiah(profit)}</td>
           <td>${escapeHtml(row.statusBuyer || '-')}</td>
           <td>
-            <button class="copy-btn" data-idx="${idx}" data-action="copy">Copy</button>
-            <button class="copy-btn" data-idx="${idx}" data-action="delete">Hapus</button>
+            <button class="action-btn delete" data-idx="${idx}" data-action="delete">Hapus</button>
           </td>
         `;
         tableBody.appendChild(tr);
@@ -325,20 +314,13 @@ document.addEventListener('DOMContentLoaded', () => {
     totalProfitEl.textContent = 'Rp ' + formatRupiah(sumProfit);
     totalCustEl.textContent = uniqueWA.size;
 
-    // update header mini-stats
-    if (headerTotalModal) headerTotalModal.textContent = 'Rp ' + formatRupiah(sumModal);
-    if (headerTotalProfit) headerTotalProfit.textContent = 'Rp ' + formatRupiah(sumProfit);
-    if (headerTotalCust) headerTotalCust.textContent = String(uniqueWA.size);
-
-    // update main KPIs too (if present)
-    try {
-      if ($('kpi-revenue')) $('kpi-revenue').textContent = formatRupiah(Number(sumModal));
-      if ($('kpi-profit')) $('kpi-profit').textContent = formatRupiah(Number(sumProfit));
-      if ($('kpi-active')) $('kpi-active').textContent = String(uniqueWA.size);
-    } catch(e){}
+    // update KPIs
+    if(kpiRevenue) kpiRevenue.textContent = formatRupiah(todayRevenue);
+    if(kpiProfit) kpiProfit.textContent = formatRupiah(sumProfit);
+    if(kpiActive) kpiActive.textContent = String(uniqueWA.size);
   }
 
-  // form submit (add data)
+  // submit
   form.addEventListener('submit', (ev) => {
     ev.preventDefault();
     const nama = namaEl.value.trim();
@@ -371,6 +353,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const all = load();
     all.push(entry);
     save(all);
+
+    // re-render and reset form & selects
     render();
 
     if (APPS_SCRIPT_URL) {
@@ -390,6 +374,8 @@ document.addEventListener('DOMContentLoaded', () => {
       addBtn.textContent = '+ Tambah Data';
       showToast('Transaksi ditambahkan');
       form.reset();
+      // ensure native select resets and custom select UI updated
+      populateSelects();
       if (tglEl) tglEl.value = isoToday();
       if (durasiEl) durasiEl.value = '30 Hari';
       if (modalEl) modalEl.value = '';
@@ -398,12 +384,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 240);
   });
 
-  // reset button (uses primary styling now)
+  // reset
   if (resetBtn) {
     resetBtn.addEventListener('click', (e) => {
       e.preventDefault();
       if (!confirm('Reset form? Semua input akan kosong.')) return;
       form.reset();
+      populateSelects(); // ensure custom select shows placeholder
       if (tglEl) tglEl.value = isoToday();
       if (durasiEl) durasiEl.value = '30 Hari';
       if (modalEl) modalEl.value = '';
@@ -412,7 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // table actions (delegate) - copy & delete use same small button style
+  // table actions (only delete)
   tableBody.addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
@@ -423,13 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!entry) return;
     const { row, originalIndex } = entry;
 
-    if (action === 'copy') {
-      const text = `Akun: ${row.akun || '-'}\nPassword: ${row.password || '-'}\nProfile/PIN: ${row.profile || '-'}\nDevice: ${row.device || '-'}`;
-      navigator.clipboard?.writeText(text).then(() => {
-        btn.textContent = '✓';
-        setTimeout(() => btn.textContent = 'Copy', 900);
-      }).catch(() => showToast('Gagal menyalin ke clipboard'));
-    } else if (action === 'delete') {
+    if (action === 'delete') {
       if (!confirm('Hapus transaksi ini?')) return;
       const all = load();
       all.splice(originalIndex, 1);
@@ -439,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // export CSV
+  // export (CSV) - same logic, triggered by icon button
   if (exportBtn) {
     exportBtn.addEventListener('click', () => {
       const rowsToExport = currentRenderList.length ? currentRenderList.map(e => e.row) : load();
@@ -455,38 +436,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // filter change
+  // filter change & search debounce
   const filterSel = $('filterProduk');
   if (filterSel) filterSel.addEventListener('change', render);
-
-  // search input
   if (searchInput) {
     let tId = null;
-    searchInput.addEventListener('input', function () {
-      clearTimeout(tId);
-      tId = setTimeout(render, 160);
-    });
+    searchInput.addEventListener('input', function () { clearTimeout(tId); tId = setTimeout(render, 160); });
   }
 
-  // currency formatting for inputs
-  function formatCurrencyForInput(v) {
-    const n = Number(numericOnly(v)) || 0;
-    return n === 0 ? '' : n.toLocaleString('id-ID');
-  }
+  // input currency formatting
+  function formatCurrencyForInput(v) { const n = Number(numericOnly(v)) || 0; return n === 0 ? '' : n.toLocaleString('id-ID'); }
   [modalEl, hargaEl].forEach(el => {
     if (!el) return;
-    el.addEventListener('focus', () => {
-      el.value = numericOnly(el.value);
-      setTimeout(() => {
-        try { el.setSelectionRange(el.value.length, el.value.length); } catch (e) {}
-      }, 0);
-    });
-    el.addEventListener('blur', () => {
-      el.value = formatCurrencyForInput(el.value);
-    });
+    el.addEventListener('focus', () => { el.value = numericOnly(el.value); setTimeout(()=>{ try{ el.setSelectionRange(el.value.length, el.value.length);}catch(e){} },0); });
+    el.addEventListener('blur', () => { el.value = formatCurrencyForInput(el.value); });
   });
 
-  // ripple effect on buttons
+  // ripple on buttons (visual)
   document.addEventListener('click', function (e) {
     const b = e.target.closest('.btn');
     if (!b) return;
@@ -501,8 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(()=> ripple.remove(), 700);
   });
 
-  // initial population of selects & render
-  populateSelects = populateSelects; // debug hint
+  // init
   populateSelects();
   if (tglEl && !tglEl.value) tglEl.value = isoToday();
   if (durasiEl && !durasiEl.value) durasiEl.value = '30 Hari';
