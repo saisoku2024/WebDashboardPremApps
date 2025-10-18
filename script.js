@@ -1,4 +1,4 @@
-// script.js - final (dynamic catalog, custom dark selects, UI micro-interactions)
+// script.js - final tweaks (header stats + button style updates)
 const APPS_SCRIPT_URL = ''; // optional sync endpoint
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -26,6 +26,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchInput = $('searchInput');
   const addCatalogBtn = $('addCatalogBtn');
   const newCatalogInput = $('newCatalogInput');
+
+  // header stat DOM
+  const headerTotalModal = $('headerTotalModal');
+  const headerTotalProfit = $('headerTotalProfit');
+  const headerTotalCust = $('headerTotalCust');
 
   if (!form || !tableBody) {
     console.warn('Core elements not found. Script stopped.');
@@ -76,8 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try { localStorage.setItem(CATALOG_KEY, JSON.stringify(arr.slice().sort((a,b)=> a.localeCompare(b,'id',{sensitivity:'base'})))); } catch(e){}
   };
 
-  // --- custom-select management
-  // ensure doc click listener only once
+  // --- custom-select management (same as previous robust impl) ---
   if(!window._saisoku_docclick) {
     document.addEventListener('click', ()=> {
       document.querySelectorAll('.custom-select.open').forEach(open => {
@@ -88,8 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     window._saisoku_docclick = true;
   }
-
-  // destroy wrappers & restore native selects
   function destroyCustomSelects(){
     const wrappers = Array.from(document.querySelectorAll('.custom-select-wrapper'));
     wrappers.forEach(w => {
@@ -104,39 +106,26 @@ document.addEventListener('DOMContentLoaded', () => {
       w.remove();
     });
   }
-
-  // create custom selects (dark dropdown)
   window.createCustomSelects = function createCustomSelects(){
     try {
       const selects = Array.from(document.querySelectorAll('select'));
       selects.forEach(sel => {
         if(sel.dataset.customized === '1') return;
-
         const wrapper = document.createElement('div');
         wrapper.className = 'custom-select-wrapper';
         sel.parentNode.insertBefore(wrapper, sel.nextSibling);
         wrapper.appendChild(sel);
-
         sel.classList.add('custom-select-hidden');
         sel.dataset.customized = '1';
         sel.setAttribute('aria-hidden', 'true');
         try { sel.tabIndex = -1; } catch(e){}
-
-        const control = document.createElement('div');
-        control.className = 'custom-select';
-        const label = document.createElement('div');
-        label.className = 'label';
+        const control = document.createElement('div'); control.className = 'custom-select';
+        const label = document.createElement('div'); label.className = 'label';
         label.textContent = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : (sel.getAttribute('placeholder') || 'Pilih');
-        const caret = document.createElement('div');
-        caret.className = 'caret';
+        const caret = document.createElement('div'); caret.className = 'caret';
         caret.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23e6eef8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
-        control.appendChild(label);
-        control.appendChild(caret);
-
-        const opts = document.createElement('div');
-        opts.className = 'custom-options';
-        opts.style.display = 'none';
-
+        control.appendChild(label); control.appendChild(caret);
+        const opts = document.createElement('div'); opts.className = 'custom-options'; opts.style.display = 'none';
         Array.from(sel.options).forEach((o, i) => {
           const item = document.createElement('div');
           item.className = 'custom-option';
@@ -156,7 +145,6 @@ document.addEventListener('DOMContentLoaded', () => {
           });
           opts.appendChild(item);
         });
-
         control.addEventListener('click', (e) => {
           e.stopPropagation();
           const isOpen = control.classList.toggle('open');
@@ -166,8 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (active) active.scrollIntoView({ block: 'nearest' });
           }
         });
-
-        // keyboard navigation
         control.tabIndex = 0;
         control.addEventListener('keydown', (e) => {
           const visible = opts.style.display === 'block';
@@ -192,7 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (active) active.click();
           }
         });
-
         sel.addEventListener('change', () => {
           const i = sel.selectedIndex;
           if (i >= 0 && sel.options[i]) {
@@ -202,7 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (item) item.classList.add('active');
           }
         });
-
         wrapper.appendChild(control);
         wrapper.appendChild(opts);
       });
@@ -211,11 +195,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // --- populate native selects (katalog + filter)
+  // populate native selects (katalog + filter)
   function populateSelects(){
-    // first destroy any wrappers so we work with native selects
     destroyCustomSelects();
-
     const catalogs = loadCatalogs();
     const selK = $('katalog');
     const selF = $('filterProduk');
@@ -248,7 +230,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // then transform native selects into custom selects (dark)
     createCustomSelects();
   }
 
@@ -264,7 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return true;
   }
 
-  // bind add-catalog UI
   if (addCatalogBtn && newCatalogInput) {
     addCatalogBtn.addEventListener('click', () => {
       const v = newCatalogInput.value || '';
@@ -345,8 +325,17 @@ document.addEventListener('DOMContentLoaded', () => {
     totalProfitEl.textContent = 'Rp ' + formatRupiah(sumProfit);
     totalCustEl.textContent = uniqueWA.size;
 
-    // update KPIs
-    updateKPI();
+    // update header mini-stats
+    if (headerTotalModal) headerTotalModal.textContent = 'Rp ' + formatRupiah(sumModal);
+    if (headerTotalProfit) headerTotalProfit.textContent = 'Rp ' + formatRupiah(sumProfit);
+    if (headerTotalCust) headerTotalCust.textContent = String(uniqueWA.size);
+
+    // update main KPIs too (if present)
+    try {
+      if ($('kpi-revenue')) $('kpi-revenue').textContent = formatRupiah(Number(sumModal));
+      if ($('kpi-profit')) $('kpi-profit').textContent = formatRupiah(Number(sumProfit));
+      if ($('kpi-active')) $('kpi-active').textContent = String(uniqueWA.size);
+    } catch(e){}
   }
 
   // form submit (add data)
@@ -384,7 +373,6 @@ document.addEventListener('DOMContentLoaded', () => {
     save(all);
     render();
 
-    // optional sync to Apps Script (fire-and-forget)
     if (APPS_SCRIPT_URL) {
       fetch(APPS_SCRIPT_URL, {
         method: 'POST',
@@ -410,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 240);
   });
 
-  // reset button
+  // reset button (uses primary styling now)
   if (resetBtn) {
     resetBtn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -424,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // table actions (delegate)
+  // table actions (delegate) - copy & delete use same small button style
   tableBody.addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
@@ -498,18 +486,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // KPI updater to sync small tiles
-  function updateKPI() {
-    try {
-      const revenue = totalModalEl ? totalModalEl.textContent.replace(/[^0-9]/g,'') : '0';
-      const profit = totalProfitEl ? totalProfitEl.textContent.replace(/[^0-9]/g,'') : '0';
-      const active = totalCustEl ? totalCustEl.textContent : '0';
-      $('kpi-revenue') && ($('kpi-revenue').textContent = formatRupiah(Number(revenue)));
-      $('kpi-profit') && ($('kpi-profit').textContent = formatRupiah(Number(profit)));
-      $('kpi-active') && ($('kpi-active').textContent = active);
-    } catch(e){}
-  }
-
   // ripple effect on buttons
   document.addEventListener('click', function (e) {
     const b = e.target.closest('.btn');
@@ -526,9 +502,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // initial population of selects & render
-  populateSelects = populateSelects; // hint for debug
+  populateSelects = populateSelects; // debug hint
   populateSelects();
-  // set default values
   if (tglEl && !tglEl.value) tglEl.value = isoToday();
   if (durasiEl && !durasiEl.value) durasiEl.value = '30 Hari';
   render();
