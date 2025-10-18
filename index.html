@@ -17,6 +17,25 @@
       </div>
     </header>
 
+    <!-- FUTURISTIC KPI ROW -->
+    <section class="kpi-row" aria-hidden="false">
+      <div class="kpi card glass">
+        <div class="kpi-title">Pendapatan Hari Ini</div>
+        <div class="kpi-value">Rp <span id="kpi-revenue">0</span></div>
+        <div class="kpi-sub">Update realtime (contoh)</div>
+      </div>
+      <div class="kpi card glass">
+        <div class="kpi-title">Total Profit</div>
+        <div class="kpi-value">Rp <span id="kpi-profit">0</span></div>
+        <div class="kpi-sub">Ringkasan modal vs jual</div>
+      </div>
+      <div class="kpi card glass">
+        <div class="kpi-title">Pelanggan Aktif</div>
+        <div class="kpi-value"><span id="kpi-active">0</span></div>
+        <div class="kpi-sub">Jumlah WA unik</div>
+      </div>
+    </section>
+
     <main class="grid">
       <!-- INPUT FORM -->
       <aside class="card input-form" aria-labelledby="input-title">
@@ -36,12 +55,12 @@
           <div class="field">
             <label for="katalog">Katalog / Produk <span class="req">*</span></label>
 
-            <!-- native select (will be populated by script) -->
+            <!-- native select (populated by script) -->
             <select id="katalog" name="katalog" aria-label="Katalog Produk">
               <option value="">Pilih Produk</option>
             </select>
 
-            <!-- UI to add new catalog items dynamically -->
+            <!-- add-catalog UI -->
             <div class="add-catalog">
               <input id="newCatalogInput" type="text" placeholder="Tambah produk baru (mis. HBO Max)" />
               <button id="addCatalogBtn" class="btn small" type="button">Tambah</button>
@@ -161,7 +180,9 @@
     <footer class="footer">© 2025 SAISOKU.ID · Flat Dark Dashboard by SIVA</footer>
   </div>
 
+  <!-- toast -->
   <div id="toast" class="toast" aria-live="polite"></div>
+
   <script src="script.js"></script>
 </body>
 </html>
