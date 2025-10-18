@@ -21,7 +21,6 @@ body {
   background:
     radial-gradient(1000px 400px at 10% 10%, rgba(138,92,255,0.06), transparent 10%),
     linear-gradient(180deg, var(--bg-900) 0%, var(--bg-800) 100%);
-  -webkit-font-smoothing:antialiased;
 }
 a { color: inherit; text-decoration: none; }
 
@@ -44,10 +43,11 @@ a { color: inherit; text-decoration: none; }
 
 /* ========== CARD ========== */
 .card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:16px; border-radius:var(--radius); border:1px solid rgba(255,255,255,0.02); box-shadow:var(--shadow); overflow:visible; }
+.card h2 { margin: 0 0 10px 0; font-size:16px; } /* konsisten margin untuk semua kartu */
 .glass { backdrop-filter: blur(var(--glass-blur)); }
 
 /* ========== GRID ========== */
-.grid { display:grid; grid-template-columns: 360px 1fr; gap:18px; }
+.grid { display:grid; grid-template-columns: 360px 1fr; gap:18px; align-items:start; } /* align-items:start menjaga kartu top-aligned */
 
 /* ========== FORM ========== */
 .fields { display:flex; flex-direction:column; gap:12px; }
@@ -105,12 +105,13 @@ a { color: inherit; text-decoration: none; }
 @keyframes ripple { from { opacity:0.6; transform:translate(-50%,-50%) scale(.4);} to { opacity:0; transform:translate(-50%,-50%) scale(2);} }
 
 /* ========== TABLE & CONTROLS ========== */
-.table-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:8px; flex-wrap:wrap; }
+/* NOTE: align-items:flex-start supaya judul tabel dan input form lurus (top aligned) */
+.table-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; gap:8px; flex-wrap:wrap; }
 .header-left { min-width:0; }
 .header-left h2 { margin:0; }
 
 /* Controls wrapper */
-.controls { display:flex; gap:10px; align-items:center; flex-wrap:wrap; min-width:0; }
+.controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; min-width:0; }
 
 /* Make select, custom-select-wrapper and search share space equally */
 .controls > select,
@@ -137,17 +138,28 @@ a { color: inherit; text-decoration: none; }
 }
 #searchInput::placeholder { color: rgba(159,176,198,0.45); }
 
-/* Export button (compact) */
+/* Export button - now outline teal (non-gradient) so it doesn't mimic "Tambah" */
 .controls .export-btn {
   flex: 0 0 auto;
-  width:110px;
+  width: 42px;
+  height: 42px;
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  gap:6px;
-  height:42px;
-  padding:0 10px;
+  gap:0;
+  padding:0;
+  border-radius:10px;
+  background: transparent;
+  border: 1px solid rgba(14,165,160,0.18);
+  color: var(--teal);
+  box-shadow: none;
+  transition: transform .12s, border-color .12s, background .12s;
 }
+.controls .export-btn svg { width:18px; height:18px; display:block; margin:0; stroke: var(--teal); }
+.controls .export-btn:hover { transform: translateY(-2px); border-color: rgba(14,165,160,0.35); background: rgba(14,165,160,0.03); }
+
+/* hide span text visually but keep for screen readers */
+.controls .export-btn span { display:none !important; }
 
 /* Table styling */
 .table-wrap { overflow:auto; max-height:58vh; border-radius:8px; padding:6px 0; }
