@@ -57,11 +57,14 @@ document.addEventListener('DOMContentLoaded', () => {
     "Canva Premium",
     "ChatGPT/Gemini AI",
     "Disney+",
-    "Netflix",
+    "HBO Max",
+    "IQiyi",
+    "Netflix Premium",
     "Prime Video",
-    "Spotify",
+    "Spotify Premium",
     "Vidio Platinum",
-    "WeTV",
+    "VIU Premium",
+    "WeTV VIP",
     "Youtube Premium"
   ].sort((a,b)=> a.localeCompare(b,'id',{sensitivity:'base'}));
   const loadCatalogs = ()=> {
