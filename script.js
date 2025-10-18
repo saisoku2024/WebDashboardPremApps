@@ -1,4 +1,4 @@
-// script.js - final tweaks requested
+// script.js - catalogs updated per request
 const APPS_SCRIPT_URL = '';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const kpiRevenue = $('kpi-revenue');
   const kpiProfit = $('kpi-profit');
   const kpiActive = $('kpi-active');
+  const kpiActiveProduct = $('kpi-active-product');
 
   if (!form || !tableBody) return;
 
@@ -53,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // storage
   const load = ()=> { try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); }catch(e){return[];} };
   const save = arr => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  // <<< UPDATED CATALOG LIST >>> 
   const defaultCatalogs = [
     "Canva Premium",
     "ChatGPT/Gemini AI",
@@ -67,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     "WeTV VIP",
     "Youtube Premium"
   ].sort((a,b)=> a.localeCompare(b,'id',{sensitivity:'base'}));
+  // <<< end update >>>
   const loadCatalogs = ()=> {
     try {
       const raw = localStorage.getItem(CATALOG_KEY);
@@ -80,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try { localStorage.setItem(CATALOG_KEY, JSON.stringify(arr.slice().sort((a,b)=> a.localeCompare(b,'id',{sensitivity:'base'})))); } catch(e){}
   };
 
-  // custom select management (same robust approach)
+  // custom select management (existing robust impl)
   if(!window._saisoku_docclick) {
     document.addEventListener('click', ()=> {
       document.querySelectorAll('.custom-select.open').forEach(open => {
@@ -210,6 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (selF) {
+      const selectedValue = selF ? selF.value : '';
       selF.innerHTML = '';
       const placeholder = document.createElement('option');
       placeholder.value = '';
@@ -218,6 +222,8 @@ document.addEventListener('DOMContentLoaded', () => {
       catalogs.forEach(c => {
         const o = document.createElement('option'); o.value = c; o.textContent = c; selF.appendChild(o);
       });
+      // try restore previously selected value if still present
+      if (selectedValue) selF.value = selectedValue;
     }
 
     createCustomSelects();
@@ -259,9 +265,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let sumModal = 0;
     let sumProfit = 0;
     let todayRevenue = 0;
-    const uniqueWA = new Set();
+    const uniqueWAFiltered = new Set();
+    const uniqueWAAll = new Set();
     const today = isoToday();
 
+    // build overall unique WA (all data)
+    all.forEach(row => {
+      if (row && row.wa) uniqueWAAll.add(row.wa);
+    });
+
+    // filtered list and sums
     all.forEach((row, originalIndex) => {
       if (!row) return;
       const katalogVal = row.katalog || row.produk || '';
@@ -278,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       sumModal += modal;
       sumProfit += profit;
-      if (row.wa) uniqueWA.add(row.wa);
+      if (row.wa) uniqueWAFiltered.add(row.wa);
 
       // revenue for today: sum harga where tglBeli == today
       if (row.tglBeli === today) todayRevenue += harga;
@@ -315,12 +328,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     totalModalEl.textContent = 'Rp ' + formatRupiah(sumModal);
     totalProfitEl.textContent = 'Rp ' + formatRupiah(sumProfit);
-    totalCustEl.textContent = uniqueWA.size;
+    totalCustEl.textContent = uniqueWAAll.size;
 
     // update KPIs
     if(kpiRevenue) kpiRevenue.textContent = formatRupiah(todayRevenue);
     if(kpiProfit) kpiProfit.textContent = formatRupiah(sumProfit);
-    if(kpiActive) kpiActive.textContent = String(uniqueWA.size);
+    if(kpiActive) kpiActive.textContent = String(uniqueWAAll.size);
+
+    // show per-product pelanggan if filter active
+    if (kpiActiveProduct) {
+      if (filtro) {
+        kpiActiveProduct.style.display = 'block';
+        kpiActiveProduct.textContent = `Pelanggan untuk "${filtro}": ${uniqueWAFiltered.size}`;
+      } else {
+        kpiActiveProduct.style.display = 'none';
+        kpiActiveProduct.textContent = '';
+      }
+    }
   }
 
   // submit
@@ -357,9 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
     all.push(entry);
     save(all);
 
-    // re-render and reset form & selects
-    render();
-
+    // sync optional
     if (APPS_SCRIPT_URL) {
       fetch(APPS_SCRIPT_URL, {
         method: 'POST',
@@ -372,19 +394,20 @@ document.addEventListener('DOMContentLoaded', () => {
       }).catch(()=>{/* ignore */});
     }
 
+    // re-render and reset form & selects
     setTimeout(() => {
       addBtn.disabled = false;
       addBtn.textContent = '+ Tambah Data';
       showToast('Transaksi ditambahkan');
       form.reset();
-      // ensure native select resets and custom select UI updated
-      populateSelects();
+      populateSelects(); // ensure select placeholder shown
       if (tglEl) tglEl.value = isoToday();
       if (durasiEl) durasiEl.value = '30 Hari';
       if (modalEl) modalEl.value = '';
       if (hargaEl) hargaEl.value = '';
+      render();
       document.querySelector('.table-view').scrollIntoView({ behavior: 'smooth' });
-    }, 240);
+    }, 250);
   });
 
   // reset
@@ -393,16 +416,17 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       if (!confirm('Reset form? Semua input akan kosong.')) return;
       form.reset();
-      populateSelects(); // ensure custom select shows placeholder
+      populateSelects();
       if (tglEl) tglEl.value = isoToday();
       if (durasiEl) durasiEl.value = '30 Hari';
       if (modalEl) modalEl.value = '';
       if (hargaEl) hargaEl.value = '';
       showToast('Form direset');
+      render();
     });
   }
 
-  // table actions (only delete)
+  // table actions (delete only)
   tableBody.addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
@@ -423,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // export (CSV) - same logic, triggered by icon button
+  // export (CSV)
   if (exportBtn) {
     exportBtn.addEventListener('click', () => {
       const rowsToExport = currentRenderList.length ? currentRenderList.map(e => e.row) : load();
@@ -439,7 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // filter change & search debounce
+  // filter & search
   const filterSel = $('filterProduk');
   if (filterSel) filterSel.addEventListener('change', render);
   if (searchInput) {
@@ -447,7 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.addEventListener('input', function () { clearTimeout(tId); tId = setTimeout(render, 160); });
   }
 
-  // input currency formatting
+  // currency formatting for inputs
   function formatCurrencyForInput(v) { const n = Number(numericOnly(v)) || 0; return n === 0 ? '' : n.toLocaleString('id-ID'); }
   [modalEl, hargaEl].forEach(el => {
     if (!el) return;
@@ -455,7 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
     el.addEventListener('blur', () => { el.value = formatCurrencyForInput(el.value); });
   });
 
-  // ripple on buttons (visual)
+  // ripple visual
   document.addEventListener('click', function (e) {
     const b = e.target.closest('.btn');
     if (!b) return;
