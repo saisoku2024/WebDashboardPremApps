@@ -303,3 +303,44 @@ tbody tr:hover { background: linear-gradient(90deg, rgba(0,243,255,0.02), rgba(1
 
 /* small utility to keep dropdown within parent widths */
 .custom-options { max-width: 100%; left: 0; right: 0; box-sizing:border-box; }
+/* === OVERRIDE: samakan tombol Reset dengan + Tambah Data (primary) === */
+
+/* pastikan tombol dalam form-actions punya ukuran & alignment konsisten */
+.form-actions .btn {
+  min-width: 140px;         /* sama lebar minimal */
+  height: 44px;             /* sama tinggi */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  box-sizing: border-box;
+}
+
+/* reset (ghost) sekarang pakai style primary agar persis sama */
+.form-actions .btn.ghost {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color: #031014;
+  border: none;
+  box-shadow: 0 8px 30px rgba(138,92,255,0.06);
+}
+
+/* hover / focus efek sama dengan primary */
+.form-actions .btn.ghost:hover,
+.form-actions .btn.ghost:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(138,92,255,0.10);
+  outline: none;
+}
+
+/* Untuk tombol tambah, pastikan ukurannya juga konsisten (redundan safe-guard) */
+.form-actions .btn.primary {
+  min-width: 140px;
+  height: 44px;
+}
+
+/* responsive: pada layar sempit, tombol full width tapi tetap sama style */
+@media (max-width:520px) {
+  .form-actions { flex-direction:column; align-items:stretch; }
+  .form-actions .btn { width:100%; min-width:0; }
+}
