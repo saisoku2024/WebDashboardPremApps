@@ -1,4 +1,4 @@
-// script.js - catalogs updated per request
+// script.js - update: count pelanggan sebagai jumlah transaksi (duplikat WA dihitung)
 const APPS_SCRIPT_URL = '';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // storage
   const load = ()=> { try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); }catch(e){return[];} };
   const save = arr => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
-  // <<< UPDATED CATALOG LIST >>> 
+  // catalogs (updated list)
   const defaultCatalogs = [
     "Canva Premium",
     "ChatGPT/Gemini AI",
@@ -69,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
     "WeTV VIP",
     "Youtube Premium"
   ].sort((a,b)=> a.localeCompare(b,'id',{sensitivity:'base'}));
-  // <<< end update >>>
   const loadCatalogs = ()=> {
     try {
       const raw = localStorage.getItem(CATALOG_KEY);
@@ -83,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try { localStorage.setItem(CATALOG_KEY, JSON.stringify(arr.slice().sort((a,b)=> a.localeCompare(b,'id',{sensitivity:'base'})))); } catch(e){}
   };
 
-  // custom select management (existing robust impl)
+  // custom select management
   if(!window._saisoku_docclick) {
     document.addEventListener('click', ()=> {
       document.querySelectorAll('.custom-select.open').forEach(open => {
@@ -222,7 +221,6 @@ document.addEventListener('DOMContentLoaded', () => {
       catalogs.forEach(c => {
         const o = document.createElement('option'); o.value = c; o.textContent = c; selF.appendChild(o);
       });
-      // try restore previously selected value if still present
       if (selectedValue) selF.value = selectedValue;
     }
 
@@ -265,14 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let sumModal = 0;
     let sumProfit = 0;
     let todayRevenue = 0;
-    const uniqueWAFiltered = new Set();
-    const uniqueWAAll = new Set();
     const today = isoToday();
-
-    // build overall unique WA (all data)
-    all.forEach(row => {
-      if (row && row.wa) uniqueWAAll.add(row.wa);
-    });
 
     // filtered list and sums
     all.forEach((row, originalIndex) => {
@@ -291,7 +282,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       sumModal += modal;
       sumProfit += profit;
-      if (row.wa) uniqueWAFiltered.add(row.wa);
 
       // revenue for today: sum harga where tglBeli == today
       if (row.tglBeli === today) todayRevenue += harga;
@@ -328,18 +318,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     totalModalEl.textContent = 'Rp ' + formatRupiah(sumModal);
     totalProfitEl.textContent = 'Rp ' + formatRupiah(sumProfit);
-    totalCustEl.textContent = uniqueWAAll.size;
+
+    // --- Pelanggan Aktif sekarang berdasarkan jumlah transaksi (baris),
+    //     sehingga duplikat WA dihitung berulang sesuai jumlah penjualan ---
+    const totalTransactions = currentRenderList.length;
+    totalCustEl.textContent = String(totalTransactions);
 
     // update KPIs
     if(kpiRevenue) kpiRevenue.textContent = formatRupiah(todayRevenue);
     if(kpiProfit) kpiProfit.textContent = formatRupiah(sumProfit);
-    if(kpiActive) kpiActive.textContent = String(uniqueWAAll.size);
+    if(kpiActive) kpiActive.textContent = String(totalTransactions);
 
     // show per-product pelanggan if filter active
     if (kpiActiveProduct) {
       if (filtro) {
         kpiActiveProduct.style.display = 'block';
-        kpiActiveProduct.textContent = `Pelanggan untuk "${filtro}": ${uniqueWAFiltered.size}`;
+        kpiActiveProduct.textContent = `Transaksi untuk "${filtro}": ${totalTransactions}`;
       } else {
         kpiActiveProduct.style.display = 'none';
         kpiActiveProduct.textContent = '';
