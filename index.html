@@ -17,51 +17,50 @@
       </div>
     </header>
 
-    <!-- KPI -->
-    <section class="kpi-row" aria-hidden="false">
-      <div class="kpi card glass">
+    <!-- KPI row (optional) -->
+    <div class="kpi-row" style="margin-bottom:14px;">
+      <div class="kpi">
         <div class="kpi-title">Pendapatan Hari Ini</div>
         <div class="kpi-value">Rp <span id="kpi-revenue">0</span></div>
         <div class="kpi-sub">Total penjualan hari ini (harga jual)</div>
       </div>
-      <div class="kpi card glass">
+      <div class="kpi">
         <div class="kpi-title">Total Profit</div>
         <div class="kpi-value">Rp <span id="kpi-profit">0</span></div>
         <div class="kpi-sub">Ringkasan modal vs jual</div>
       </div>
-      <div class="kpi card glass">
+      <div class="kpi">
         <div class="kpi-title">Pelanggan Aktif</div>
         <div class="kpi-value"><span id="kpi-active">0</span></div>
-        <div class="kpi-sub">Jumlah WA unik</div>
-        <!-- product-specific count (shown when product filter active) -->
-        <div id="kpi-active-product" class="kpi-sub muted small" style="margin-top:6px;display:none"></div>
+        <div class="kpi-sub">Jumlah transaksi</div>
       </div>
-    </section>
+    </div>
 
     <main class="grid">
-      <!-- INPUT -->
+      <!-- INPUT FORM -->
       <aside class="card input-form" aria-labelledby="input-title">
         <h2 id="input-title">Input Data Langganan</h2>
 
         <form id="entryForm" class="fields" autocomplete="off" novalidate>
           <div class="field">
-            <label for="nama">Nama Pembeli <span class="req">*</span></label>
+            <label for="nama">Nama Pembeli <span aria-hidden="true">*</span></label>
             <input id="nama" name="nama" type="text" placeholder="Nama lengkap" required />
           </div>
 
           <div class="field">
-            <label for="wa">No. WhatsApp <span class="req">*</span></label>
+            <label for="wa">No. WhatsApp <span aria-hidden="true">*</span></label>
             <input id="wa" name="wa" type="text" inputmode="tel" placeholder="08xxxxxxxxxx" required />
           </div>
 
           <div class="field">
-            <label for="katalog">Katalog / Produk <span class="req">*</span></label>
+            <label for="katalog">Katalog / Produk <span aria-hidden="true">*</span></label>
             <select id="katalog" name="katalog" aria-label="Katalog Produk">
-              <option value="">Pilih Produk</option>
+              <!-- options populated by script -->
             </select>
-            <div class="add-catalog">
-              <input id="newCatalogInput" type="text" placeholder="Tambah produk baru (mis. HBO Max)" />
-              <button id="addCatalogBtn" class="btn small" type="button">Tambah</button>
+
+            <div class="add-catalog" style="margin-top:8px;">
+              <input id="newCatalogInput" placeholder="Tambah produk baru (mis. HBO Max)" />
+              <button id="addCatalogBtn" type="button" class="btn small">Tambah</button>
             </div>
           </div>
 
@@ -124,12 +123,12 @@
 
           <div class="form-actions">
             <button id="addBtn" class="btn primary" type="submit">+ Tambah Data</button>
-            <button id="resetBtn" class="btn primary small" type="button">Reset</button>
+            <button id="resetBtn" class="btn ghost" type="button">Reset</button>
           </div>
         </form>
       </aside>
 
-      <!-- TABLE -->
+      <!-- DATA TABLE -->
       <section class="card table-view" aria-labelledby="table-title">
         <div class="table-header">
           <div class="header-left">
@@ -137,22 +136,27 @@
             <p class="muted small">Pantau transaksi, profit, dan export laporan.</p>
           </div>
 
-          <div class="controls">
+          <div class="controls" role="group" aria-label="Controls">
             <select id="filterProduk" name="filterProduk" aria-label="Filter Produk">
-              <option value="">Semua Produk</option>
+              <!-- populated by script -->
             </select>
 
-            <input id="searchInput" type="search" placeholder="Cari nama / WA..." aria-label="Cari transaksi" />
+            <input id="searchInput" placeholder="Cari nama / WA..." aria-label="Cari" />
 
-            <button id="exportBtn" class="btn small teal export-btn" type="button" aria-label="Export">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#052726" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <button id="exportBtn" class="export-btn" type="button" aria-label="Export">
+              <!-- simple download icon (SVG) -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="#032826" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
               <span>Export</span>
             </button>
           </div>
         </div>
 
         <div class="table-wrap">
-          <table id="subsTable" role="table">
+          <table id="subsTable" role="table" aria-describedby="table-title">
             <thead>
               <tr>
                 <th>Nama</th>
@@ -173,7 +177,7 @@
         <div class="summary">
           <div><span>Total Modal:</span> <strong id="totalModal">Rp 0</strong></div>
           <div><span>Total Profit:</span> <strong id="totalProfit">Rp 0</strong></div>
-          <div><span>Total Pelanggan:</span> <strong id="totalCust">0</strong></div>
+          <div style="display:none;"><span>Total Pelanggan:</span> <strong id="totalCust">0</strong></div>
         </div>
       </section>
     </main>
@@ -181,7 +185,9 @@
     <footer class="footer">© 2025 SAISOKU.ID · Flat Dark Dashboard by SIVA</footer>
   </div>
 
+  <!-- toast -->
   <div id="toast" class="toast" aria-live="polite"></div>
+
   <script src="script.js"></script>
 </body>
 </html>

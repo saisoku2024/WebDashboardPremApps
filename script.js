@@ -1,5 +1,6 @@
-// script.js - update: count pelanggan sebagai jumlah transaksi (duplikat WA dihitung)
-const APPS_SCRIPT_URL = '';
+// script.js - final version (compatible with provided style.css)
+// Counts pelanggan as jumlah transaksi (duplicates counted).
+const APPS_SCRIPT_URL = ''; // optional sync endpoint
 
 document.addEventListener('DOMContentLoaded', () => {
   const $ = id => document.getElementById(id);
@@ -30,9 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const kpiRevenue = $('kpi-revenue');
   const kpiProfit = $('kpi-profit');
   const kpiActive = $('kpi-active');
-  const kpiActiveProduct = $('kpi-active-product');
 
-  if (!form || !tableBody) return;
+  if (!form || !tableBody) {
+    console.warn('Element penting tidak ditemukan — script berhenti.');
+    return;
+  }
 
   // helpers
   const isoToday = () => new Date().toISOString().slice(0,10);
@@ -51,10 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
 
-  // storage
+  // storage helpers
   const load = ()=> { try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); }catch(e){return[];} };
   const save = arr => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
-  // catalogs (updated list)
+  // default catalogs (sorted)
   const defaultCatalogs = [
     "Canva Premium",
     "ChatGPT/Gemini AI",
@@ -69,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     "WeTV VIP",
     "Youtube Premium"
   ].sort((a,b)=> a.localeCompare(b,'id',{sensitivity:'base'}));
+
   const loadCatalogs = ()=> {
     try {
       const raw = localStorage.getItem(CATALOG_KEY);
@@ -82,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try { localStorage.setItem(CATALOG_KEY, JSON.stringify(arr.slice().sort((a,b)=> a.localeCompare(b,'id',{sensitivity:'base'})))); } catch(e){}
   };
 
-  // custom select management
+  /* ----- Custom select: convert native selects into styled dropdowns ----- */
   if(!window._saisoku_docclick) {
     document.addEventListener('click', ()=> {
       document.querySelectorAll('.custom-select.open').forEach(open => {
@@ -93,6 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     window._saisoku_docclick = true;
   }
+
   function destroyCustomSelects(){
     const wrappers = Array.from(document.querySelectorAll('.custom-select-wrapper'));
     wrappers.forEach(w => {
@@ -107,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
       w.remove();
     });
   }
+
   window.createCustomSelects = function createCustomSelects(){
     try {
       const selects = Array.from(document.querySelectorAll('select'));
@@ -193,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch(e) { console.error('createCustomSelects', e); }
   };
 
-  // populate selects
+  /* ----- populate selects with catalogs ----- */
   function populateSelects(){
     destroyCustomSelects();
     const catalogs = loadCatalogs();
@@ -249,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
     newCatalogInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addCatalogBtn.click(); } });
   }
 
-  // render table & KPIs
+  /* ----- render table & KPIs ----- */
   let currentRenderList = [];
   function render() {
     const all = load();
@@ -309,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <td>Rp ${formatRupiah(profit)}</td>
           <td>${escapeHtml(row.statusBuyer || '-')}</td>
           <td>
-            <button class="action-btn delete" data-idx="${idx}" data-action="delete">Hapus</button>
+            <button class="action-btn delete" data-idx="${idx}" data-action="delete" aria-label="Hapus transaksi">Hapus</button>
           </td>
         `;
         tableBody.appendChild(tr);
@@ -319,8 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
     totalModalEl.textContent = 'Rp ' + formatRupiah(sumModal);
     totalProfitEl.textContent = 'Rp ' + formatRupiah(sumProfit);
 
-    // --- Pelanggan Aktif sekarang berdasarkan jumlah transaksi (baris),
-    //     sehingga duplikat WA dihitung berulang sesuai jumlah penjualan ---
+    // pelanggan aktif = jumlah transaksi yang ditampilkan (duplicates counted)
     const totalTransactions = currentRenderList.length;
     totalCustEl.textContent = String(totalTransactions);
 
@@ -328,20 +333,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if(kpiRevenue) kpiRevenue.textContent = formatRupiah(todayRevenue);
     if(kpiProfit) kpiProfit.textContent = formatRupiah(sumProfit);
     if(kpiActive) kpiActive.textContent = String(totalTransactions);
-
-    // show per-product pelanggan if filter active
-    if (kpiActiveProduct) {
-      if (filtro) {
-        kpiActiveProduct.style.display = 'block';
-        kpiActiveProduct.textContent = `Transaksi untuk "${filtro}": ${totalTransactions}`;
-      } else {
-        kpiActiveProduct.style.display = 'none';
-        kpiActiveProduct.textContent = '';
-      }
-    }
   }
 
-  // submit
+  /* ----- form submit (add) ----- */
   form.addEventListener('submit', (ev) => {
     ev.preventDefault();
     const nama = namaEl.value.trim();
@@ -375,7 +369,6 @@ document.addEventListener('DOMContentLoaded', () => {
     all.push(entry);
     save(all);
 
-    // sync optional
     if (APPS_SCRIPT_URL) {
       fetch(APPS_SCRIPT_URL, {
         method: 'POST',
@@ -388,13 +381,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }).catch(()=>{/* ignore */});
     }
 
-    // re-render and reset form & selects
     setTimeout(() => {
       addBtn.disabled = false;
       addBtn.textContent = '+ Tambah Data';
       showToast('Transaksi ditambahkan');
       form.reset();
-      populateSelects(); // ensure select placeholder shown
+      populateSelects(); // restore selects (placeholder)
       if (tglEl) tglEl.value = isoToday();
       if (durasiEl) durasiEl.value = '30 Hari';
       if (modalEl) modalEl.value = '';
@@ -404,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 250);
   });
 
-  // reset
+  /* ----- reset form ----- */
   if (resetBtn) {
     resetBtn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -420,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // table actions (delete only)
+  /* ----- table actions (delete only) ----- */
   tableBody.addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
@@ -429,7 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (Number.isNaN(idx)) return;
     const entry = currentRenderList[idx];
     if (!entry) return;
-    const { row, originalIndex } = entry;
+    const { originalIndex } = entry;
 
     if (action === 'delete') {
       if (!confirm('Hapus transaksi ini?')) return;
@@ -441,7 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // export (CSV)
+  /* ----- export CSV ----- */
   if (exportBtn) {
     exportBtn.addEventListener('click', () => {
       const rowsToExport = currentRenderList.length ? currentRenderList.map(e => e.row) : load();
@@ -457,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // filter & search
+  /* ----- filter & search ----- */
   const filterSel = $('filterProduk');
   if (filterSel) filterSel.addEventListener('change', render);
   if (searchInput) {
@@ -465,7 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.addEventListener('input', function () { clearTimeout(tId); tId = setTimeout(render, 160); });
   }
 
-  // currency formatting for inputs
+  /* ----- currency formatting for inputs ----- */
   function formatCurrencyForInput(v) { const n = Number(numericOnly(v)) || 0; return n === 0 ? '' : n.toLocaleString('id-ID'); }
   [modalEl, hargaEl].forEach(el => {
     if (!el) return;
@@ -473,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
     el.addEventListener('blur', () => { el.value = formatCurrencyForInput(el.value); });
   });
 
-  // ripple visual
+  /* ----- ripple visual for buttons ----- */
   document.addEventListener('click', function (e) {
     const b = e.target.closest('.btn');
     if (!b) return;
