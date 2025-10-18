@@ -35,7 +35,15 @@ a{color:inherit;text-decoration:none}
 .fields{display:flex;flex-direction:column;gap:12px}
 .field{display:flex;flex-direction:column;gap:6px}
 .field label{display:block;text-align:left;font-size:13px;color:var(--muted);margin-bottom:6px}
-.field input, .field select{padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));color:var(--white);outline:none;font-size:14px;width:100%;min-width:0;box-sizing:border-box}
+
+/* style native selects (dark) so if JS fails native remains usable */
+.field select, .field input{
+  padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));color:var(--white);outline:none;font-size:14px;width:100%;min-width:0;box-sizing:border-box;
+  -webkit-appearance:none;appearance:none;
+}
+
+/* arrow hint for native select */
+.field select { background-image: linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.12) 50%), linear-gradient(135deg, rgba(255,255,255,0.12) 50%, transparent 50%); background-position: calc(100% - 18px) calc(1em + 2px), calc(100% - 13px) calc(1em + 2px); background-size: 6px 6px, 6px 6px; background-repeat:no-repeat; padding-right:38px;}
 
 /* Row handling: allow shrink to avoid overflow */
 .row{display:flex;gap:10px;align-items:flex-start}
@@ -52,6 +60,18 @@ a{color:inherit;text-decoration:none}
 
 /* Table */
 .table-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px}
+.controls{display:flex;gap:10px;align-items:center}
+.controls select{min-width:160px}
+#searchInput{
+  background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+  border:1px solid rgba(255,255,255,0.04);
+  color:var(--white);
+  padding:8px 10px;border-radius:10px;
+  font-size:13px;min-width:200px;
+  outline:none;
+}
+#searchInput::placeholder{color:rgba(159,176,198,0.45)}
+
 .table-wrap{overflow:auto;max-height:58vh;border-radius:8px;padding:6px 0}
 table{width:100%;border-collapse:collapse;font-size:13px}
 thead th{position:sticky;top:0;background:rgba(11,19,27,0.85);padding:10px;text-align:left;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.03)}
@@ -79,6 +99,15 @@ tbody tr:hover{background:rgba(6,182,212,0.03)}
 @media (max-width:980px){ .grid{grid-template-columns:1fr} .input-form{order:2} .table-view{order:1} }
 @media (max-width:520px){ .row{flex-direction:column} .form-actions{flex-direction:column;align-items:stretch} .btn{width:100%} }
 
+/* add-catalog */
+.add-catalog{display:flex;gap:8px;align-items:center;margin-top:8px}
+.add-catalog input{
+  flex:1;
+  padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);
+  background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0)); color:var(--white);
+  font-size:13px; outline:none;
+}
+.add-catalog .btn.small{padding:8px 10px}
 
 /* ===== Custom select (JS-driven) styles (dark dropdown) ===== */
 .custom-select-wrapper { position: relative; width:100%; }
@@ -123,8 +152,7 @@ tbody tr:hover{background:rgba(6,182,212,0.03)}
 .custom-option:last-child{ border-bottom:none; }
 .custom-option:hover, .custom-option.active { background: rgba(6,182,212,0.06); color:var(--white); }
 
-/* IMPORTANT: hide original select off-screen and disable pointer events
-   so native browser popup (white) won't appear. Keep it in DOM for form value. */
+/* IMPORTANT: hide original select off-screen & inert only when JS marks it (class added by script) */
 .custom-select-hidden {
   position: absolute !important;
   left: -9999px !important;

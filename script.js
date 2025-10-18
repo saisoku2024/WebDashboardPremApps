@@ -1,6 +1,10 @@
-// script.js (final) - timpa file lama
+// final script.js - paste/overwrite this file
 const APPS_SCRIPT_URL = ''; // optional sync URL to Google Apps Script
 
+// --- Utility: safe global createCustomSelects reference (will be defined further down)
+let createCustomSelects;
+
+// Run after DOM loaded
 document.addEventListener('DOMContentLoaded', () => {
   const $ = id => document.getElementById(id);
 
@@ -33,7 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // utils
   const isoToday = () => new Date().toISOString().slice(0, 10);
   const numericOnly = s => String(s || '').replace(/[^0-9]/g, '');
-  const onlyDigits = numericOnly;
   const formatRupiah = n => (Number(n) || 0).toLocaleString('id-ID');
   const STORAGE_KEY = 'saisoku_subs';
 
@@ -57,7 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }, ms);
   }
 
-  // escape
   function escapeHtml(s) {
     return String(s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]);
   }
@@ -71,10 +73,114 @@ document.addEventListener('DOMContentLoaded', () => {
   // current view list (after filter/search)
   let currentRenderList = [];
 
-  /* ===== RENDER TABLE ===== */
+  /* ========== CATALOG MANAGER (persist & populate) ========== */
+  const CatalogManager = (function () {
+    const DEFAULT_CATALOGS = [
+      "Canva Premium",
+      "ChatGPT/Gemini AI",
+      "Disney+",
+      "Netflix",
+      "Prime Video",
+      "Spotify",
+      "Vidio Platinum",
+      "WeTV",
+      "Youtube Premium"
+    ].sort((a, b) => a.localeCompare(b, 'id', { sensitivity: 'base' }));
+
+    function loadCatalogs() {
+      try {
+        const raw = localStorage.getItem('saisoku_catalogs');
+        if (!raw) return DEFAULT_CATALOGS.slice();
+        const arr = JSON.parse(raw);
+        if (!Array.isArray(arr) || !arr.length) return DEFAULT_CATALOGS.slice();
+        // keep sorted
+        return arr.slice().sort((a,b)=> a.localeCompare(b,'id',{sensitivity:'base'}));
+      } catch (e) { return DEFAULT_CATALOGS.slice(); }
+    }
+
+    function saveCatalogs(arr) {
+      try { localStorage.setItem('saisoku_catalogs', JSON.stringify(arr.slice().sort((a,b)=> a.localeCompare(b,'id',{sensitivity:'base'})))); } catch (e) {}
+    }
+
+    function restoreSelectsFromWrappers() {
+      // if selects are inside wrappers, move them back before wrapper and remove wrapper
+      const wrappers = Array.from(document.querySelectorAll('.custom-select-wrapper'));
+      wrappers.forEach(w => {
+        const sel = w.querySelector('select');
+        if (sel) {
+          w.parentNode.insertBefore(sel, w);
+          sel.classList.remove('custom-select-hidden');
+          delete sel.dataset.customized;
+          sel.removeAttribute('aria-hidden');
+          try { sel.tabIndex = 0; } catch(e){}
+        }
+        w.remove();
+      });
+    }
+
+    function populateCatalogSelects() {
+      // restore selects to plain DOM (if previously converted)
+      restoreSelectsFromWrappers();
+
+      const catalogs = loadCatalogs();
+      const selKatalog = document.getElementById('katalog');
+      const selFilter = document.getElementById('filterProduk');
+
+      if (selKatalog) {
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Pilih Produk';
+        selKatalog.innerHTML = '';
+        selKatalog.appendChild(placeholder);
+        catalogs.forEach(c => {
+          const o = document.createElement('option');
+          o.value = c;
+          o.textContent = c;
+          selKatalog.appendChild(o);
+        });
+      }
+
+      if (selFilter) {
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Semua Produk';
+        selFilter.innerHTML = '';
+        selFilter.appendChild(placeholder);
+        catalogs.forEach(c => {
+          const o = document.createElement('option');
+          o.value = c;
+          o.textContent = c;
+          selFilter.appendChild(o);
+        });
+      }
+
+      // After native selects are populated, create custom selects
+      if (typeof createCustomSelects === 'function') {
+        // small delay to allow DOM update
+        setTimeout(() => { createCustomSelects(); }, 30);
+      }
+    }
+
+    function addCatalogItem(name) {
+      if (!name || !name.trim()) return false;
+      const label = name.trim();
+      const catalogs = loadCatalogs();
+      if (catalogs.some(c => c.toLowerCase() === label.toLowerCase())) return false;
+      catalogs.push(label);
+      saveCatalogs(catalogs);
+      populateCatalogSelects();
+      return true;
+    }
+
+    return {
+      loadCatalogs, saveCatalogs, populateCatalogSelects, addCatalogItem
+    };
+  })();
+
+  /* ========== TABLE RENDER ====== */
   function render() {
     const all = load();
-    const filterSel = $('filterProduk');
+    const filterSel = document.getElementById('filterProduk');
     const filtro = filterSel && filterSel.value ? filterSel.value : '';
     const q = (searchInput && searchInput.value || '').trim().toLowerCase();
 
@@ -89,13 +195,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!row) return;
       const katalogVal = row.katalog || row.produk || '';
       if (filtro && katalogVal !== filtro) return;
-
-      // search by name / wa / katalog
       if (q) {
         const hay = ((row.nama||'') + ' ' + (row.wa||'') + ' ' + katalogVal).toLowerCase();
         if (hay.indexOf(q) === -1) return;
       }
-
       currentRenderList.push({ row, originalIndex });
     });
 
@@ -143,22 +246,14 @@ document.addEventListener('DOMContentLoaded', () => {
     totalCustEl.textContent = uniqueWA.size;
   }
 
-  /* ===== FORM SUBMIT (Add) ===== */
+  /* ========== FORM SUBMIT (Add) ========= */
   if (form) {
     form.addEventListener('submit', (ev) => {
       ev.preventDefault();
       const nama = namaEl.value.trim();
       const wa = waEl.value.trim();
-
-      // robust katalog read
-      let katalog = '';
-      const selKatalog = $('katalog');
-      if (selKatalog) katalog = selKatalog.value || '';
-      else {
-        const alt = document.querySelector('select[name="katalog"], select[name="produk"]');
-        if (alt) katalog = alt.value || '';
-      }
-
+      const selKatalog = document.getElementById('katalog');
+      const katalog = selKatalog ? (selKatalog.value || '') : '';
       const device = $('device') ? $('device').value : '';
       const akun = akunEl ? akunEl.value.trim() : '';
       const password = passEl ? passEl.value : '';
@@ -216,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ===== RESET ===== */
+  /* ========= RESET ========= */
   if (resetBtn && form) {
     resetBtn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -230,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ===== TABLE ACTIONS (delegate) ===== */
+  /* ========= TABLE ACTIONS (delegate) ========= */
   tableBody.addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
@@ -257,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  /* ===== EXPORT (filtered) ===== */
+  /* ========= EXPORT (filtered) ========= */
   if (exportBtn) {
     exportBtn.addEventListener('click', () => {
       const rowsToExport = currentRenderList.length ? currentRenderList.map(e => e.row) : load();
@@ -273,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ===== SEARCH listener ===== */
+  /* ========= SEARCH listener ========= */
   if (searchInput) {
     let tId = null;
     searchInput.addEventListener('input', function () {
@@ -282,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ===== CURRENCY INPUT FORMATTING ===== */
+  /* ========= CURRENCY FORMATTING ========= */
   function formatCurrencyForInput(v) {
     const n = Number(numericOnly(v)) || 0;
     return n === 0 ? '' : n.toLocaleString('id-ID');
@@ -300,32 +395,59 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /* ===== CUSTOM SELECT CREATION (SAFE INSERT) ===== */
-  (function createCustomSelects(){
+  /* ========= ADD CATALOG UI HOOK ========= */
+  const addCatalogBtn = document.getElementById('addCatalogBtn');
+  const newCatalogInput = document.getElementById('newCatalogInput');
+  if (addCatalogBtn && newCatalogInput) {
+    addCatalogBtn.addEventListener('click', () => {
+      const v = newCatalogInput.value || '';
+      if (!v.trim()) { showToast('Masukkan nama produk'); return; }
+      const ok = CatalogManager.addCatalogItem(v);
+      if (ok) {
+        showToast('Produk ditambahkan');
+        newCatalogInput.value = '';
+      } else {
+        showToast('Produk sudah ada atau nama tidak valid');
+      }
+    });
+    newCatalogInput.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') { ev.preventDefault(); addCatalogBtn.click(); }
+    });
+  }
+
+  /* ========= CUSTOM SELECT CREATION (exposed) ========= */
+  createCustomSelects = function createCustomSelectsFn() {
     try {
+      // to avoid double-binding global document click, ensure flag
+      if (!window._customSelectDocListenerAdded) {
+        document.addEventListener('click', (ev) => {
+          // close all open custom selects when clicking outside
+          document.querySelectorAll('.custom-select.open').forEach(open => {
+            open.classList.remove('open');
+            const opts = open.parentNode.querySelector('.custom-options');
+            if (opts) opts.style.display = 'none';
+          });
+        });
+        window._customSelectDocListenerAdded = true;
+      }
+
       const selects = Array.from(document.querySelectorAll('select'));
       selects.forEach(sel => {
         if (sel.dataset.customized === '1') return;
 
-        // store original parent & sibling BEFORE changing DOM
+        // create wrapper in place
         const originalParent = sel.parentNode;
         const originalNext = sel.nextSibling;
-
-        // create wrapper and insert at original place first
         const wrapper = document.createElement('div');
         wrapper.className = 'custom-select-wrapper';
         originalParent.insertBefore(wrapper, originalNext);
-
-        // move select into wrapper
         wrapper.appendChild(sel);
 
-        // hide original select (off-screen & inert)
         sel.classList.add('custom-select-hidden');
         sel.dataset.customized = '1';
-        sel.setAttribute('aria-hidden','true');
+        sel.setAttribute('aria-hidden', 'true');
         try { sel.tabIndex = -1; } catch (e) {}
 
-        // visible control
         const control = document.createElement('div');
         control.className = 'custom-select';
         const label = document.createElement('div');
@@ -337,7 +459,6 @@ document.addEventListener('DOMContentLoaded', () => {
         control.appendChild(label);
         control.appendChild(caret);
 
-        // options container
         const opts = document.createElement('div');
         opts.className = 'custom-options';
         opts.style.display = 'none';
@@ -362,7 +483,6 @@ document.addEventListener('DOMContentLoaded', () => {
           opts.appendChild(item);
         });
 
-        // toggle
         control.addEventListener('click', (e) => {
           e.stopPropagation();
           const isOpen = control.classList.toggle('open');
@@ -373,15 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
 
-        // close on outside click
-        document.addEventListener('click', (e) => {
-          if (!wrapper.contains(e.target)) {
-            opts.style.display = 'none';
-            control.classList.remove('open');
-          }
-        });
-
-        // keyboard nav
+        // keyboard navigation
         control.tabIndex = 0;
         control.addEventListener('keydown', (e) => {
           const visible = opts.style.display === 'block';
@@ -407,7 +519,6 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
 
-        // sync original select changes
         sel.addEventListener('change', () => {
           const i = sel.selectedIndex;
           if (i >= 0 && sel.options[i]) {
@@ -418,15 +529,21 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
 
-        // append control & opts (wrapper already in DOM)
         wrapper.appendChild(control);
         wrapper.appendChild(opts);
       });
     } catch (e) {
       console.error('createCustomSelects error', e);
     }
-  })();
+  }; // end createCustomSelects
 
-  // initial render
+  // Expose CatalogManager helpers to console if needed
+  window.addCatalogItem = CatalogManager.addCatalogItem;
+  window.loadCatalogs = CatalogManager.loadCatalogs;
+
+  // Populate catalogs first, then create custom selects
+  CatalogManager.populateCatalogSelects();
+
+  // initial table render
   render();
 });

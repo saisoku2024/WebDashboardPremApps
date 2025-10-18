@@ -35,16 +35,16 @@
 
           <div class="field">
             <label for="katalog">Katalog / Produk <span class="req">*</span></label>
-            <!-- native select (always present). If JS runs it will convert to custom-select,
-                 otherwise native select stays visible (dark styled by CSS below). -->
+            <!-- native select (always present). The script will populate options and convert to dark custom dropdown -->
             <select id="katalog" name="katalog" aria-label="Katalog Produk">
               <option value="">Pilih Produk</option>
-              <option value="Netflix">Netflix</option>
-              <option value="Viu">Viu</option>
-              <option value="Prime Video">Prime Video</option>
-              <option value="Disney+">Disney+</option>
-              <option value="WeTV">WeTV</option>
             </select>
+
+            <!-- UI to add new catalog items dynamically -->
+            <div class="add-catalog">
+              <input id="newCatalogInput" type="text" placeholder="Tambah produk baru (mis. HBO Max)" />
+              <button id="addCatalogBtn" class="btn small" type="button">Tambah</button>
+            </div>
           </div>
 
           <div class="field">
@@ -122,11 +122,6 @@
           <div class="controls">
             <select id="filterProduk" name="filterProduk" aria-label="Filter Produk">
               <option value="">Semua Produk</option>
-              <option value="Netflix">Netflix</option>
-              <option value="Viu">Viu</option>
-              <option value="Prime Video">Prime Video</option>
-              <option value="Disney+">Disney+</option>
-              <option value="WeTV">WeTV</option>
             </select>
 
             <input id="searchInput" type="search" placeholder="Cari nama / WA..." aria-label="Cari transaksi" />
