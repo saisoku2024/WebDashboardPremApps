@@ -17,7 +17,7 @@
       </div>
     </header>
 
-    <!-- FUTURISTIC KPI ROW -->
+    <!-- FUTURISTIC KPI ROW (tetap) -->
     <section class="kpi-row" aria-hidden="false">
       <div class="kpi card glass">
         <div class="kpi-title">Pendapatan Hari Ini</div>
@@ -37,16 +37,14 @@
     </section>
 
     <main class="grid">
-      <!-- INPUT FORM -->
+      <!-- INPUT FORM (tidak berubah) -->
       <aside class="card input-form" aria-labelledby="input-title">
         <h2 id="input-title">Input Data Langganan</h2>
-
         <form id="entryForm" class="fields" autocomplete="off" novalidate>
           <div class="field">
             <label for="nama">Nama Pembeli <span class="req">*</span></label>
             <input id="nama" name="nama" type="text" placeholder="Nama lengkap" required />
           </div>
-
           <div class="field">
             <label for="wa">No. WhatsApp <span class="req">*</span></label>
             <input id="wa" name="wa" type="text" inputmode="tel" placeholder="08xxxxxxxxxx" required />
@@ -54,13 +52,9 @@
 
           <div class="field">
             <label for="katalog">Katalog / Produk <span class="req">*</span></label>
-
-            <!-- native select (populated by script) -->
             <select id="katalog" name="katalog" aria-label="Katalog Produk">
               <option value="">Pilih Produk</option>
             </select>
-
-            <!-- add-catalog UI -->
             <div class="add-catalog">
               <input id="newCatalogInput" type="text" placeholder="Tambah produk baru (mis. HBO Max)" />
               <button id="addCatalogBtn" class="btn small" type="button">Tambah</button>
@@ -125,10 +119,7 @@
           </div>
 
           <div class="form-actions">
-            <!-- primary add button -->
             <button id="addBtn" class="btn primary" type="submit">+ Tambah Data</button>
-
-            <!-- reset now uses same primary look (per request) -->
             <button id="resetBtn" class="btn primary small" type="button">Reset</button>
           </div>
         </form>
@@ -183,9 +174,7 @@
     <footer class="footer">© 2025 SAISOKU.ID · Flat Dark Dashboard by SIVA</footer>
   </div>
 
-  <!-- toast -->
   <div id="toast" class="toast" aria-live="polite"></div>
-
   <script src="script.js"></script>
 </body>
 </html>
