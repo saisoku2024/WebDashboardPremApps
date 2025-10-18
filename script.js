@@ -1,14 +1,10 @@
-// final script.js - paste/overwrite this file
-const APPS_SCRIPT_URL = ''; // optional sync URL to Google Apps Script
+// script.js - simplified & robust for dynamic catalog + dark custom dropdown
+const APPS_SCRIPT_URL = ''; // optional
 
-// --- Utility: safe global createCustomSelects reference (will be defined further down)
-let createCustomSelects;
-
-// Run after DOM loaded
 document.addEventListener('DOMContentLoaded', () => {
   const $ = id => document.getElementById(id);
 
-  // DOM elements
+  // elements
   const form = $('entryForm');
   const namaEl = $('nama');
   const waEl = $('wa');
@@ -28,214 +24,289 @@ document.addEventListener('DOMContentLoaded', () => {
   const totalCustEl = $('totalCust');
   const toastEl = $('toast');
   const searchInput = $('searchInput');
+  const addCatalogBtn = $('addCatalogBtn');
+  const newCatalogInput = $('newCatalogInput');
 
-  if (!tableBody || !form) {
-    console.warn('Core elements not found. Script stopped.');
+  if (!form || !tableBody) {
+    console.warn('Core elements missing, abort script.');
     return;
   }
 
-  // utils
-  const isoToday = () => new Date().toISOString().slice(0, 10);
-  const numericOnly = s => String(s || '').replace(/[^0-9]/g, '');
-  const formatRupiah = n => (Number(n) || 0).toLocaleString('id-ID');
+  // utilities
+  const isoToday = () => new Date().toISOString().slice(0,10);
+  const numericOnly = s => String(s||'').replace(/[^0-9]/g,'');
+  const formatRupiah = n => (Number(n)||0).toLocaleString('id-ID');
   const STORAGE_KEY = 'saisoku_subs';
+  const CATALOG_KEY = 'saisoku_catalogs';
 
-  // storage helpers
-  const load = () => {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
-    catch (e) { return []; }
-  };
-  const save = arr => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
-
-  // toast
-  function showToast(msg = '', ms = 1500) {
-    if (!toastEl) return;
+  function showToast(msg='', ms=1400){
+    if(!toastEl) return;
     toastEl.textContent = msg;
     toastEl.style.display = 'block';
     toastEl.style.opacity = '1';
     clearTimeout(toastEl._t);
-    toastEl._t = setTimeout(() => {
-      toastEl.style.opacity = '0';
-      toastEl.style.display = 'none';
-    }, ms);
+    toastEl._t = setTimeout(()=>{ toastEl.style.opacity='0'; toastEl.style.display='none'; }, ms);
   }
+  function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
 
-  function escapeHtml(s) {
-    return String(s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]);
-  }
+  // storage helpers
+  const load = ()=> { try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); }catch(e){return[];} };
+  const save = arr => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  const loadCatalogs = ()=> {
+    try {
+      const raw = localStorage.getItem(CATALOG_KEY);
+      if(!raw) return defaultCatalogs.slice();
+      const arr = JSON.parse(raw);
+      if(!Array.isArray(arr)) return defaultCatalogs.slice();
+      return arr.slice().sort((a,b)=> a.localeCompare(b,'id',{sensitivity:'base'}));
+    } catch(e){ return defaultCatalogs.slice(); }
+  };
+  const saveCatalogs = arr => {
+    try{ localStorage.setItem(CATALOG_KEY, JSON.stringify(arr.slice().sort((a,b)=> a.localeCompare(b,'id',{sensitivity:'base'})))); }catch(e){}
+  };
 
-  // initial defaults
-  if (tglEl && !tglEl.value) tglEl.value = isoToday();
-  if (durasiEl && !durasiEl.value) durasiEl.value = '30 Hari';
-  if (modalEl && !modalEl.value) modalEl.value = '';
-  if (hargaEl && !hargaEl.value) hargaEl.value = '';
+  const defaultCatalogs = [
+    "Canva Premium",
+    "ChatGPT/Gemini AI",
+    "Disney+",
+    "Netflix",
+    "Prime Video",
+    "Spotify",
+    "Vidio Platinum",
+    "WeTV",
+    "Youtube Premium"
+  ].sort((a,b)=> a.localeCompare(b,'id',{sensitivity:'base'}));
 
-  // current view list (after filter/search)
-  let currentRenderList = [];
+  // --- populate native selects (katalog + filter)
+  function populateSelects(){
+    // remove any existing custom wrappers first (to start from native select)
+    destroyCustomSelects();
 
-  /* ========== CATALOG MANAGER (persist & populate) ========== */
-  const CatalogManager = (function () {
-    const DEFAULT_CATALOGS = [
-      "Canva Premium",
-      "ChatGPT/Gemini AI",
-      "Disney+",
-      "Netflix",
-      "Prime Video",
-      "Spotify",
-      "Vidio Platinum",
-      "WeTV",
-      "Youtube Premium"
-    ].sort((a, b) => a.localeCompare(b, 'id', { sensitivity: 'base' }));
-
-    function loadCatalogs() {
-      try {
-        const raw = localStorage.getItem('saisoku_catalogs');
-        if (!raw) return DEFAULT_CATALOGS.slice();
-        const arr = JSON.parse(raw);
-        if (!Array.isArray(arr) || !arr.length) return DEFAULT_CATALOGS.slice();
-        // keep sorted
-        return arr.slice().sort((a,b)=> a.localeCompare(b,'id',{sensitivity:'base'}));
-      } catch (e) { return DEFAULT_CATALOGS.slice(); }
+    const catalogs = loadCatalogs();
+    const selK = $('katalog');
+    const selF = $('filterProduk');
+    if(selK){
+      selK.innerHTML = '';
+      const p = document.createElement('option'); p.value=''; p.textContent='Pilih Produk'; selK.appendChild(p);
+      catalogs.forEach(c=>{
+        const o = document.createElement('option'); o.value=c; o.textContent=c; selK.appendChild(o);
+      });
     }
-
-    function saveCatalogs(arr) {
-      try { localStorage.setItem('saisoku_catalogs', JSON.stringify(arr.slice().sort((a,b)=> a.localeCompare(b,'id',{sensitivity:'base'})))); } catch (e) {}
-    }
-
-    function restoreSelectsFromWrappers() {
-      // if selects are inside wrappers, move them back before wrapper and remove wrapper
-      const wrappers = Array.from(document.querySelectorAll('.custom-select-wrapper'));
-      wrappers.forEach(w => {
-        const sel = w.querySelector('select');
-        if (sel) {
-          w.parentNode.insertBefore(sel, w);
-          sel.classList.remove('custom-select-hidden');
-          delete sel.dataset.customized;
-          sel.removeAttribute('aria-hidden');
-          try { sel.tabIndex = 0; } catch(e){}
-        }
-        w.remove();
+    if(selF){
+      selF.innerHTML = '';
+      const p = document.createElement('option'); p.value=''; p.textContent='Semua Produk'; selF.appendChild(p);
+      catalogs.forEach(c=>{
+        const o = document.createElement('option'); o.value=c; o.textContent=c; selF.appendChild(o);
       });
     }
 
-    function populateCatalogSelects() {
-      // restore selects to plain DOM (if previously converted)
-      restoreSelectsFromWrappers();
+    // after populating native selects, create custom selects
+    createCustomSelects();
+  }
 
-      const catalogs = loadCatalogs();
-      const selKatalog = document.getElementById('katalog');
-      const selFilter = document.getElementById('filterProduk');
+  // --- destroy custom wrappers and restore native selects
+  function destroyCustomSelects(){
+    const wrappers = Array.from(document.querySelectorAll('.custom-select-wrapper'));
+    wrappers.forEach(w => {
+      const sel = w.querySelector('select');
+      if(sel){
+        // move select before wrapper
+        w.parentNode.insertBefore(sel, w);
+        sel.classList.remove('custom-select-hidden');
+        sel.removeAttribute('data-customized');
+        sel.removeAttribute('aria-hidden');
+        try{ sel.tabIndex = 0; }catch(e){}
+      }
+      w.remove();
+    });
+  }
 
-      if (selKatalog) {
-        const placeholder = document.createElement('option');
-        placeholder.value = '';
-        placeholder.textContent = 'Pilih Produk';
-        selKatalog.innerHTML = '';
-        selKatalog.appendChild(placeholder);
-        catalogs.forEach(c => {
-          const o = document.createElement('option');
-          o.value = c;
-          o.textContent = c;
-          selKatalog.appendChild(o);
+  // --- create custom selects (dark styled)
+  // ensure doc click listener only added once
+  if(!window._saisoku_docclick) {
+    document.addEventListener('click', ()=> {
+      document.querySelectorAll('.custom-select.open').forEach(c=>{
+        c.classList.remove('open');
+        const opts = c.parentNode.querySelector('.custom-options');
+        if(opts) opts.style.display='none';
+      });
+    });
+    window._saisoku_docclick = true;
+  }
+
+  function createCustomSelects(){
+    try {
+      const selects = Array.from(document.querySelectorAll('select'));
+      selects.forEach(sel=>{
+        if(sel.dataset.customized==='1') return;
+        // wrap
+        const wrapper = document.createElement('div');
+        wrapper.className = 'custom-select-wrapper';
+        sel.parentNode.insertBefore(wrapper, sel.nextSibling);
+        wrapper.appendChild(sel);
+
+        sel.classList.add('custom-select-hidden');
+        sel.dataset.customized = '1';
+        sel.setAttribute('aria-hidden','true');
+        try{ sel.tabIndex = -1; }catch(e){}
+
+        const control = document.createElement('div'); control.className='custom-select';
+        const label = document.createElement('div'); label.className='label';
+        label.textContent = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : (sel.getAttribute('placeholder')||'Pilih');
+        const caret = document.createElement('div'); caret.className='caret';
+        caret.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23e6eef8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+        control.appendChild(label); control.appendChild(caret);
+
+        const opts = document.createElement('div'); opts.className='custom-options'; opts.style.display='none';
+
+        Array.from(sel.options).forEach((o,i)=>{
+          const item = document.createElement('div');
+          item.className='custom-option';
+          item.textContent = o.text;
+          item.dataset.index = i;
+          if(o.disabled) item.setAttribute('aria-disabled','true');
+          if(sel.selectedIndex===i) item.classList.add('active');
+          item.addEventListener('click', ()=>{
+            if(o.disabled) return;
+            sel.selectedIndex = i;
+            sel.dispatchEvent(new Event('change',{bubbles:true}));
+            label.textContent = o.text;
+            opts.querySelectorAll('.custom-option').forEach(x=>x.classList.remove('active'));
+            item.classList.add('active');
+            opts.style.display='none';
+            control.classList.remove('open');
+          });
+          opts.appendChild(item);
         });
-      }
 
-      if (selFilter) {
-        const placeholder = document.createElement('option');
-        placeholder.value = '';
-        placeholder.textContent = 'Semua Produk';
-        selFilter.innerHTML = '';
-        selFilter.appendChild(placeholder);
-        catalogs.forEach(c => {
-          const o = document.createElement('option');
-          o.value = c;
-          o.textContent = c;
-          selFilter.appendChild(o);
+        control.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          const is = control.classList.toggle('open');
+          opts.style.display = is ? 'block' : 'none';
+          if(is){
+            const active = opts.querySelector('.custom-option.active');
+            if(active) active.scrollIntoView({block:'nearest'});
+          }
         });
-      }
 
-      // After native selects are populated, create custom selects
-      if (typeof createCustomSelects === 'function') {
-        // small delay to allow DOM update
-        setTimeout(() => { createCustomSelects(); }, 30);
-      }
+        control.tabIndex = 0;
+        control.addEventListener('keydown', (e)=>{
+          const visible = opts.style.display==='block';
+          if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); control.click(); return; }
+          if(e.key === 'Escape') { opts.style.display='none'; control.classList.remove('open'); return; }
+          if(!visible && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) { control.click(); return; }
+          if(visible && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+            e.preventDefault();
+            const items = Array.from(opts.querySelectorAll('.custom-option'));
+            if(!items.length) return;
+            const currentIndex = items.findIndex(it=>it.classList.contains('active'));
+            let next = currentIndex;
+            if(e.key === 'ArrowDown') next = Math.min(items.length-1, currentIndex+1);
+            if(e.key === 'ArrowUp') next = Math.max(0, currentIndex-1);
+            if(currentIndex === -1) next = 0;
+            items.forEach(it=>it.classList.remove('active'));
+            items[next].classList.add('active');
+            items[next].scrollIntoView({block:'nearest'});
+          }
+          if(visible && e.key === 'Enter') {
+            const active = opts.querySelector('.custom-option.active');
+            if(active) active.click();
+          }
+        });
+
+        sel.addEventListener('change', ()=>{
+          const i = sel.selectedIndex;
+          if(i>=0 && sel.options[i]){
+            label.textContent = sel.options[i].text;
+            opts.querySelectorAll('.custom-option').forEach(x=>x.classList.remove('active'));
+            const it = opts.querySelector(`.custom-option[data-index="${i}"]`);
+            if(it) it.classList.add('active');
+          }
+        });
+
+        wrapper.appendChild(control);
+        wrapper.appendChild(opts);
+      });
+    } catch(e) {
+      console.error('createCustomSelects error', e);
     }
+  }
 
-    function addCatalogItem(name) {
-      if (!name || !name.trim()) return false;
-      const label = name.trim();
-      const catalogs = loadCatalogs();
-      if (catalogs.some(c => c.toLowerCase() === label.toLowerCase())) return false;
-      catalogs.push(label);
-      saveCatalogs(catalogs);
-      populateCatalogSelects();
-      return true;
-    }
+  // --- CATALOG add function
+  function addCatalog(name){
+    if(!name || !name.trim()) return false;
+    const label = name.trim();
+    const catalogs = loadCatalogs();
+    if(catalogs.some(c=>c.toLowerCase()===label.toLowerCase())) return false;
+    catalogs.push(label);
+    saveCatalogs(catalogs);
+    populateSelects();
+    return true;
+  }
 
-    return {
-      loadCatalogs, saveCatalogs, populateCatalogSelects, addCatalogItem
-    };
-  })();
+  // Bind add-catalog UI
+  if(addCatalogBtn && newCatalogInput){
+    addCatalogBtn.addEventListener('click', ()=>{
+      const v = newCatalogInput.value || '';
+      if(!v.trim()){ showToast('Masukkan nama produk'); return; }
+      const ok = addCatalog(v);
+      if(ok){ showToast('Produk ditambahkan'); newCatalogInput.value=''; }
+      else showToast('Produk sudah ada atau tidak valid');
+    });
+    newCatalogInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); addCatalogBtn.click(); } });
+  }
 
-  /* ========== TABLE RENDER ====== */
-  function render() {
+  // --- Table render, form handling, export, search, currency formatting --- (kept concise)
+  let currentRenderList = [];
+
+  function render(){
     const all = load();
-    const filterSel = document.getElementById('filterProduk');
+    const filterSel = $('filterProduk');
     const filtro = filterSel && filterSel.value ? filterSel.value : '';
     const q = (searchInput && searchInput.value || '').trim().toLowerCase();
+    tableBody.innerHTML = ''; currentRenderList = [];
+    let sumModal=0, sumProfit=0; const uniqueWA = new Set();
 
-    tableBody.innerHTML = '';
-    currentRenderList = [];
-
-    let sumModal = 0;
-    let sumProfit = 0;
-    const uniqueWA = new Set();
-
-    all.forEach((row, originalIndex) => {
-      if (!row) return;
-      const katalogVal = row.katalog || row.produk || '';
-      if (filtro && katalogVal !== filtro) return;
-      if (q) {
-        const hay = ((row.nama||'') + ' ' + (row.wa||'') + ' ' + katalogVal).toLowerCase();
-        if (hay.indexOf(q) === -1) return;
+    all.forEach((row, idx)=>{
+      if(!row) return;
+      const katalogVal = row.katalog||row.produk||'';
+      if(filtro && katalogVal !== filtro) return;
+      if(q){
+        const hay = ((row.nama||'')+' '+(row.wa||'')+' '+katalogVal).toLowerCase();
+        if(hay.indexOf(q)===-1) return;
       }
-      currentRenderList.push({ row, originalIndex });
+      currentRenderList.push({row, originalIndex: idx});
     });
 
-    if (!currentRenderList.length) {
+    if(!currentRenderList.length){
       const tr = document.createElement('tr');
       tr.innerHTML = `<td colspan="9" class="empty-state">Belum ada transaksi. Isi form di kiri lalu klik <strong>Tambah Data</strong>.</td>`;
       tableBody.appendChild(tr);
-      totalModalEl.textContent = 'Rp 0';
-      totalProfitEl.textContent = 'Rp 0';
-      totalCustEl.textContent = '0';
+      totalModalEl.textContent='Rp 0'; totalProfitEl.textContent='Rp 0'; totalCustEl.textContent='0';
       return;
     }
 
-    currentRenderList.forEach((entry, idx) => {
+    currentRenderList.forEach((entry, i)=>{
       const row = entry.row || {};
       const modal = Number(row.modal) || 0;
       const harga = Number(row.harga) || 0;
       const profit = harga - modal;
-      sumModal += modal;
-      sumProfit += profit;
-      if (row.wa) uniqueWA.add(row.wa);
-
+      sumModal += modal; sumProfit += profit;
+      if(row.wa) uniqueWA.add(row.wa);
       const produk = row.katalog || row.produk || '-';
-
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${escapeHtml(row.nama || '-')}</td>
+        <td>${escapeHtml(row.nama||'-')}</td>
         <td>${escapeHtml(produk)}</td>
-        <td>${escapeHtml(row.tglBeli || '-')}</td>
-        <td>${escapeHtml(row.durasi || '-')}</td>
+        <td>${escapeHtml(row.tglBeli||'-')}</td>
+        <td>${escapeHtml(row.durasi||'-')}</td>
         <td>Rp ${formatRupiah(modal)}</td>
         <td>Rp ${formatRupiah(harga)}</td>
         <td>Rp ${formatRupiah(profit)}</td>
-        <td>${escapeHtml(row.statusBuyer || '-')}</td>
+        <td>${escapeHtml(row.statusBuyer||'-')}</td>
         <td>
-          <button class="copy-btn" data-idx="${idx}" data-action="copy">Copy</button>
-          <button class="copy-btn" data-idx="${idx}" data-action="delete">Hapus</button>
+          <button class="copy-btn" data-idx="${i}" data-action="copy">Copy</button>
+          <button class="copy-btn" data-idx="${i}" data-action="delete">Hapus</button>
         </td>
       `;
       tableBody.appendChild(tr);
@@ -246,304 +317,57 @@ document.addEventListener('DOMContentLoaded', () => {
     totalCustEl.textContent = uniqueWA.size;
   }
 
-  /* ========== FORM SUBMIT (Add) ========= */
-  if (form) {
-    form.addEventListener('submit', (ev) => {
-      ev.preventDefault();
-      const nama = namaEl.value.trim();
-      const wa = waEl.value.trim();
-      const selKatalog = document.getElementById('katalog');
-      const katalog = selKatalog ? (selKatalog.value || '') : '';
-      const device = $('device') ? $('device').value : '';
-      const akun = akunEl ? akunEl.value.trim() : '';
-      const password = passEl ? passEl.value : '';
-      const profile = profileEl ? profileEl.value.trim() : '';
-      const tglBeli = (tglEl && tglEl.value) ? tglEl.value : isoToday();
-      const dur = durasiEl ? durasiEl.value.trim() : '';
-      const statusBuyer = $('statusBuyer') ? $('statusBuyer').value : '';
+  // form submit
+  form.addEventListener('submit', (ev)=>{
+    ev.preventDefault();
+    const nama = namaEl.value.trim();
+    const wa = waEl.value.trim();
+    const katalog = $('katalog') ? $('katalog').value : '';
+    const device = $('device') ? $('device').value : '';
+    const akun = akunEl ? akunEl.value.trim() : '';
+    const password = passEl ? passEl.value : '';
+    const profile = profileEl ? profileEl.value.trim() : '';
+    const tglBeli = (tglEl && tglEl.value) ? tglEl.value : isoToday();
+    const dur = durasiEl ? durasiEl.value.trim() : '';
+    const statusBuyer = $('statusBuyer') ? $('statusBuyer').value : '';
+    const modalRaw = modalEl ? String(modalEl.value||'') : '';
+    const hargaRaw = hargaEl ? String(hargaEl.value||'') : '';
+    const modal = numericOnly(modalRaw);
+    const harga = numericOnly(hargaRaw);
 
-      const modalRaw = modalEl ? String(modalEl.value || '') : '';
-      const hargaRaw = hargaEl ? String(hargaEl.value || '') : '';
-      const modal = numericOnly(modalRaw);
-      const harga = numericOnly(hargaRaw);
+    if(!nama){ namaEl.focus(); showToast('Nama harus diisi'); return; }
+    if(!wa){ waEl.focus(); showToast('No. WhatsApp harus diisi'); return; }
+    if(!katalog){ showToast('Pilih produk'); return; }
 
-      if (!nama) { namaEl.focus(); showToast('Nama harus diisi'); return; }
-      if (!wa) { waEl.focus(); showToast('No. WhatsApp harus diisi'); return; }
-      if (!katalog) { showToast('Pilih produk'); return; }
+    addBtn.disabled = true; addBtn.textContent = 'Menyimpan...';
+    const entry = { nama, wa, katalog, akun, password, profile, device, tglBeli, durasi:dur, statusBuyer, modal, harga, created: new Date().toISOString() };
+    const all = load(); all.push(entry); save(all); render();
 
-      addBtn.disabled = true;
-      addBtn.textContent = 'Menyimpan...';
+    if(APPS_SCRIPT_URL){
+      fetch(APPS_SCRIPT_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ buyerName:nama, buyerWA:wa, catalog:katalog, duration:dur, account:akun, password, profilePin:profile, device, buyerType:statusBuyer, paymentNum:Number(harga)||0, modalNum:Number(modal)||0, dateBuy:tglBeli }) }).catch(()=>{});
+    }
 
-      const entry = {
-        nama, wa, katalog, akun, password, profile, device,
-        tglBeli, durasi: dur, statusBuyer, modal, harga, created: new Date().toISOString()
-      };
+    setTimeout(()=>{ addBtn.disabled=false; addBtn.textContent='+ Tambah Data'; showToast('Transaksi ditambahkan'); form.reset(); if(tglEl) tglEl.value = isoToday(); if(durasiEl) durasiEl.value='30 Hari'; if(modalEl) modalEl.value=''; if(hargaEl) hargaEl.value=''; document.querySelector('.table-view').scrollIntoView({behavior:'smooth'}); }, 220);
+  });
 
-      const all = load();
-      all.push(entry);
-      save(all);
-      render();
+  // reset
+  resetBtn && resetBtn.addEventListener('click', (e)=>{ e.preventDefault(); if(!confirm('Reset form? Semua input akan kosong.')) return; form.reset(); if(tglEl) tglEl.value=isoToday(); if(durasiEl) durasiEl.value='30 Hari'; if(modalEl) modalEl.value=''; if(hargaEl) hargaEl.value=''; showToast('Form direset'); });
 
-      // optional sync
-      if (APPS_SCRIPT_URL) {
-        fetch(APPS_SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            buyerName: nama, buyerWA: wa, catalog: katalog, duration: dur,
-            account: akun, password: password, profilePin: profile, device: device,
-            buyerType: statusBuyer, paymentNum: Number(harga)||0, modalNum: Number(modal)||0, dateBuy: tglBeli
-          })
-        }).catch(()=>{/* ignore */});
-      }
-
-      setTimeout(() => {
-        addBtn.disabled = false;
-        addBtn.textContent = '+ Tambah Data';
-        showToast('Transaksi ditambahkan');
-        form.reset();
-        if (tglEl) tglEl.value = isoToday();
-        if (durasiEl) durasiEl.value = '30 Hari';
-        if (modalEl) modalEl.value = '';
-        if (hargaEl) hargaEl.value = '';
-        document.querySelector('.table-view').scrollIntoView({ behavior: 'smooth' });
-      }, 220);
-    });
-  }
-
-  /* ========= RESET ========= */
-  if (resetBtn && form) {
-    resetBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (!confirm('Reset form? Semua input akan kosong.')) return;
-      form.reset();
-      if (tglEl) tglEl.value = isoToday();
-      if (durasiEl) durasiEl.value = '30 Hari';
-      if (modalEl) modalEl.value = '';
-      if (hargaEl) hargaEl.value = '';
-      showToast('Form direset');
-    });
-  }
-
-  /* ========= TABLE ACTIONS (delegate) ========= */
-  tableBody.addEventListener('click', (e) => {
-    const btn = e.target.closest('button');
-    if (!btn) return;
-    const idx = Number(btn.dataset.idx);
-    const action = btn.dataset.action;
-    if (Number.isNaN(idx)) return;
-    const entry = currentRenderList[idx];
-    if (!entry) return;
+  // table actions
+  tableBody.addEventListener('click', (e)=>{
+    const btn = e.target.closest('button'); if(!btn) return;
+    const idx = Number(btn.dataset.idx); const action = btn.dataset.action;
+    if(Number.isNaN(idx)) return; const entry = currentRenderList[idx]; if(!entry) return;
     const { row, originalIndex } = entry;
-
-    if (action === 'copy') {
-      const text = `Akun: ${row.akun || '-'}\nPassword: ${row.password || '-'}\nProfile/PIN: ${row.profile || '-'}\nDevice: ${row.device || '-'}`;
-      navigator.clipboard?.writeText(text).then(() => {
-        btn.textContent = '✓';
-        setTimeout(() => btn.textContent = 'Copy', 900);
-      }).catch(() => showToast('Gagal menyalin ke clipboard'));
-    } else if (action === 'delete') {
-      if (!confirm('Hapus transaksi ini?')) return;
-      const all = load();
-      all.splice(originalIndex, 1);
-      save(all);
-      render();
-      showToast('Transaksi dihapus');
-    }
+    if(action === 'copy'){ const text = `Akun: ${row.akun||'-'}\nPassword: ${row.password||'-'}\nProfile/PIN: ${row.profile||'-'}\nDevice: ${row.device||'-'}`; navigator.clipboard?.writeText(text).then(()=>{ btn.textContent='✓'; setTimeout(()=>btn.textContent='Copy',900); }).catch(()=>showToast('Gagal menyalin ke clipboard')); }
+    else if(action === 'delete'){ if(!confirm('Hapus transaksi ini?')) return; const all = load(); all.splice(originalIndex,1); save(all); render(); showToast('Transaksi dihapus'); }
   });
 
-  /* ========= EXPORT (filtered) ========= */
-  if (exportBtn) {
-    exportBtn.addEventListener('click', () => {
-      const rowsToExport = currentRenderList.length ? currentRenderList.map(e => e.row) : load();
-      if (!rowsToExport.length) { showToast('Tidak ada data untuk diekspor'); return; }
-      const header = ['Nama','WA','Produk','Durasi','Akun','Password','Profile','Device','Pembayaran','Modal','Tanggal','Created'];
-      const rows = rowsToExport.map(r => [r.nama, r.wa, r.katalog, r.durasi, r.akun, r.password, r.profile, r.device, r.harga, r.modal, r.tglBeli, r.created]);
-      const csv = [header, ...rows].map(r => r.map(c => `"${String(c || '').replace(/"/g,'""')}"`).join(',')).join('\r\n');
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'saisoku_subs.csv'; a.click();
-      URL.revokeObjectURL(url);
-      showToast('CSV diekspor');
-    });
-  }
-
-  /* ========= SEARCH listener ========= */
-  if (searchInput) {
-    let tId = null;
-    searchInput.addEventListener('input', function () {
-      clearTimeout(tId);
-      tId = setTimeout(render, 160);
-    });
-  }
-
-  /* ========= CURRENCY FORMATTING ========= */
-  function formatCurrencyForInput(v) {
-    const n = Number(numericOnly(v)) || 0;
-    return n === 0 ? '' : n.toLocaleString('id-ID');
-  }
-  [modalEl, hargaEl].forEach(el => {
-    if (!el) return;
-    el.addEventListener('focus', () => {
-      el.value = numericOnly(el.value);
-      setTimeout(() => {
-        try { el.setSelectionRange(el.value.length, el.value.length); } catch (e) {}
-      }, 0);
-    });
-    el.addEventListener('blur', () => {
-      el.value = formatCurrencyForInput(el.value);
-    });
-  });
-
-  /* ========= ADD CATALOG UI HOOK ========= */
-  const addCatalogBtn = document.getElementById('addCatalogBtn');
-  const newCatalogInput = document.getElementById('newCatalogInput');
-  if (addCatalogBtn && newCatalogInput) {
-    addCatalogBtn.addEventListener('click', () => {
-      const v = newCatalogInput.value || '';
-      if (!v.trim()) { showToast('Masukkan nama produk'); return; }
-      const ok = CatalogManager.addCatalogItem(v);
-      if (ok) {
-        showToast('Produk ditambahkan');
-        newCatalogInput.value = '';
-      } else {
-        showToast('Produk sudah ada atau nama tidak valid');
-      }
-    });
-    newCatalogInput.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Enter') { ev.preventDefault(); addCatalogBtn.click(); }
-    });
-  }
-
-  /* ========= CUSTOM SELECT CREATION (exposed) ========= */
-  createCustomSelects = function createCustomSelectsFn() {
-    try {
-      // to avoid double-binding global document click, ensure flag
-      if (!window._customSelectDocListenerAdded) {
-        document.addEventListener('click', (ev) => {
-          // close all open custom selects when clicking outside
-          document.querySelectorAll('.custom-select.open').forEach(open => {
-            open.classList.remove('open');
-            const opts = open.parentNode.querySelector('.custom-options');
-            if (opts) opts.style.display = 'none';
-          });
-        });
-        window._customSelectDocListenerAdded = true;
-      }
-
-      const selects = Array.from(document.querySelectorAll('select'));
-      selects.forEach(sel => {
-        if (sel.dataset.customized === '1') return;
-
-        // create wrapper in place
-        const originalParent = sel.parentNode;
-        const originalNext = sel.nextSibling;
-        const wrapper = document.createElement('div');
-        wrapper.className = 'custom-select-wrapper';
-        originalParent.insertBefore(wrapper, originalNext);
-        wrapper.appendChild(sel);
-
-        sel.classList.add('custom-select-hidden');
-        sel.dataset.customized = '1';
-        sel.setAttribute('aria-hidden', 'true');
-        try { sel.tabIndex = -1; } catch (e) {}
-
-        const control = document.createElement('div');
-        control.className = 'custom-select';
-        const label = document.createElement('div');
-        label.className = 'label';
-        label.textContent = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : (sel.getAttribute('placeholder') || 'Pilih');
-        const caret = document.createElement('div');
-        caret.className = 'caret';
-        caret.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23e6eef8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
-        control.appendChild(label);
-        control.appendChild(caret);
-
-        const opts = document.createElement('div');
-        opts.className = 'custom-options';
-        opts.style.display = 'none';
-
-        Array.from(sel.options).forEach((o, i) => {
-          const item = document.createElement('div');
-          item.className = 'custom-option';
-          item.textContent = o.text;
-          item.dataset.index = i;
-          if (o.disabled) item.setAttribute('aria-disabled','true');
-          if (sel.selectedIndex === i) item.classList.add('active');
-          item.addEventListener('click', () => {
-            if (o.disabled) return;
-            sel.selectedIndex = i;
-            sel.dispatchEvent(new Event('change', { bubbles: true }));
-            label.textContent = o.text;
-            opts.querySelectorAll('.custom-option').forEach(x => x.classList.remove('active'));
-            item.classList.add('active');
-            opts.style.display = 'none';
-            control.classList.remove('open');
-          });
-          opts.appendChild(item);
-        });
-
-        control.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const isOpen = control.classList.toggle('open');
-          opts.style.display = isOpen ? 'block' : 'none';
-          if (isOpen) {
-            const active = opts.querySelector('.custom-option.active');
-            if (active) active.scrollIntoView({ block: 'nearest' });
-          }
-        });
-
-        // keyboard navigation
-        control.tabIndex = 0;
-        control.addEventListener('keydown', (e) => {
-          const visible = opts.style.display === 'block';
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); control.click(); return; }
-          if (e.key === 'Escape') { opts.style.display = 'none'; control.classList.remove('open'); return; }
-          if (!visible && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) { control.click(); return; }
-          if (visible && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
-            e.preventDefault();
-            const items = Array.from(opts.querySelectorAll('.custom-option'));
-            if (!items.length) return;
-            const currentIndex = items.findIndex(it => it.classList.contains('active'));
-            let nextIndex = currentIndex;
-            if (e.key === 'ArrowDown') nextIndex = Math.min(items.length - 1, currentIndex + 1);
-            if (e.key === 'ArrowUp') nextIndex = Math.max(0, currentIndex - 1);
-            if (currentIndex === -1) nextIndex = 0;
-            items.forEach(it => it.classList.remove('active'));
-            items[nextIndex].classList.add('active');
-            items[nextIndex].scrollIntoView({ block: 'nearest' });
-          }
-          if (visible && e.key === 'Enter') {
-            const active = opts.querySelector('.custom-option.active');
-            if (active) active.click();
-          }
-        });
-
-        sel.addEventListener('change', () => {
-          const i = sel.selectedIndex;
-          if (i >= 0 && sel.options[i]) {
-            label.textContent = sel.options[i].text;
-            opts.querySelectorAll('.custom-option').forEach(x => x.classList.remove('active'));
-            const item = opts.querySelector(`.custom-option[data-index="${i}"]`);
-            if (item) item.classList.add('active');
-          }
-        });
-
-        wrapper.appendChild(control);
-        wrapper.appendChild(opts);
-      });
-    } catch (e) {
-      console.error('createCustomSelects error', e);
-    }
-  }; // end createCustomSelects
-
-  // Expose CatalogManager helpers to console if needed
-  window.addCatalogItem = CatalogManager.addCatalogItem;
-  window.loadCatalogs = CatalogManager.loadCatalogs;
-
-  // Populate catalogs first, then create custom selects
-  CatalogManager.populateCatalogSelects();
-
-  // initial table render
-  render();
-});
+  // export (filtered)
+  exportBtn && exportBtn.addEventListener('click', ()=>{
+    const rowsToExport = currentRenderList.length ? currentRenderList.map(e=>e.row) : load();
+    if(!rowsToExport.length){ showToast('Tidak ada data untuk diekspor'); return; }
+    const header = ['Nama','WA','Produk','Durasi','Akun','Password','Profile','Device','Pembayaran','Modal','Tanggal','Created'];
+    const rows = rowsToExport.map(r=>[r.nama, r.wa, r.katalog, r.durasi, r.akun, r.password, r.profile, r.device, r.harga, r.modal, r.tglBeli, r.created]);
+    const csv = [header, ...rows].map(r => r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+    const blob = new Blob([csv], {ty
