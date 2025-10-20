@@ -179,3 +179,8 @@ thead th:nth-child(9),tbody td:nth-child(9){width:6%;min-width:70px;text-align:r
 .form-actions { display:flex; gap:10px; align-items:center; margin-top:8px; }
 .btn.small { height:40px; line-height:40px; padding:0 14px; font-size:14px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; }
 .btn.small.outline { background:transparent; color:var(--white); border:1px solid rgba(255,255,255,0.06); box-shadow:none; }
+
+/* PATCH: turun-kan KPI kedua (Total Profit) agar sejajar dengan judul Data Langganan */
+.kpi-row .kpi:nth-child(2) {
+  margin-top: 8px; /* naik/d turun: ubah angka ini (px) jika mau lebih halus */
+}
