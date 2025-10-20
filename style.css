@@ -179,22 +179,40 @@ thead th:nth-child(9),tbody td:nth-child(9){width:6%;min-width:70px;text-align:r
 .form-actions { display:flex; gap:10px; align-items:center; margin-top:8px; }
 .btn.small { height:40px; line-height:40px; padding:0 14px; font-size:14px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; }
 .btn.small.outline { background:transparent; color:var(--white); border:1px solid rgba(255,255,255,0.06); box-shadow:none; }
+.btn.small.primary { background: linear-gradient(90deg, var(--accent1), var(--accent2)); color: #031014; }
 
-/* ====== ALIGN KPI & Card Header (stable fix) ====== */
+/* ===== FINAL: stable KPI + header alignment (copy-paste this at EOF of style.css) ===== */
 
-/* HAPUS atau pastikan tidak ada rule yang target .kpi-row .kpi:nth-child(2) */
-/* Jika masih ada: .kpi-row .kpi:nth-child(2) { margin-top: 8px; } -> hapus/komentar */
+/* Neutralize any previous one-off shift (safety) */
+.kpi-row .kpi:nth-child(2) { margin-top: 0 !important; }
 
-/* Pastikan row KPI items semua diratakan ke atas */
+/* Ensure KPI row aligns to top baseline */
 .kpi-row { align-items: start; }
 
-/* Beri offset top yang konsisten ke isi KPI dan juga ke header-left di card table */
-.kpi { padding-top: 8px; padding-bottom: 8px; }
+/* Make KPI internal padding consistent so visual baselines match card headers */
+.kpi {
+  padding-top: 6px;   /* adjust 6px -> 8px if you prefer slightly lower */
+  padding-bottom: 6px;
+}
 
-/* Sesuaikan padding-top header card agar sejajar dengan isi KPI */
-.table-view .header-left { padding-top: 8px; }
+/* Make table header-left use the same vertical offset as KPI */
+.table-view .header-left {
+  padding-top: 6px;   /* match this to .kpi padding-top */
+}
 
-/* Jika judul Data Langganan memiliki margin, pastikan nol agar tidak mendorong turun */
-.table-view .header-left h2 { margin-top: 0; }
+/* Ensure h2 doesn't add extra offset */
+.table-view .header-left h2 {
+  margin-top: 0;
+}
 
-/* Tweak kecil jika masih perlu penyesuaian: ubah angka 8px -> 6px atau 10px sesuai kebutuhan */
+/* Optional tiny tweak for very large screens: keep things centered visually */
+@media (min-width: 1400px) {
+  .kpi-row { gap: 14px; }
+  .kpi { padding-top: 8px; padding-bottom: 8px; }
+  .table-view .header-left { padding-top: 8px; }
+}
+
+/* If you still see small misalignment, tweak the numeric px values above:
+   - lower the numbers (4-6px) to raise the KPI,
+   - increase (8-10px) to lower the KPI — repeat until visually perfect.
+*/
