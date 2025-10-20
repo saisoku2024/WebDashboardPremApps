@@ -25,16 +25,17 @@ a{color:inherit;text-decoration:none}
 .brand{font-family:Poppins, Inter, sans-serif;font-weight:700;font-size:18px;margin:0}
 .tag{color:var(--muted);margin:0;font-size:13px;opacity:0.95}
 
-/* KPI row - 4 equal columns, same height */
+/* KPI row - 4 equal columns, same height
+   Adjusted margin/padding so KPI row baseline aligns visually with table header below */
 .kpi-row{
   display:grid;
   grid-template-columns: repeat(4, 1fr);
   gap:12px;
-  margin-bottom:18px;
-  align-items:stretch; /* ensure equal height */
+  margin-bottom:14px;           /* reduced spacing so top and table align */
+  align-items:stretch;
 }
 .kpi{
-  padding:12px;
+  padding:14px 12px;           /* more vertical padding for visual balance */
   border-radius:12px;
   border:1px solid rgba(255,255,255,0.03);
   box-shadow:var(--shadow);
@@ -55,6 +56,9 @@ a{color:inherit;text-decoration:none}
 /* Card */
 .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:16px;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.02);box-shadow:var(--shadow);overflow:visible}
 .card h2{margin:0 0 10px 0;font-size:16px}
+
+/* Make header-left padding match KPI vertical offset so top edges look aligned */
+.table-view .header-left { padding-top:14px; }  /* MATCHES .kpi padding-top (14px) */
 
 /* Forms */
 .fields{display:flex;flex-direction:column;gap:12px}
@@ -166,7 +170,6 @@ thead th:nth-child(9),tbody td:nth-child(9){width:6%;min-width:70px;text-align:r
 
 /* small-screen adjustments */
 @media (max-width:1100px){
-  /* stack KPI into 2 columns on medium screens */
   .kpi-row{grid-template-columns:repeat(2,1fr)}
   .grid{grid-template-columns:1fr}
 }
@@ -182,30 +185,5 @@ thead th:nth-child(9),tbody td:nth-child(9){width:6%;min-width:70px;text-align:r
   .kpi-row{gap:8px;grid-template-columns:1fr}
 }
 
-/* prefers-reduced-motion */
-@media (prefers-reduced-motion:reduce){
-  .modal-card,.custom-options,.btn{transition:none !important;animation:none !important}
-}
-
-/* small scrollbar */
-::-webkit-scrollbar{height:8px;width:8px}
-::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));border-radius:8px}
-
-/* Final adjustments: ensure small buttons parity and outline variant same size */
-.form-actions { display:flex; gap:10px; align-items:center; margin-top:8px; }
-.btn.small { height:40px; line-height:40px; padding:0 14px; font-size:14px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; }
-.btn.small.outline { background:transparent; color:var(--white); border:1px solid rgba(255,255,255,0.06); box-shadow:none; }
-.btn.small.primary { background: linear-gradient(90deg, var(--accent1), var(--accent2)); color: #031014; }
-
-/* KPI/header alignment: use same vertical offset so titles align visually */
-.kpi { padding-top:10px; padding-bottom:10px; }
-.table-view .header-left { padding-top:10px; }
-.table-view .header-left h2 { margin-top:0; }
-
-/* helper: ensure export icon stays compact */
+/* final helper */
 .controls .export-btn { padding:0; }
-
-/* If any ultra-fine alignment tweak required, change the numbers above:
-   - KPI padding-top/padding-bottom (10px) and .table-view .header-left padding-top (10px)
-   - grid gap between KPIs (12px)
-*/

@@ -23,6 +23,15 @@ function sortCatalog(list) {
 }
 CATALOG_LIST = sortCatalog(CATALOG_LIST);
 
+// safe number parser: strips non-numeric except minus and dot
+function parseNumber(v){
+  if (v === undefined || v === null) return 0;
+  const s = String(v).replace(/[^\d.-]/g,'').trim();
+  if (s === '') return 0;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : 0;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   const $ = id => document.getElementById(id);
 
@@ -92,7 +101,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // populate selects (katalog & filter)
   function populateCatalogSelects() {
     const sorted = sortCatalog(CATALOG_LIST);
-    // katalog select
     katalogSel.innerHTML = `<option value="">Pilih Produk</option>`;
     sorted.forEach(item => {
       const o = document.createElement('option');
@@ -100,7 +108,6 @@ document.addEventListener('DOMContentLoaded', function () {
       o.textContent = item;
       katalogSel.appendChild(o);
     });
-    // filter select (add an empty default)
     filterSel.innerHTML = `<option value="">Semua Produk</option>`;
     sorted.forEach(item => {
       const o = document.createElement('option');
@@ -122,15 +129,13 @@ document.addEventListener('DOMContentLoaded', function () {
     let sumModal = 0;
     let sumProfit = 0;
     const profilesSet = new Set();
-    // count active as total transactions (allow duplicates)
     let totalActive = 0;
 
     const todayISO = isoToday();
 
+    // build filtered list
     all.forEach((row, originalIndex) => {
-      // filter
       if (filtro && row.katalog !== filtro) return;
-      // search
       if (q) {
         const hay = `${row.nama || ''} ${row.wa || ''}`.toLowerCase();
         if (!hay.includes(q)) return;
@@ -145,9 +150,10 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
       currentRenderList.forEach((entry, idx) => {
         const row = entry.row;
-        const modal = Number(row.modal) || 0;
-        const harga = Number(row.harga) || 0;
-        const profit = harga - modal;
+        // parse numbers safely (handles "33.900", "Rp 33.900", etc)
+        const modal = parseNumber(row.modal);
+        const harga = parseNumber(row.harga);
+        const profit = harga - modal; // correct formula
         sumModal += modal;
         sumProfit += profit;
         if (row.profile) profilesSet.add(row.profile);
@@ -176,10 +182,9 @@ document.addEventListener('DOMContentLoaded', function () {
     totalProfitEl.textContent = 'Rp ' + formatRupiah(sumProfit);
     totalCustEl && (totalCustEl.textContent = currentRenderList.length);
 
-    // KPI calculations
-    // Penjualan Hari Ini: sum harga where tglBeli == today
-    const totalSalesToday = load().filter(r => (r.tglBeli || '').startsWith(todayISO)).reduce((s,r)=>s + (Number(r.harga)||0), 0);
-    const gmv = load().reduce((s,r)=>s + (Number(r.harga)||0), 0);
+    // KPI
+    const totalSalesToday = load().filter(r => (r.tglBeli || '').startsWith(todayISO)).reduce((s,r)=> s + parseNumber(r.harga), 0);
+    const gmv = load().reduce((s,r)=> s + parseNumber(r.harga), 0);
     KPI.sales && (KPI.sales.textContent = formatRupiah(totalSalesToday));
     KPI.gmv && (KPI.gmv.textContent = formatRupiah(gmv));
     KPI.profiles && (KPI.profiles.textContent = profilesSet.size);
@@ -195,20 +200,14 @@ document.addEventListener('DOMContentLoaded', function () {
   function createCustomSelects() {
     const selects = Array.from(document.querySelectorAll('select'));
     selects.forEach(sel => {
-      // skip if already converted
       if (sel.dataset.customized === '1') return;
-
       const parent = sel.parentNode;
       const wrapper = document.createElement('div');
       wrapper.className = 'custom-select-wrapper';
-
-      // make original invisible but keep in DOM
       sel.classList.add('custom-select-hidden');
       sel.dataset.customized = '1';
       sel.setAttribute('aria-hidden', 'true');
       try { sel.tabIndex = -1; } catch(e){}
-
-      // create visible control
       const control = document.createElement('div');
       control.className = 'custom-select';
       const label = document.createElement('div');
@@ -219,13 +218,9 @@ document.addEventListener('DOMContentLoaded', function () {
       caret.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%23e6eef8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
       control.appendChild(label);
       control.appendChild(caret);
-
-      // create options container
       const opts = document.createElement('div');
       opts.className = 'custom-options';
       opts.style.display = 'none';
-
-      // build option items
       Array.from(sel.options).forEach((o,i) => {
         const item = document.createElement('div');
         item.className = 'custom-option';
@@ -245,8 +240,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         opts.appendChild(item);
       });
-
-      // attach toggle
       control.addEventListener('click', (e) => {
         e.stopPropagation();
         const isOpen = control.classList.toggle('open');
@@ -256,8 +249,6 @@ document.addEventListener('DOMContentLoaded', function () {
           if (active) active.scrollIntoView({ block: 'nearest' });
         }
       });
-
-      // keyboard navigation
       control.tabIndex = 0;
       control.addEventListener('keydown', (e) => {
         const visible = opts.style.display === 'block';
@@ -284,16 +275,12 @@ document.addEventListener('DOMContentLoaded', function () {
           if (active) active.click();
         }
       });
-
-      // close on outside click
       document.addEventListener('click', (e) => {
         if (!wrapper.contains(e.target)) {
           opts.style.display = 'none';
           control.classList.remove('open');
         }
       });
-
-      // when original select value changes (programmatically), update label
       sel.addEventListener('change', () => {
         const i = sel.selectedIndex;
         if (i >= 0 && sel.options[i]) {
@@ -303,8 +290,6 @@ document.addEventListener('DOMContentLoaded', function () {
           if (item) item.classList.add('active');
         }
       });
-
-      // assemble and insert wrapper before original select and move select inside
       parent.insertBefore(wrapper, sel);
       wrapper.appendChild(sel);
       wrapper.appendChild(control);
@@ -319,24 +304,19 @@ document.addEventListener('DOMContentLoaded', function () {
     CATALOG_LIST.push(v);
     CATALOG_LIST = sortCatalog(CATALOG_LIST);
     populateCatalogSelects();
-    // re-create custom selects so new options get converted
     setTimeout(()=> createCustomSelects(), 60);
     newCatalogInput.value = '';
     showToast('Produk ditambahkan');
   });
 
-  // sync createCustomSelects after populating selects
+  // initial setup
   populateCatalogSelects();
   createCustomSelects();
-
-  // ensure date default
   if (tglEl && !tglEl.value) tglEl.value = isoToday();
   if (durasiEl && !durasiEl.value) durasiEl.value = '30 Hari';
-
-  // render initially
   render();
 
-  // form submit (add data)
+  // form submit
   if (form) {
     form.addEventListener('submit', function(ev) {
       ev.preventDefault();
@@ -369,7 +349,6 @@ document.addEventListener('DOMContentLoaded', function () {
       save(all);
       render();
 
-      // optional sync to Google Apps Script
       if (APPS_SCRIPT_URL) {
         fetch(APPS_SCRIPT_URL, {
           method: 'POST',
@@ -386,23 +365,19 @@ document.addEventListener('DOMContentLoaded', function () {
         addBtn.disabled = false;
         addBtn.textContent = '+ Tambah Data';
         showToast('Transaksi ditambahkan');
-        // reset form values
         form.reset();
-        // set date & durasi defaults
         if (tglEl) tglEl.value = isoToday();
         if (durasiEl) durasiEl.value = '30 Hari';
-        // reset selects programmatically and dispatch change to update custom labels
         if (katalogSel) { katalogSel.selectedIndex = 0; katalogSel.dispatchEvent(new Event('change',{bubbles:true})); }
         if (filterSel) { filterSel.selectedIndex = 0; filterSel.dispatchEvent(new Event('change',{bubbles:true})); }
         if (deviceSel) { deviceSel.selectedIndex = 0; deviceSel.dispatchEvent(new Event('change',{bubbles:true})); }
         if (statusSel) { statusSel.selectedIndex = 0; statusSel.dispatchEvent(new Event('change',{bubbles:true})); }
-        // scroll to table
         document.querySelector('.table-view').scrollIntoView({ behavior: 'smooth' });
       }, 300);
     });
   }
 
-  // reset button
+  // reset
   if (resetBtn && form) {
     resetBtn.addEventListener('click', function(e){
       e.preventDefault();
@@ -410,7 +385,6 @@ document.addEventListener('DOMContentLoaded', function () {
       form.reset();
       if (tglEl) tglEl.value = isoToday();
       if (durasiEl) durasiEl.value = '30 Hari';
-      // reset selects too
       if (katalogSel) { katalogSel.selectedIndex = 0; katalogSel.dispatchEvent(new Event('change',{bubbles:true})); }
       if (deviceSel) { deviceSel.selectedIndex = 0; deviceSel.dispatchEvent(new Event('change',{bubbles:true})); }
       if (statusSel) { statusSel.selectedIndex = 0; statusSel.dispatchEvent(new Event('change',{bubbles:true})); }
@@ -418,7 +392,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // table actions (delegate)
+  // table actions
   tableBody.addEventListener('click', function (e) {
     const btn = e.target.closest('button');
     if (!btn) return;
@@ -430,10 +404,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const { row, originalIndex } = entry;
 
     if (action === 'struk') {
-      // build invoice string (format dates mm/dd/yyyy)
       const startISO = row.tglBeli || isoToday();
       let endISO = '';
-      // try parse durasi to days
       const m = String(row.durasi || '').match(/(\d+)/);
       if (m && startISO) {
         const days = parseInt(m[1],10);
@@ -441,7 +413,6 @@ document.addEventListener('DOMContentLoaded', function () {
         d.setDate(d.getDate() + days);
         endISO = d.toISOString().slice(0,10);
       }
-      const pemakaianDays = '';
       const lines = [];
       lines.push(`🧾 STRUK PENJUALAN SAISOKU.ID`);
       lines.push(`──────────`);
@@ -457,10 +428,10 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       lines.push(`⏱️ Durasi    : ${row.durasi || '-'}`);
       lines.push(`──────────`);
-      lines.push(`🏷️ Harga     : Rp ${formatRupiah(row.harga || 0)}`);
+      lines.push(`🏷️ Harga     : Rp ${formatRupiah(parseNumber(row.harga || 0))}`);
       lines.push(`🧩 Status    : ${row.statusBuyer || '-'}`);
       lines.push(`──────────`);
-      lines.push(`💎 *Net Profit: Rp ${formatRupiah((Number(row.harga)||0) - (Number(row.modal)||0))}*`);
+      lines.push(`💎 *Net Profit: Rp ${formatRupiah(parseNumber(row.harga||0) - parseNumber(row.modal||0))}*`);
       lines.push(`──────────`);
       lines.push(`Terima kasih telah menggunakan layanan SAISOKU.ID 🙏`);
       lines.push(`© 2025 SAISOKU.ID • ${formatDateMMDDYYYY(new Date().toISOString().slice(0,10))}`);
@@ -510,7 +481,6 @@ document.addEventListener('DOMContentLoaded', function () {
     invoiceModal.classList.add('open');
     invoiceModal.setAttribute('aria-hidden', 'false');
     invoiceBody.focus();
-    // store for copy/wa
     invoiceModal._text = text;
   }
 
@@ -539,17 +509,11 @@ document.addEventListener('DOMContentLoaded', function () {
     window.open(url, '_blank');
   });
   if (closeInvoiceBtn) closeInvoiceBtn.addEventListener('click', closeInvoiceModal);
-  // close on backdrop
   document.querySelectorAll('.modal-backdrop').forEach(b => b.addEventListener('click', closeInvoiceModal));
-  // escape key
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeInvoiceModal(); });
-
-  // small diagnostics (console)
-  console.log('SAISOKU dashboard initialized. Catalog items:', CATALOG_LIST.length);
 
   // final populate + render
   populateCatalogSelects();
-  // re-run custom select creation in case new select markup changed
   createCustomSelects();
   render();
 });
