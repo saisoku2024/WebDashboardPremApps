@@ -50,7 +50,6 @@
           <div class="field">
             <label for="wa">No. WhatsApp <span class="req" aria-hidden="true">*</span></label>
             <div class="input-icon">
-              <!-- simple WA icon -->
               <svg class="icon icon-wa" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5C18.9 2 16.8 1 14.5 1 7.9 1 2.6 6.2 2.6 12.8c0 2 .5 3.9 1.4 5.6L1 23l4.9-1.3c1.6.9 3.4 1.4 5.2 1.4 6.6 0 11.9-5.1 11.9-11.7 0-2.4-.9-4.6-2.5-6.2z"></path></svg>
               <input id="wa" name="wa" type="text" inputmode="tel" placeholder="08xxxxxxxxxx" required />
             </div>
@@ -59,12 +58,13 @@
           <div class="field">
             <label for="katalog">Katalog / Produk <span class="req" aria-hidden="true">*</span></label>
             <select id="katalog" name="katalog" aria-label="Katalog Produk">
-              <!-- populated by script -->
+              <!-- will be populated by script (keamanan: keep native select for form) -->
             </select>
 
-            <div class="add-catalog" aria-hidden="false">
+            <div class="add-catalog" style="display:flex; gap:8px; margin-top:8px; align-items:center;">
               <input id="newCatalogInput" placeholder="Tambah produk baru (mis. HBO Max)" />
-              <button id="addCatalogBtn" type="button" class="btn small outline" aria-label="Tambah produk baru">Tambah</button>
+              <!-- tombol konsisten: gunakan kelas sama dengan tombol submit -->
+              <button id="addCatalogBtn" type="button" class="btn small primary" aria-label="Tambah produk baru">Tambah</button>
             </div>
           </div>
 
@@ -150,7 +150,8 @@
 
             <input id="searchInput" placeholder="Cari nama / WA..." aria-label="Cari" />
 
-            <button id="exportBtn" class="export-btn" type="button" aria-label="Export data">
+            <!-- icon-only export (consistent, small square) -->
+            <button id="exportBtn" class="export-btn" type="button" title="Export CSV" aria-label="Export data">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="7 10 12 15 17 10"></polyline>

@@ -631,41 +631,50 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // invoice actions
-  copyInvoiceBtn.addEventListener('click', async () => {
-    const entry = invoiceModal._current;
-    if (!entry) return;
-    const txt = invoicePlainText(entry);
-    try {
-      await navigator.clipboard.writeText(txt);
-      showToast('Struk disalin ke clipboard');
-    } catch(e) {
-      const t = document.createElement('textarea'); t.value = txt; document.body.appendChild(t); t.select();
-      document.execCommand('copy'); t.remove();
-      showToast('Struk disalin (fallback)');
-    }
-  });
-  printInvoiceBtn.addEventListener('click', () => {
-    const entry = invoiceModal._current;
-    if (!entry) return;
-    const w = window.open('', '_blank');
-    const html = `
+  if (copyInvoiceBtn) {
+    copyInvoiceBtn.addEventListener('click', async () => {
+      const entry = invoiceModal._current;
+      if (!entry) return;
+      const txt = invoicePlainText(entry);
+      try {
+        await navigator.clipboard.writeText(txt);
+        showToast('Struk disalin ke clipboard');
+      } catch(e) {
+        const t = document.createElement('textarea'); t.value = txt; document.body.appendChild(t); t.select();
+        document.execCommand('copy'); t.remove();
+        showToast('Struk disalin (fallback)');
+      }
+    });
+  }
+  if (printInvoiceBtn) {
+    printInvoiceBtn.addEventListener('click', () => {
+      const entry = invoiceModal._current;
+      if (!entry) return;
+      const w = window.open('', '_blank');
+      const html = `
       <html><head><title>Struk ${entry.invoiceId||''}</title>
       <style>body{font-family:Inter, Arial, sans-serif;padding:20px;background:#fff;color:#000} pre{white-space:pre-wrap;font-family:monospace;font-size:14px}</style>
       </head><body><pre>${escapeHtml(invoicePlainText(entry))}</pre></body></html>`;
-    w.document.open(); w.document.write(html); w.document.close();
-    w.focus(); w.print();
-    setTimeout(()=> w.close(), 600);
-  });
-  waInvoiceBtn.addEventListener('click', () => {
-    const entry = invoiceModal._current;
-    if (!entry) return;
-    const txt = invoicePlainText(entry);
-    const phone = String(entry.wa || '').replace(/\D/g,'');
-    const url = `https://wa.me/${phone}?text=${encodeURIComponent(txt)}`;
-    window.open(url, '_blank');
-  });
-  closeInvoiceBtn.addEventListener('click', closeInvoiceModal);
-  invoiceModal.querySelector('.modal-backdrop').addEventListener('click', closeInvoiceModal);
+      w.document.open(); w.document.write(html); w.document.close();
+      w.focus(); w.print();
+      setTimeout(()=> w.close(), 600);
+    });
+  }
+  if (waInvoiceBtn) {
+    waInvoiceBtn.addEventListener('click', () => {
+      const entry = invoiceModal._current;
+      if (!entry) return;
+      const txt = invoicePlainText(entry);
+      const phone = String(entry.wa || '').replace(/\D/g,'');
+      const url = `https://wa.me/${phone}?text=${encodeURIComponent(txt)}`;
+      window.open(url, '_blank');
+    });
+  }
+  if (closeInvoiceBtn) {
+    closeInvoiceBtn.addEventListener('click', closeInvoiceModal);
+  }
+  const backdrop = invoiceModal && invoiceModal.querySelector('.modal-backdrop');
+  if (backdrop) backdrop.addEventListener('click', closeInvoiceModal);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && invoiceModal.classList.contains('open')) closeInvoiceModal(); });
 
   // focus trap
