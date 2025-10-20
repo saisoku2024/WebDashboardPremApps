@@ -55,7 +55,7 @@ a{color:inherit;text-decoration:none}
 .row .field{flex:1 1 0%;min-width:0;box-sizing:border-box}
 .row.two .field{min-width:0}
 
-/* Add-catalog group (make inline and match primary button) */
+/* Add-catalog group */
 .add-catalog{display:flex;gap:8px;align-items:center}
 .add-catalog input{flex:1 1 auto;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.00));color:var(--white)}
 .add-catalog .btn.small{height:36px;padding:0 12px;display:inline-flex;align-items:center;justify-content:center}
@@ -143,6 +143,9 @@ thead th:nth-child(9),tbody td:nth-child(9){width:6%;min-width:70px;text-align:r
 /* hide original select off-screen to prevent native white popup */
 .custom-select-hidden{position:absolute !important;left:-9999px !important;top:auto !important;width:1px !important;height:1px !important;overflow:hidden !important;opacity:0 !important;pointer-events:none !important;touch-action:none !important}
 
+/* visually hide helper text for icon-only buttons */
+.sr-only{position:absolute !important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
 /* small-screen adjustments */
 @media (max-width:980px){
   .grid{grid-template-columns:1fr}
@@ -153,7 +156,7 @@ thead th:nth-child(9),tbody td:nth-child(9){width:6%;min-width:70px;text-align:r
 @media (max-width:680px){
   .table-header .controls{flex-direction:column;align-items:stretch}
   .table-header .controls>select,.table-header .controls>.custom-select-wrapper,.table-header .controls>#searchInput{flex:none;width:100%}
-  .table-header .controls .export-btn{width:120px;align-self:flex-end}
+  .table-header .controls .export-btn{width:100%;align-self:flex-end}
 }
 @media (max-width:520px){
   .row{flex-direction:column}

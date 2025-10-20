@@ -58,12 +58,11 @@
           <div class="field">
             <label for="katalog">Katalog / Produk <span class="req" aria-hidden="true">*</span></label>
             <select id="katalog" name="katalog" aria-label="Katalog Produk">
-              <!-- will be populated by script (keamanan: keep native select for form) -->
+              <!-- populated by script -->
             </select>
 
             <div class="add-catalog" style="display:flex; gap:8px; margin-top:8px; align-items:center;">
               <input id="newCatalogInput" placeholder="Tambah produk baru (mis. HBO Max)" />
-              <!-- tombol konsisten: gunakan kelas sama dengan tombol submit -->
               <button id="addCatalogBtn" type="button" class="btn small primary" aria-label="Tambah produk baru">Tambah</button>
             </div>
           </div>
@@ -130,7 +129,7 @@
 
           <div class="form-actions">
             <button id="addBtn" class="btn primary" type="submit">+ Tambah Data</button>
-            <button id="resetBtn" class="btn outline" type="button">Reset</button>
+            <button id="resetBtn" class="btn small outline" type="button">Reset</button>
           </div>
         </form>
       </aside>
@@ -150,7 +149,6 @@
 
             <input id="searchInput" placeholder="Cari nama / WA..." aria-label="Cari" />
 
-            <!-- icon-only export (consistent, small square) -->
             <button id="exportBtn" class="export-btn" type="button" title="Export CSV" aria-label="Export data">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -192,7 +190,7 @@
     <footer class="footer">© 2025 SAISOKU.ID · Flat Dark Dashboard by SIVA</footer>
   </div>
 
-  <!-- Invoice Modal (hidden by default) -->
+  <!-- Invoice Modal -->
   <div id="invoiceModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="invoiceTitle" aria-hidden="true">
     <div class="modal-backdrop" data-action="close"></div>
     <div class="modal-card" role="document">
@@ -206,12 +204,11 @@
         </div>
       </header>
       <div class="modal-body invoice-body" id="invoiceBody" tabindex="0">
-        <!-- content injected by JS -->
+        <!-- injected by script -->
       </div>
     </div>
   </div>
 
-  <!-- toast -->
   <div id="toast" class="toast" aria-live="polite" role="status"></div>
 
   <script src="script.js"></script>
