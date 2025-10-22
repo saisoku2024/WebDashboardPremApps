@@ -4,9 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SAISOKU.ID — Dashboard Premium Apps</title>
-
-  <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="wrap">
@@ -17,24 +16,24 @@
       </div>
     </header>
 
-    <!-- KPI Row -->
-    <div class="kpi-row" role="region" aria-label="KPI">
-      <div class="kpi" title="Penjualan hari ini">
+    <!-- KPI row -->
+    <div class="kpi-row">
+      <div class="kpi">
         <div class="kpi-title">Penjualan Hari Ini</div>
         <div class="kpi-value">Rp <span id="kpi-sales">0</span></div>
         <div class="kpi-sub">Total penjualan hari ini (harga jual)</div>
       </div>
-      <div class="kpi" title="Total GMV">
+      <div class="kpi">
         <div class="kpi-title">Total GMV</div>
         <div class="kpi-value">Rp <span id="kpi-gmv">0</span></div>
         <div class="kpi-sub">Akumulasi (awal → akhir) hari ini</div>
       </div>
-      <div class="kpi" title="Total Profil">
+      <div class="kpi">
         <div class="kpi-title">Total Profil (As Is)</div>
         <div class="kpi-value"><span id="kpi-profiles">0</span></div>
         <div class="kpi-sub">Jumlah profil / akun (as-is)</div>
       </div>
-      <div class="kpi" title="Total Pelanggan Aktif">
+      <div class="kpi">
         <div class="kpi-title">Total Pelanggan Aktif</div>
         <div class="kpi-value"><span id="kpi-active">0</span></div>
         <div class="kpi-sub">Jumlah transaksi (count)</div>
@@ -52,10 +51,10 @@
             <input id="nama" name="nama" type="text" placeholder="Nama lengkap" required />
           </div>
 
-          <div class="field">
+          <div class="field input-icon">
             <label for="wa">No. WhatsApp <span class="req">*</span></label>
-            <div class="input-icon">
-              <svg aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.472-.148-.672.15-.198.297-.767.966-.94 1.164-.173.198-.347.223-.644.075-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.654-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.447-.52.149-.173.198-.297.298-.495.099-.198.05-.372-.025-.52-.075-.148-.672-1.611-.92-2.207-.242-.579-.487-.5-.672-.51l-.573-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.064 2.876 1.213 3.074c.149.198 2.096 3.2 5.077 4.487  .709.306 1.26.489 1.692.626.71.226 1.357.194 1.87.118.57-.085 1.758-.72 2.006-1.415.248-.695.248-1.29.173-1.415-.074-.124-.272-.198-.57-.347z"></path></svg>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" style="opacity:.9"><path fill="currentColor" d="M17.6 14.2c-.3-.2-1.7-.8-1.9-.9-.2-.1-.3-.2-.5.2-.1.3-.6.9-.7 1-.1.2-.3.2-.6.1C10.7 14 7 11.3 6.2 9.8c-.1-.3 0-.4.1-.6.1-.1.3-.3.5-.5.2-.2.3-.4.4-.7.1-.2 0-.4 0-.6 0-.2-.5-1.1-.7-1.5-.2-.4-.4-.3-.6-.3-.1 0-.2 0-.4 0-.1 0-.4 0-.6 0-.2 0-.5 0-.8.3-.3.3-1 1-1.1 1.1-.3.3-.7.6-1 1-.3.4-.5 1.1-.5 1.8 0 3.3 1.7 6.8 4.8 9.8 3 3 6.6 4.6 9.2 4.6 1.2 0 1.9-.2 2.4-.4.6-.3 1-1.2 1.2-2.2.2-1 .1-2.1-.4-2.7-.5-.6-1.5-1.1-1.8-1.3z"></path></svg>
               <input id="wa" name="wa" type="text" inputmode="tel" placeholder="08xxxxxxxxxx" required />
             </div>
           </div>
@@ -66,8 +65,8 @@
           </div>
 
           <div class="add-catalog">
-            <input id="newCatalogInput" type="text" placeholder="Tambah produk baru (mis. HBO Max)" aria-label="Tambah produk baru">
-            <button id="addCatalogBtn" class="btn small" type="button">Tambah</button>
+            <input id="newCatalogInput" placeholder="Tambah produk baru (mis. HBO Max)" />
+            <button type="button" id="addCatalogBtn" class="btn small">Tambah</button>
           </div>
 
           <div class="field">
@@ -87,12 +86,12 @@
 
           <div class="field">
             <label for="device">Device</label>
-            <select id="device" name="device" aria-label="Device">
+            <select id="device" name="device">
               <option value="">Pilih Device</option>
-              <option value="TV">TV</option>
-              <option value="HP">HP</option>
-              <option value="Laptop">Laptop</option>
-              <option value="All">All</option>
+              <option>TV</option>
+              <option>HP</option>
+              <option>Laptop</option>
+              <option>All</option>
             </select>
           </div>
 
@@ -109,10 +108,10 @@
 
           <div class="field">
             <label for="statusBuyer">Status Buyer</label>
-            <select id="statusBuyer" name="statusBuyer" aria-label="Status Buyer">
+            <select id="statusBuyer" name="statusBuyer">
               <option value="">Pilih Status</option>
-              <option value="Reguler">Reguler</option>
-              <option value="Reseller">Reseller</option>
+              <option>Reguler</option>
+              <option>Reseller</option>
             </select>
           </div>
 
@@ -142,13 +141,16 @@
             <p class="muted small">Pantau transaksi, profit, dan export laporan.</p>
           </div>
 
-          <div class="controls" role="region" aria-label="Kontrol tabel">
-            <div class="custom-select-wrapper" id="filterWrapper">
+          <div class="controls">
+            <div class="custom-select-wrapper" style="max-width:260px;">
               <select id="filterProduk" name="filterProduk" aria-label="Filter Produk"></select>
             </div>
-            <input id="searchInput" type="search" placeholder="Cari nama / WA..." aria-label="Cari nama atau WA">
+
+            <input id="searchInput" placeholder="Cari nama / WA..." />
+
+            <!-- export icon-only -->
             <button id="exportBtn" class="export-btn" title="Export CSV" aria-label="Export CSV">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M21 21H3"/></svg>
               <span class="sr-only">Export</span>
             </button>
           </div>
@@ -173,10 +175,10 @@
           </table>
         </div>
 
-        <div class="summary" aria-hidden="true" style="margin-top:12px">
+        <div class="summary" style="margin-top:12px">
           <div><span>Total Modal:</span> <strong id="totalModal">Rp 0</strong></div>
-          <div style="margin-left:12px"><span>Total Profit:</span> <strong id="totalProfit">Rp 0</strong></div>
-          <div style="margin-left:12px"><span>Total Pelanggan:</span> <strong id="totalCust">0</strong></div>
+          <div style="margin-left:18px"><span>Total Profit:</span> <strong id="totalProfit">Rp 0</strong></div>
+          <div style="margin-left:18px"><span>Total Pelanggan:</span> <strong id="totalCust">0</strong></div>
         </div>
       </section>
     </main>
@@ -184,17 +186,17 @@
     <footer class="footer">© 2025 SAISOKU.ID · Flat Dark Dashboard by SIVA</footer>
   </div>
 
-  <!-- Invoice Modal -->
-  <div id="invoiceModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Struk Penjualan">
+  <!-- invoice modal -->
+  <div id="invoiceModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
     <div class="modal-backdrop"></div>
     <div class="modal-card" role="document">
       <div class="modal-header">
-        <h3>Struk Penjualan</h3>
+        <h3 class="brand">Struk Penjualan</h3>
         <div class="modal-actions">
-          <button id="copyInvoiceBtn" class="btn small outline" type="button">Copy</button>
-          <button id="printInvoiceBtn" class="btn small teal" type="button">Print</button>
-          <button id="waInvoiceBtn" class="btn small" type="button">WA</button>
-          <button id="closeInvoiceBtn" class="btn small outline" type="button">Tutup</button>
+          <button id="copyInvoiceBtn" class="btn small outline">Copy</button>
+          <button id="printInvoiceBtn" class="btn small teal">Print</button>
+          <button id="waInvoiceBtn" class="btn small">WA</button>
+          <button id="closeInvoiceBtn" class="btn small outline">Tutup</button>
         </div>
       </div>
       <div id="invoiceBody" class="invoice-body" tabindex="0"></div>
@@ -202,7 +204,6 @@
   </div>
 
   <div id="toast" class="toast" aria-live="polite"></div>
-
   <script src="script.js"></script>
 </body>
 </html>
