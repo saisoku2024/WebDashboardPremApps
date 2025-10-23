@@ -1,18 +1,18 @@
 :root{
-  --left-col: 360px;
-  --bg-900: #030616;
-  --bg-800: #061228;
-  --card: #071627;
-  --muted: #9fb0c6;
-  --accent1: #00f3ff;
-  --accent2: #8a5cff;
-  --teal: #0ea5a0;
-  --white: #e6eef8;
-  --radius: 12px;
-  --shadow: 0 10px 30px rgba(0,0,0,0.6);
-  --danger: #ff4d4f;
-  --outline-border: rgba(255,255,255,0.06);
-  --danger-outline: rgba(255,77,79,0.28);
+    --left-col: 360px;
+    --bg-900: #030616;
+    --bg-800: #061228;
+    --card: #071627;
+    --muted: #9fb0c6;
+    --accent1: #00f3ff;
+    --accent2: #8a5cff;
+    --teal: #0ea5a0;
+    --white: #e6eef8;
+    --radius: 12px;
+    --shadow: 0 10px 30px rgba(0,0,0,0.6);
+    --danger: #ff4d4f;
+    --outline-border: rgba(255,255,255,0.06);
+    --danger-outline: rgba(255,77,79,0.28);
 }
 
 /* Reset & base */
@@ -27,25 +27,26 @@ a{color:inherit;text-decoration:none}
 .brand{font-family:Poppins, Inter, sans-serif;font-weight:700;font-size:18px;margin:0}
 .tag{color:var(--muted);margin:0;font-size:13px;opacity:0.95}
 
-/* KPI row - tuned spacing so baseline aligns with cards */
+/* KPI row - ditambahkan grid-column span ke CSS */
 .kpi-row{
-  display:grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap:12px;
-  margin: 10px 0 12px 0;
-  align-items:stretch;
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap:12px;
+    margin: 10px 0 12px 0;
+    align-items:stretch;
+    grid-column: 1 / -1; /* FIX: Memastikan KPI span 2 kolom */
 }
 .kpi{
-  padding:12px 14px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,0.03);
-  box-shadow:var(--shadow);
-  background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));
-  min-height:86px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  box-sizing:border-box;
+    padding:12px 14px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.03);
+    box-shadow:var(--shadow);
+    background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));
+    min-height:86px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    box-sizing:border-box;
 }
 .kpi-title{font-size:12px;color:var(--muted);margin-bottom:6px}
 .kpi-value{font-size:20px;font-weight:800;color:var(--white);display:flex;align-items:baseline;gap:6px}
@@ -66,7 +67,11 @@ a{color:inherit;text-decoration:none}
 .field input::placeholder,.controls input::placeholder{color:rgba(230,238,248,0.25)}
 
 /* Inputs with icon */
-.input-icon{display:flex;align-items:center;gap:8px}
+.wa-input-group{
+    display:flex;
+    gap:8px;
+    align-items:center; /* FIX: Styling WA input group */
+}
 .input-icon svg{width:18px;height:18px;opacity:0.95;flex:0 0 18px}
 
 /* Add catalog row */
@@ -97,6 +102,7 @@ a{color:inherit;text-decoration:none}
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;min-width:0}
 
 /* make filter & search equal width */
+/* FIX: Style ini sudah didefinisikan, jadi menghapus inline style di HTML akan membuatnya bekerja */
 .controls select,.controls .custom-select-wrapper,#searchInput{flex:0 0 auto;min-width:0}
 .controls .custom-select-wrapper{flex-basis:260px;flex-shrink:0}
 #searchInput{flex-basis:260px;flex-shrink:0}
@@ -165,19 +171,27 @@ thead th:nth-child(9),tbody td:nth-child(9){width:6%;min-width:70px;text-align:r
 
 /* responsive */
 @media (max-width:1100px){
-  .kpi-row{grid-template-columns:repeat(2,1fr)}
-  .grid{grid-template-columns:1fr}
+    .kpi-row{grid-template-columns:repeat(2,1fr)}
+    .grid{grid-template-columns:1fr}
 }
 @media (max-width:680px){
-  .table-header .controls{flex-direction:column;align-items:stretch}
-  .table-header .controls>select,.table-header .controls>.custom-select-wrapper,#searchInput{flex:none;width:100%}
-  .table-header .controls .export-btn{width:100%;align-self:flex-end}
+    .table-header .controls{flex-direction:column;align-items:stretch}
+    /* FIX: Hapus lebar statis, gunakan lebar penuh pada layar kecil */
+    .table-header .controls>select,
+    .table-header .controls>.custom-select-wrapper,
+    #searchInput {
+        flex: none;
+        width: 100%;
+        flex-basis: auto;
+        flex-shrink: 1; 
+    }
+    .table-header .controls .export-btn{width:100%;align-self:flex-end}
 }
 @media (max-width:520px){
-  .row{flex-direction:column}
-  .form-actions{flex-direction:column;align-items:stretch}
-  .btn{width:100%}
-  .kpi-row{gap:8px;grid-template-columns:1fr}
+    .row{flex-direction:column}
+    .form-actions{flex-direction:column;align-items:stretch}
+    .btn{width:100%}
+    .kpi-row{gap:8px;grid-template-columns:1fr}
 }
 
 /* helper */
