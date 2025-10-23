@@ -553,9 +553,8 @@ document.addEventListener('DOMContentLoaded', function () {
             lines.push(`🏷️ Harga     : Rp ${formatRupiah(parseNumber(row.harga || 0))}`);
             lines.push(`🧩 Status    : ${row.statusBuyer || '-'}`);
             lines.push(`──────────`);
-            lines.push(`💎 *Net Profit: Rp ${formatRupiah(parseNumber(row.harga||0) - parseNumber(row.modal||0))}*`);
-            lines.push(`──────────`);
-            lines.push(`Terima kasih telah menggunakan layanan SAISOKU.ID 🙏`);
+            // Revisi di sini: Hapus baris "Net Profit" dan ganti dengan pesan yang lebih sesuai.
+            lines.push(`Terima kasih telah berbelanja di SAISOKU.ID 🙏`);
             lines.push(`© 2025 SAISOKU.ID • ${formatDateDDMMYYYY(new Date().toISOString().slice(0,10))}`);
 
             openInvoiceModal(lines.join('\n'), row.wa); // Tambahkan nomor WA ke modal
