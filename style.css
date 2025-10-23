@@ -20,8 +20,8 @@
 html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;background:linear-gradient(180deg,var(--bg-900) 0%, var(--bg-800) 100%);color:var(--white);-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
 
-/* Layout */
-.wrap{max-width:1200px;margin:20px auto;padding:18px}
+/* Layout container */
+.wrap{max-width:1200px;margin:18px auto;padding:18px}
 .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:12px}
 .brand-wrap{display:flex;flex-direction:column;gap:6px}
 .brand{font-family:Poppins, Inter, sans-serif;font-weight:700;font-size:18px;margin:0}
@@ -32,11 +32,11 @@ a{color:inherit;text-decoration:none}
   display:grid;
   grid-template-columns: repeat(4, 1fr);
   gap:12px;
-  margin: 6px 0 12px 0;
+  margin: 8px 0 14px 0;
   align-items:stretch;
 }
 .kpi{
-  padding:14px 12px;
+  padding:14px 14px;
   border-radius:12px;
   border:1px solid rgba(255,255,255,0.03);
   box-shadow:var(--shadow);
@@ -54,7 +54,7 @@ a{color:inherit;text-decoration:none}
 /* Grid */
 .grid{display:grid;grid-template-columns:var(--left-col) 1fr;gap:18px;align-items:start}
 
-/* Card */
+/* Card base */
 .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:14px;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.02);box-shadow:var(--shadow);overflow:visible}
 .card h2{margin:0 0 10px 0;font-size:16px}
 .table-view .header-left{padding-top:2px}
@@ -75,7 +75,7 @@ a{color:inherit;text-decoration:none}
 .add-catalog input{flex:1 1 auto;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.00));color:var(--white)}
 .add-catalog .btn.small{height:40px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center}
 
-/* Buttons */
+/* Buttons / actions */
 .form-actions{display:flex;gap:10px;margin-top:6px;align-items:center}
 .btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#031014;position:relative;overflow:hidden;box-shadow:0 8px 30px rgba(138,92,255,0.06);display:inline-flex;align-items:center;gap:8px;height:40px}
 .btn.small{padding:8px 10px;font-size:14px;border-radius:10px;height:40px;line-height:40px;display:inline-flex;align-items:center;justify-content:center}
@@ -89,15 +89,21 @@ a{color:inherit;text-decoration:none}
 .action-btn.outline-danger{border:1px solid var(--danger-outline);color:var(--white);padding:6px 8px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-right:6px;background:transparent}
 .action-btn.outline-danger:hover{border-color:rgba(255,77,79,0.48)}
 
-/* ripple (optional) */
+/* small ripple */
 .ripple{position:absolute;border-radius:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,0.12);pointer-events:none;animation:ripple 700ms ease-out}
 @keyframes ripple{from{opacity:0.6;transform:translate(-50%,-50%) scale(.4)}to{opacity:0;transform:translate(-50%,-50%) scale(2)}}
 
-/* Controls */
-.table-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px;flex-wrap:wrap}
-.header-left{min-width:0}
+/* Table header / controls: align center so top of table lines up with KPI */
+.table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;flex-wrap:wrap}
+.header-left{min-width:0;display:flex;flex-direction:column;justify-content:center}
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;min-width:0}
+
+/* Controls sizing: ensure equal widths for filter & search */
 .controls select,.controls .custom-select-wrapper,#searchInput{flex:0 0 auto;min-width:0}
+.controls .custom-select-wrapper{flex-basis:260px;flex-shrink:0}
+#searchInput{flex-basis:260px;flex-shrink:0}
+
+/* export icon-only */
 .controls .export-btn{flex:0 0 auto;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0;border-radius:8px;background:transparent;border:1px solid rgba(14,165,160,0.18);color:var(--teal);box-shadow:none;transition:transform .12s,border-color .12s,background .12s}
 .controls .export-btn svg{width:18px;height:18px;stroke:var(--teal)}
 .controls .export-btn:hover{transform:translateY(-2px);border-color:rgba(14,165,160,0.35);background:rgba(14,165,160,0.03)}
@@ -149,7 +155,7 @@ thead th:nth-child(9),tbody td:nth-child(9){width:6%;min-width:70px;text-align:r
 .field.invalid input{border-color:var(--danger);box-shadow:0 6px 20px rgba(255,77,79,0.06) inset}
 .field .error{color:var(--danger);font-size:12px;margin-top:6px;display:block}
 
-/* custom select */
+/* custom select helper (kept) */
 .custom-select-wrapper{position:relative;width:100%}
 .custom-select{background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.04);color:var(--white);padding:10px 14px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;height:42px;box-sizing:border-box}
 .custom-select .label{flex:1;text-align:left;font-size:14px;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -159,7 +165,7 @@ thead th:nth-child(9),tbody td:nth-child(9){width:6%;min-width:70px;text-align:r
 .custom-option:last-child{border-bottom:none}
 .custom-select-hidden{position:absolute !important;left:-9999px !important;top:auto !important;width:1px !important;height:1px !important;overflow:hidden !important;opacity:0 !important;pointer-events:none !important;touch-action:none !important}
 
-/* small-screen adjustments */
+/* responsive tweaks */
 @media (max-width:1100px){
   .kpi-row{grid-template-columns:repeat(2,1fr)}
   .grid{grid-template-columns:1fr}
@@ -176,5 +182,5 @@ thead th:nth-child(9),tbody td:nth-child(9){width:6%;min-width:70px;text-align:r
   .kpi-row{gap:8px;grid-template-columns:1fr}
 }
 
-/* visually hide helper text for icon-only buttons */
+/* helper hide for icon only buttons */
 .sr-only{position:absolute !important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
