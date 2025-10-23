@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const profileEl = $('profile');
     const tglEl = $('tglBeli');
     const durasiEl = $('durasi');
-    const customDurasiInput = $('customDurasiInput'); // Elemen input custom
+    const customDurasiInput = $('customDurasiInput'); 
     
     const modalEl = $('modal');
     const hargaEl = $('harga');
@@ -515,7 +515,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // table actions (struk/delete)
     tableBody.addEventListener('click', function (e) {
-        // ... (kode tetap sama) ...
         const btn = e.target.closest('button');
         if (!btn) return;
         const idx = Number(btn.dataset.idx);
