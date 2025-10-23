@@ -88,7 +88,28 @@ document.addEventListener('DOMContentLoaded', function () {
         return `${dd}/${mm}/${yyyy}`;
     }
 
+    // FIX: Hapus custom select yang sudah ada sebelum membuat yang baru
+    function destroyCustomSelect(sel) {
+        if (sel.dataset.customized === '1') {
+            const wrapper = sel.closest('.custom-select-wrapper');
+            if (wrapper) {
+                // Pindahkan select asli kembali ke parent sebelum wrapper
+                wrapper.parentNode.insertBefore(sel, wrapper);
+                // Hapus wrapper
+                wrapper.remove();
+            }
+            sel.classList.remove('custom-select-hidden');
+            sel.removeAttribute('data-customized');
+            sel.removeAttribute('aria-hidden');
+            try { sel.tabIndex = 0; } catch(e){}
+        }
+    }
+
     function populateCatalogSelects() {
+        // Hapus elemen custom select lama sebelum membuat opsi baru
+        destroyCustomSelect(katalogSel);
+        destroyCustomSelect(filterSel);
+        
         const sorted = sortCatalog(CATALOG_LIST);
         katalogSel.innerHTML = `<option value="">Pilih Produk</option>`;
         sorted.forEach(item => {
@@ -104,13 +125,18 @@ document.addEventListener('DOMContentLoaded', function () {
             o.textContent = item;
             filterSel.appendChild(o);
         });
+        
+        // Panggil ulang create custom select setelah populate
+        createCustomSelects(); 
     }
-
+    
     // custom select (kept)
     function createCustomSelects() {
         const selects = Array.from(document.querySelectorAll('select'));
         selects.forEach(sel => {
-            if (sel.dataset.customized === '1') return;
+            if (sel.dataset.customized === '1') return; // Sudah dibuat
+            
+            // Logika pembuatan custom select seperti sebelumnya
             const parent = sel.parentNode;
             const wrapper = document.createElement('div');
             wrapper.className = 'custom-select-wrapper';
@@ -298,7 +324,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- Validation and UI Feedback ---
     function validateInput(el) {
         const parentField = el.closest('.field');
-        if (el.checkValidity() && el.value.trim() !== '' && el.value.trim() !== 'Pilih Produk' && el.value.trim() !== 'Pilih Status') {
+        // Pengecekan untuk Select element
+        const isSelect = el.tagName === 'SELECT';
+        const value = el.value.trim();
+
+        if (el.checkValidity() && value !== '' && (!isSelect || value !== 'Pilih Produk' && value !== 'Pilih Status')) {
             parentField?.classList.remove('invalid');
             return true;
         }
@@ -313,17 +343,17 @@ document.addEventListener('DOMContentLoaded', function () {
         CATALOG_LIST.push(v);
         CATALOG_LIST = sortCatalog(CATALOG_LIST);
         
-        // FIX: populate dulu, baru create custom select, tanpa setTimeout
+        // Panggil populateCatalogSelects. Ini akan otomatis memanggil createCustomSelects()
         populateCatalogSelects();
-        createCustomSelects(); 
 
         newCatalogInput.value = '';
         showToast('Produk ditambahkan');
     });
 
     // init
-    populateCatalogSelects();
-    createCustomSelects();
+    // FIX: createCustomSelects dihapus dari init karena sudah dipanggil di populate
+    populateCatalogSelects(); 
+    
     if (tglEl && !tglEl.value) tglEl.value = isoToday();
     if (durasiEl && !durasiEl.value) durasiEl.value = '30 Hari';
     render();
@@ -384,11 +414,16 @@ document.addEventListener('DOMContentLoaded', function () {
             selectsToReset.forEach(sel => {
                 if (sel) {
                     sel.selectedIndex = 0; 
+                    // Trigger change event untuk mengupdate tampilan custom select
                     sel.dispatchEvent(new Event('change',{bubbles:true})); 
                     // Remove invalid class setelah reset
                     sel.closest('.field')?.classList.remove('invalid'); 
                 }
             });
+            
+            // Hapus kelas invalid dari input wajib
+            namaEl.closest('.field')?.classList.remove('invalid');
+            waEl.closest('.field')?.classList.remove('invalid');
             
             // Fokus ke tampilan tabel
             document.querySelector('.table-view').scrollIntoView({ behavior: 'smooth' });
@@ -481,7 +516,7 @@ document.addEventListener('DOMContentLoaded', function () {
             lines.push(`Terima kasih telah menggunakan layanan SAISOKU.ID 🙏`);
             lines.push(`© 2025 SAISOKU.ID • ${formatDateDDMMYYYY(new Date().toISOString().slice(0,10))}`);
 
-            openInvoiceModal(lines.join('\n'));
+            openInvoiceModal(lines.join('\n'), row.wa); // Tambahkan nomor WA ke modal
         } else if (action === 'delete') {
             if (!confirm('Hapus transaksi ini?')) return;
             const all = load();
@@ -519,13 +554,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const waInvoiceBtn = $('waInvoiceBtn');
     const closeInvoiceBtn = $('closeInvoiceBtn');
 
-    function openInvoiceModal(text) {
+    function openInvoiceModal(text, waNumber = '') {
         if (!invoiceModal) return;
         invoiceBody.innerHTML = `<pre class="invoice-pre">${escapeHtml(text)}</pre>`;
         invoiceModal.classList.add('open');
         invoiceModal.setAttribute('aria-hidden', 'false');
         invoiceBody.focus();
         invoiceModal._text = text;
+        invoiceModal._wa = waNumber; // Simpan nomor WA di modal
     }
 
     function closeInvoiceModal() {
@@ -533,6 +569,7 @@ document.addEventListener('DOMContentLoaded', function () {
         invoiceModal.classList.remove('open');
         invoiceModal.setAttribute('aria-hidden', 'true');
         invoiceModal._text = '';
+        invoiceModal._wa = ''; // Hapus nomor WA saat tutup
     }
 
     if (copyInvoiceBtn) copyInvoiceBtn.addEventListener('click', () => {
@@ -549,14 +586,18 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     if (waInvoiceBtn) waInvoiceBtn.addEventListener('click', () => {
         const text = encodeURIComponent(invoiceModal && invoiceModal._text ? invoiceModal._text : invoiceBody.textContent || '');
-        const url = `https://wa.me/?text=${text}`;
+        let wa = invoiceModal && invoiceModal._wa ? invoiceModal._wa.replace(/[^0-9]/g, '') : '';
+        
+        // Aturan WA: Jika diawali 0, ganti 62
+        if (wa.startsWith('0')) {
+            wa = '62' + wa.substring(1);
+        }
+
+        const url = `https://wa.me/${wa}?text=${text}`; // FIX: Menambahkan nomor WA ke URL
         window.open(url, '_blank');
     });
     if (closeInvoiceBtn) closeInvoiceBtn.addEventListener('click', closeInvoiceModal);
     document.querySelectorAll('.modal-backdrop').forEach(b => b.addEventListener('click', closeInvoiceModal));
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeInvoiceModal(); });
 
-    // ensure selects are created after populate
-    populateCatalogSelects();
-    createCustomSelects(); 
 });
