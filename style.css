@@ -81,6 +81,16 @@ a{color:inherit;text-decoration:none}
 }
 .field input::placeholder,.controls input::placeholder{color:rgba(230,238,248,0.25)}
 
+/* HILANGKAN SPINNER (Tombol panah) pada input type="number" */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
 /* WA Input (Ikon terintegrasi) */
 .input-icon-group .input-icon-wrap{
     position: relative;
@@ -107,21 +117,17 @@ a{color:inherit;text-decoration:none}
     position: relative;
 }
 .field.currency-input .currency-prefix {
-    /* FIX: Posisi, padding, dan font size disesuaikan agar tidak tumpang tindih */
+    /* FIX: Tinggi dihilangkan, sejajarkan hanya dengan transform */
     position: absolute;
     left: 14px; 
     top: 50%;
-    transform: translateY(-50%);
+    transform: translateY(-50%); /* Kunci vertikal alignment */
     color: var(--muted);
-    font-size: 13px; /* Dibuat sedikit lebih kecil agar lebih rapi */
+    font-size: 14px; /* Dibuat sama dengan font input */
     opacity: 0.9;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    padding-right: 8px; 
+    /* Hilangkan height dan display flex yang berlebihan */
 }
 .field.currency-input .currency-prefix + input {
-    /* FIX: Padding input disesuaikan agar angka tidak tumpang tindih dengan "Rp" */
     padding-left: 50px; 
 }
 
