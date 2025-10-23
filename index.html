@@ -17,7 +17,7 @@
     </header>
 
     <main class="grid">
-      <!-- KPI row: dipindah *ke dalam* .grid dan men-span kedua kolom -->
+      <!-- KPI row: inside grid so alignment is perfect -->
       <div class="kpi-row" style="grid-column: 1 / -1;" role="region" aria-label="KPI">
         <div class="kpi">
           <div class="kpi-title">Penjualan Hari Ini</div>
@@ -66,7 +66,7 @@
 
           <div class="add-catalog">
             <input id="newCatalogInput" placeholder="Tambah produk baru (mis. HBO Max)" />
-            <button type="button" id="addCatalogBtn" class="btn small">Tambah</button>
+            <button type="button" id="addCatalogBtn" class="btn small add-btn-inline">Tambah</button>
           </div>
 
           <div class="field">
@@ -128,7 +128,7 @@
 
           <div class="form-actions">
             <button id="addBtn" class="btn primary" type="submit">+ Tambah Data</button>
-            <button id="resetBtn" class="btn outline" type="button">Reset</button>
+            <button id="resetBtn" class="btn primary secondary" type="button">Reset</button>
           </div>
         </form>
       </aside>

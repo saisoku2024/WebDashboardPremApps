@@ -63,11 +63,11 @@ document.addEventListener('DOMContentLoaded', function () {
     active: $('kpi-active')
   };
 
-  const STORAGE_KEY = 'saisoku_subs_v3_fixed_v2';
+  const STORAGE_KEY = 'saisoku_subs_v3_fixed_vfinal';
   const load = () => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch (e) { return []; } };
   const save = arr => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
 
-  function showToast(msg, ms = 1400) {
+  function showToast(msg, ms = 1200) {
     if (!toastEl) return;
     toastEl.textContent = msg;
     toastEl.style.display = 'block';
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // custom select (kept)
+  // custom select UI: hides native select and renders dark dropdown
   function createCustomSelects() {
     const selects = Array.from(document.querySelectorAll('select'));
     selects.forEach(sel => {
@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
-    // KPI calculations (update KPIs)
+    // KPI calculations
     const allData = load();
     const totalSalesToday = allData.filter(r => (r.tglBeli || '').slice(0,10) === todayISO).reduce((s,r)=> s + parseNumber(r.harga), 0);
     const gmv = allData.reduce((s,r)=> s + parseNumber(r.harga), 0);
