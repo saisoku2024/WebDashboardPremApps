@@ -1,5 +1,5 @@
 :root{
-    --left-col: 360px; /* KRITIS: Pastikan variabel ini terbaca */
+    --left-col: 360px;
     --bg-900: #030616;
     --bg-800: #061228;
     --card: #071627;
@@ -39,8 +39,8 @@ input[type="number"] {
 
 /* Grid (left column + right) - KRITIS */
 .grid{
-    display:grid; /* KRITIS */
-    grid-template-columns:var(--left-col) 1fr; /* KRITIS */
+    display:grid; 
+    grid-template-columns:var(--left-col) 1fr; 
     gap:18px;
     align-items:start; 
     margin-top:6px
@@ -98,7 +98,7 @@ input[type="number"] {
 }
 .field input::placeholder,.controls input::placeholder{color:rgba(230,238,248,0.25)}
 
-/* Durasi Wrapper */
+/* Durasi Wrapper untuk custom input */
 .durasi-wrapper {
     display: flex;
     flex-direction: column;
@@ -222,6 +222,8 @@ input[type="number"] {
 .btn[disabled]{opacity:0.6;cursor:not-allowed}
 
 /* Controls, Table, Modal, Footer: Tetap sama */
+
+/* ... (lanjutan kode CSS) ... */
 .table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;flex-wrap:wrap}
 .header-left{min-width:0;display:flex;flex-direction:column;justify-content:center}
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;min-width:0}
