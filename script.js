@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
     active: $('kpi-active')
   };
 
-  const STORAGE_KEY = 'saisoku_subs_v3';
+  const STORAGE_KEY = 'saisoku_subs_v3_fixed';
   const load = () => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch (e) { return []; } };
   const save = arr => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
 
@@ -84,14 +84,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function formatRupiah(n) { return (Number(n) || 0).toLocaleString('id-ID'); }
   function isoToday() { return new Date().toISOString().slice(0,10); }
-  function formatDateMMDDYYYY(iso){
+  function formatDateDDMMYYYY(iso){
     if (!iso) return '-';
+    // accept ISO date (YYYY-MM-DD) or JS Date string
     const d = new Date(iso);
     if (isNaN(d)) return iso;
-    const mm = String(d.getMonth()+1).padStart(2,'0');
     const dd = String(d.getDate()).padStart(2,'0');
+    const mm = String(d.getMonth()+1).padStart(2,'0');
     const yyyy = d.getFullYear();
-    return `${mm}/${dd}/${yyyy}`;
+    return `${dd}/${mm}/${yyyy}`;
   }
 
   // populate selects (katalog & filter)
@@ -113,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // custom select (dark)
+  // custom select (dark) - keep behavior but not mandatory to change now
   function createCustomSelects() {
     const selects = Array.from(document.querySelectorAll('select'));
     selects.forEach(sel => {
@@ -236,6 +237,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const todayISO = isoToday();
 
+    // prepare filtered view
     all.forEach((row, originalIndex) => {
       if (filtro && row.katalog !== filtro) return;
       if (q) {
@@ -254,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const row = entry.row;
         const modal = parseNumber(row.modal);
         const harga = parseNumber(row.harga);
-        const profit = harga - modal;
+        const profit = harga - modal; // CORRECT formula
         sumModal += modal;
         sumProfit += profit;
         if (row.profile) profilesSet.add(row.profile);
@@ -264,7 +266,7 @@ document.addEventListener('DOMContentLoaded', function () {
         tr.innerHTML = `
           <td title="${escapeHtml(row.nama)}">${escapeHtml(row.nama)}</td>
           <td title="${escapeHtml(row.katalog)}">${escapeHtml(row.katalog)}</td>
-          <td title="${row.tglBeli}">${formatDateMMDDYYYY(row.tglBeli)}</td>
+          <td title="${row.tglBeli}">${formatDateDDMMYYYY(row.tglBeli)}</td>
           <td>${escapeHtml(row.durasi)}</td>
           <td style="text-align:right">Rp ${formatRupiah(modal)}</td>
           <td style="text-align:right">Rp ${formatRupiah(harga)}</td>
@@ -283,9 +285,10 @@ document.addEventListener('DOMContentLoaded', function () {
     totalProfitEl.textContent = 'Rp ' + formatRupiah(sumProfit);
     totalCustEl && (totalCustEl.textContent = currentRenderList.length);
 
-    // KPI
-    const totalSalesToday = load().filter(r => (r.tglBeli || '').startsWith(todayISO)).reduce((s,r)=> s + parseNumber(r.harga), 0);
-    const gmv = load().reduce((s,r)=> s + parseNumber(r.harga), 0);
+    // KPI calculations
+    const allData = load();
+    const totalSalesToday = allData.filter(r => (r.tglBeli || '').slice(0,10) === todayISO).reduce((s,r)=> s + parseNumber(r.harga), 0);
+    const gmv = allData.reduce((s,r)=> s + parseNumber(r.harga), 0);
     KPI.sales && (KPI.sales.textContent = formatRupiah(totalSalesToday));
     KPI.gmv && (KPI.gmv.textContent = formatRupiah(gmv));
     KPI.profiles && (KPI.profiles.textContent = profilesSet.size);
@@ -421,9 +424,9 @@ document.addEventListener('DOMContentLoaded', function () {
       lines.push(`🔑 Akun      : ${row.akun || '-'}`);
       lines.push(`──────────`);
       if (endISO) {
-        lines.push(`📅 Beli/Klaim: ${formatDateMMDDYYYY(startISO)} → ${formatDateMMDDYYYY(endISO)}`);
+        lines.push(`📅 Beli/Klaim: ${formatDateDDMMYYYY(startISO)} → ${formatDateDDMMYYYY(endISO)}`);
       } else {
-        lines.push(`📅 Tanggal   : ${formatDateMMDDYYYY(startISO)}`);
+        lines.push(`📅 Tanggal   : ${formatDateDDMMYYYY(startISO)}`);
       }
       lines.push(`⏱️ Durasi    : ${row.durasi || '-'}`);
       lines.push(`──────────`);
@@ -433,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function () {
       lines.push(`💎 *Net Profit: Rp ${formatRupiah(parseNumber(row.harga||0) - parseNumber(row.modal||0))}*`);
       lines.push(`──────────`);
       lines.push(`Terima kasih telah menggunakan layanan SAISOKU.ID 🙏`);
-      lines.push(`© 2025 SAISOKU.ID • ${formatDateMMDDYYYY(new Date().toISOString().slice(0,10))}`);
+      lines.push(`© 2025 SAISOKU.ID • ${formatDateDDMMYYYY(new Date().toISOString().slice(0,10))}`);
 
       openInvoiceModal(lines.join('\n'));
     } else if (action === 'delete') {

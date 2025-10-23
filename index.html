@@ -17,7 +17,7 @@
     </header>
 
     <!-- KPI row -->
-    <div class="kpi-row">
+    <div class="kpi-row" role="region" aria-label="KPI">
       <div class="kpi">
         <div class="kpi-title">Penjualan Hari Ini</div>
         <div class="kpi-value">Rp <span id="kpi-sales">0</span></div>
@@ -142,11 +142,11 @@
           </div>
 
           <div class="controls">
-            <div class="custom-select-wrapper" style="max-width:260px;">
+            <div class="custom-select-wrapper" style="flex-basis:260px;flex-shrink:0;">
               <select id="filterProduk" name="filterProduk" aria-label="Filter Produk"></select>
             </div>
 
-            <input id="searchInput" placeholder="Cari nama / WA..." />
+            <input id="searchInput" placeholder="Cari nama / WA..." style="flex-basis:260px;flex-shrink:0;" />
 
             <!-- export icon-only -->
             <button id="exportBtn" class="export-btn" title="Export CSV" aria-label="Export CSV">
