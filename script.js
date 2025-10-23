@@ -1,7 +1,7 @@
 // CONFIG: isi APPS_SCRIPT_URL jika mau sinkron ke Google Sheets
 const APPS_SCRIPT_URL = '';
 
-// initial catalog list (requested items)
+// initial catalog list
 let CATALOG_LIST = [
   "Canva Premium",
   "ChatGPT/Gemini AI",
@@ -17,13 +17,11 @@ let CATALOG_LIST = [
   "Youtube Premium"
 ];
 
-// helper: sort unique
 function sortCatalog(list) {
   return Array.from(new Set(list)).sort((a,b)=> a.toLowerCase().localeCompare(b.toLowerCase()));
 }
 CATALOG_LIST = sortCatalog(CATALOG_LIST);
 
-// safe number parser: strips non-numeric except minus and dot
 function parseNumber(v){
   if (v === undefined || v === null) return 0;
   const s = String(v).replace(/[^\d.-]/g,'').trim();
@@ -35,7 +33,6 @@ function parseNumber(v){
 document.addEventListener('DOMContentLoaded', function () {
   const $ = id => document.getElementById(id);
 
-  // DOM refs
   const form = $('entryForm');
   const namaEl = $('nama');
   const waEl = $('wa');
@@ -57,19 +54,16 @@ document.addEventListener('DOMContentLoaded', function () {
   const searchInput = $('searchInput');
   const exportBtn = $('exportBtn');
   const tableBody = $('tableBody');
-  const totalModalEl = $('totalModal');
-  const totalProfitEl = $('totalProfit');
-  const totalCustEl = $('totalCust');
   const toastEl = $('toast');
 
   const KPI = {
     sales: $('kpi-sales'),
     gmv: $('kpi-gmv'),
-    profiles: $('kpi-profiles'),
+    profitAll: $('kpi-profit-all'),
     active: $('kpi-active')
   };
 
-  const STORAGE_KEY = 'saisoku_subs_v3_fixed';
+  const STORAGE_KEY = 'saisoku_subs_v3_fixed_v2';
   const load = () => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch (e) { return []; } };
   const save = arr => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
 
@@ -86,7 +80,6 @@ document.addEventListener('DOMContentLoaded', function () {
   function isoToday() { return new Date().toISOString().slice(0,10); }
   function formatDateDDMMYYYY(iso){
     if (!iso) return '-';
-    // accept ISO date (YYYY-MM-DD) or JS Date string
     const d = new Date(iso);
     if (isNaN(d)) return iso;
     const dd = String(d.getDate()).padStart(2,'0');
@@ -95,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function () {
     return `${dd}/${mm}/${yyyy}`;
   }
 
-  // populate selects (katalog & filter)
   function populateCatalogSelects() {
     const sorted = sortCatalog(CATALOG_LIST);
     katalogSel.innerHTML = `<option value="">Pilih Produk</option>`;
@@ -114,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // custom select (dark) - keep behavior but not mandatory to change now
+  // custom select (kept)
   function createCustomSelects() {
     const selects = Array.from(document.querySelectorAll('select'));
     selects.forEach(sel => {
@@ -221,7 +213,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // render table + KPIs
   let currentRenderList = [];
   function render() {
     const all = load();
@@ -232,12 +223,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let sumModal = 0;
     let sumProfit = 0;
-    const profilesSet = new Set();
     let totalActive = 0;
 
     const todayISO = isoToday();
 
-    // prepare filtered view
     all.forEach((row, originalIndex) => {
       if (filtro && row.katalog !== filtro) return;
       if (q) {
@@ -256,10 +245,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const row = entry.row;
         const modal = parseNumber(row.modal);
         const harga = parseNumber(row.harga);
-        const profit = harga - modal; // CORRECT formula
+        const profit = harga - modal;
         sumModal += modal;
         sumProfit += profit;
-        if (row.profile) profilesSet.add(row.profile);
         totalActive += 1;
 
         const tr = document.createElement('tr');
@@ -281,17 +269,15 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
-    totalModalEl.textContent = 'Rp ' + formatRupiah(sumModal);
-    totalProfitEl.textContent = 'Rp ' + formatRupiah(sumProfit);
-    totalCustEl && (totalCustEl.textContent = currentRenderList.length);
-
-    // KPI calculations
+    // KPI calculations (update KPIs)
     const allData = load();
     const totalSalesToday = allData.filter(r => (r.tglBeli || '').slice(0,10) === todayISO).reduce((s,r)=> s + parseNumber(r.harga), 0);
     const gmv = allData.reduce((s,r)=> s + parseNumber(r.harga), 0);
+    const totalProfitAll = allData.reduce((s,r)=> s + (parseNumber(r.harga) - parseNumber(r.modal)), 0);
+
     KPI.sales && (KPI.sales.textContent = formatRupiah(totalSalesToday));
     KPI.gmv && (KPI.gmv.textContent = formatRupiah(gmv));
-    KPI.profiles && (KPI.profiles.textContent = profilesSet.size);
+    KPI.profitAll && (KPI.profitAll.textContent = formatRupiah(totalProfitAll));
     KPI.active && (KPI.active.textContent = totalActive);
   }
 
@@ -394,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // table actions
+  // table actions (struk/delete)
   tableBody.addEventListener('click', function (e) {
     const btn = e.target.closest('button');
     if (!btn) return;
@@ -465,7 +451,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // search & filter
   if (searchInput) searchInput.addEventListener('input', render);
   if (filterSel) filterSel.addEventListener('change', render);
 
