@@ -27,14 +27,14 @@ a{color:inherit;text-decoration:none}
 .brand{font-family:Poppins, Inter, sans-serif;font-weight:700;font-size:18px;margin:0}
 .tag{color:var(--muted);margin:0;font-size:13px;opacity:0.95}
 
-/* KPI row - ditambahkan grid-column span ke CSS */
+/* KPI row */
 .kpi-row{
     display:grid;
     grid-template-columns: repeat(4, 1fr);
     gap:12px;
     margin: 10px 0 12px 0;
     align-items:stretch;
-    grid-column: 1 / -1; /* FIX: Memastikan KPI span 2 kolom */
+    grid-column: 1 / -1; 
 }
 .kpi{
     padding:12px 14px;
@@ -66,13 +66,24 @@ a{color:inherit;text-decoration:none}
 .field input,.field select,.controls input{padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:linear-gradient(180deg,rgba(10,16,22,0.28),rgba(6,10,14,0.18));color:var(--white);outline:none;font-size:14px;width:100%;min-width:0;box-sizing:border-box}
 .field input::placeholder,.controls input::placeholder{color:rgba(230,238,248,0.25)}
 
-/* Inputs with icon */
-.wa-input-group{
-    display:flex;
-    gap:8px;
-    align-items:center; /* FIX: Styling WA input group */
+/* REVISI: Inputs with icon (WA) */
+.input-icon-group .input-icon-wrap{
+    position: relative;
+    display: flex; /* Untuk memastikan input mengambil sisa ruang */
+    align-items: center;
 }
-.input-icon svg{width:18px;height:18px;opacity:0.95;flex:0 0 18px}
+.input-icon-group .input-icon-wrap input{
+    /* Memberi padding di kiri agar tidak menabrak ikon */
+    padding-left: 40px; 
+}
+.input-icon-group .input-icon-wrap svg{
+    position: absolute;
+    left: 12px;
+    width: 18px;
+    height: 18px;
+    opacity: 0.9;
+    color: var(--muted); /* Warna ikon */
+}
 
 /* Add catalog row */
 .add-catalog{display:flex;gap:8px;align-items:center}
@@ -81,7 +92,7 @@ a{color:inherit;text-decoration:none}
 
 /* Buttons */
 .form-actions{display:flex;gap:10px;margin-top:6px;align-items:center}
-.btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#031014;position:relative;overflow:hidden;box-shadow:0 8px 30px rgba(138,92,255,0.06);display:inline-flex;align-items:center;gap:8px;height:40px}
+.btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#031014;position:relative;overflow:hidden;box-shadow:0 8px 30px rgba(138,92,255,0.06);display:inline-flex;align-items:center;gap:8px;height:40px; transition: all .15s ease} /* Tambah transition */
 .btn.small{padding:8px 10px;font-size:14px;border-radius:10px;height:40px;line-height:40px;display:inline-flex;align-items:center;justify-content:center}
 .btn.primary{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#031014}
 .btn.secondary{background:linear-gradient(90deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);color:var(--white)}
@@ -102,7 +113,6 @@ a{color:inherit;text-decoration:none}
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;min-width:0}
 
 /* make filter & search equal width */
-/* FIX: Style ini sudah didefinisikan, jadi menghapus inline style di HTML akan membuatnya bekerja */
 .controls select,.controls .custom-select-wrapper,#searchInput{flex:0 0 auto;min-width:0}
 .controls .custom-select-wrapper{flex-basis:260px;flex-shrink:0}
 #searchInput{flex-basis:260px;flex-shrink:0}
@@ -163,11 +173,27 @@ thead th:nth-child(9),tbody td:nth-child(9){width:6%;min-width:70px;text-align:r
 .custom-select-wrapper{position:relative;width:100%}
 .custom-select{background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.04);color:var(--white);padding:10px 14px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;height:42px;box-sizing:border-box}
 .custom-select .label{flex:1;text-align:left;font-size:14px;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.custom-select .caret{
+    transition: transform 0.15s ease; /* Animasi caret */
+    line-height: 0;
+}
+.custom-select.open .caret{
+    transform: rotate(180deg); /* Memutar caret saat terbuka */
+}
+
 .custom-options{position:absolute;left:0;right:0;top:calc(100% + 8px);background:linear-gradient(180deg,var(--card),rgba(11,19,27,0.98));border:1px solid rgba(255,255,255,0.03);border-radius:10px;max-height:260px;overflow:auto;box-shadow:0 12px 40px rgba(0,0,0,0.6);z-index:1200;box-sizing:border-box}
 .custom-option{padding:10px 12px;color:var(--white);cursor:pointer;font-size:14px;border-bottom:1px solid rgba(255,255,255,0.01)}
 .custom-option:hover,.custom-option.active{background:linear-gradient(90deg,rgba(0,243,255,0.03),rgba(138,92,255,0.03));color:var(--white)}
 .custom-option:last-child{border-bottom:none}
 .custom-select-hidden{position:absolute !important;left:-9999px !important;top:auto !important;width:1px !important;height:1px !important;overflow:hidden !important;opacity:0 !important;pointer-events:none !important;touch-action:none !important}
+
+/* REVISI: Footer di tengah */
+.footer.text-center {
+    text-align: center;
+    padding-top: 20px;
+    font-size: 13px;
+    color: var(--muted);
+}
 
 /* responsive */
 @media (max-width:1100px){
