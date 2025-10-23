@@ -1,5 +1,5 @@
 :root{
-    --left-col: 360px;
+    --left-col: 360px; /* KRITIS: Pastikan variabel ini terbaca */
     --bg-900: #030616;
     --bg-800: #061228;
     --card: #071627;
@@ -37,6 +37,15 @@ input[type="number"] {
 .brand{font-family:Poppins, Inter, sans-serif;font-weight:700;font-size:18px;margin:0}
 .tag{color:var(--muted);margin:0;font-size:13px;opacity:0.95}
 
+/* Grid (left column + right) - KRITIS */
+.grid{
+    display:grid; /* KRITIS */
+    grid-template-columns:var(--left-col) 1fr; /* KRITIS */
+    gap:18px;
+    align-items:start; 
+    margin-top:6px
+}
+
 /* KPI row */
 .kpi-row{
     display:grid;
@@ -62,9 +71,6 @@ input[type="number"] {
 .kpi-value{font-size:20px;font-weight:800;color:var(--white);display:flex;align-items:baseline;gap:6px}
 .kpi-sub{font-size:12px;color:rgba(159,176,198,0.75);margin-top:6px}
 
-/* Grid (left column + right) */
-.grid{display:grid;grid-template-columns:var(--left-col) 1fr;gap:18px;align-items:start; margin-top:6px}
-
 /* Card */
 .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:14px;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.02);box-shadow:var(--shadow);overflow:visible}
 .card h2{margin:0 0 10px 0;font-size:16px}
@@ -88,9 +94,23 @@ input[type="number"] {
     min-width:0;
     box-sizing:border-box;
     height: 44px; 
-    line-height: 20px; /* FIX 1: Set line-height untuk perataan vertikal */
+    line-height: 20px; 
 }
 .field input::placeholder,.controls input::placeholder{color:rgba(230,238,248,0.25)}
+
+/* Durasi Wrapper */
+.durasi-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; 
+}
+.durasi-wrapper input {
+    height: 44px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.04);
+    background: linear-gradient(180deg,rgba(10,16,22,0.28),rgba(6,10,14,0.18));
+}
 
 
 /* WA Input (Ikon terintegrasi) */
@@ -122,11 +142,10 @@ input[type="number"] {
     position: absolute;
     left: 14px; 
     top: 50%;
-    transform: translateY(-50%); /* Kunci vertikal alignment */
+    transform: translateY(-50%); 
     color: var(--muted);
     font-size: 14px; 
     opacity: 0.9;
-    /* Hilangkan properti CSS yang tidak perlu agar tidak mengganggu positioning */
 }
 .field.currency-input .currency-prefix + input {
     padding-left: 50px; 
@@ -181,7 +200,7 @@ input[type="number"] {
     display:inline-flex;
     align-items:center;
     gap:8px;
-    height:44px; /* Tinggi sama dengan input utama */
+    height:44px; 
     transition: all .15s ease;
     font-size: 14px; 
     justify-content: center; 
@@ -203,9 +222,6 @@ input[type="number"] {
 .btn[disabled]{opacity:0.6;cursor:not-allowed}
 
 /* Controls, Table, Modal, Footer: Tetap sama */
-
-/* ... (lanjutan kode CSS) ... */
-
 .table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;flex-wrap:wrap}
 .header-left{min-width:0;display:flex;flex-direction:column;justify-content:center}
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;min-width:0}
