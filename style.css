@@ -107,20 +107,22 @@ a{color:inherit;text-decoration:none}
     position: relative;
 }
 .field.currency-input .currency-prefix {
+    /* FIX: Posisi, padding, dan font size disesuaikan agar tidak tumpang tindih */
     position: absolute;
     left: 14px; 
     top: 50%;
     transform: translateY(-50%);
     color: var(--muted);
-    font-size: 14px;
-    opacity: 0.8;
+    font-size: 13px; /* Dibuat sedikit lebih kecil agar lebih rapi */
+    opacity: 0.9;
     height: 44px;
     display: flex;
     align-items: center;
     padding-right: 8px; 
 }
 .field.currency-input .currency-prefix + input {
-    padding-left: 40px; 
+    /* FIX: Padding input disesuaikan agar angka tidak tumpang tindih dengan "Rp" */
+    padding-left: 50px; 
 }
 
 
@@ -192,7 +194,6 @@ a{color:inherit;text-decoration:none}
 .btn.outline{background:transparent;border:1px solid var(--outline-border);color:var(--white);box-shadow:none}
 .btn.teal{background:linear-gradient(90deg,var(--teal),#06b6d4);color:#052726}
 .btn[disabled]{opacity:0.6;cursor:not-allowed}
-
 
 /* Controls */
 .table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;flex-wrap:wrap}
