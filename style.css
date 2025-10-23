@@ -1,136 +1,203 @@
-/* ... (Bagian atas CSS tetap sama) ... */
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>SAISOKU.ID — Dashboard Premium Apps</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="wrap">
+        <header class="header">
+            <div class="brand-wrap">
+                <h1 class="brand">Web Dashboard Premium Apps – SAISOKU.ID</h1>
+                <p class="tag">Form Input Sales • Riwayat Transaksi • Ringkasan Modal & Profit</p>
+            </div>
+        </header>
 
-/* Form basics */
-.fields{
-    display:flex;
-    flex-direction:column;
-    gap: 16px; /* REVISI UX: Meningkatkan jarak antar field dari 12px ke 16px */
-}
-.field{display:flex;flex-direction:column;gap:6px;min-width:0}
-.field label{font-size:13px;color:var(--muted);margin-bottom:6px}
-.field input,.field select,.controls input{
-    padding:12px 14px;
-    border-radius:10px;
-    border:1px solid rgba(255,255,255,0.04);
-    background:linear-gradient(180deg,rgba(10,16,22,0.28),rgba(6,10,14,0.18));
-    color:var(--white);outline:none;
-    font-size:14px;
-    width:100%;
-    min-width:0;
-    box-sizing:border-box;
-    height: 44px; /* REVISI UI: Menentukan tinggi input yang seragam */
-}
-.field input::placeholder,.controls input::placeholder{color:rgba(230,238,248,0.25)}
+        <main class="grid">
+            <div class="kpi-row" role="region" aria-label="KPI">
+                <div class="kpi">
+                    <div class="kpi-title">Penjualan Hari Ini</div>
+                    <div class="kpi-value">Rp <span id="kpi-sales">0</span></div>
+                    <div class="kpi-sub">Total penjualan hari ini (harga jual)</div>
+                </div>
+                <div class="kpi">
+                    <div class="kpi-title">Total GMV</div>
+                    <div class="kpi-value">Rp <span id="kpi-gmv">0</span></div>
+                    <div class="kpi-sub">Akumulasi (awal → akhir)</div>
+                </div>
+                <div class="kpi">
+                    <div class="kpi-title">Total Profit (All time)</div>
+                    <div class="kpi-value">Rp <span id="kpi-profit-all">0</span></div>
+                    <div class="kpi-sub">Jumlah profit = Σ(harga − modal)</div>
+                </div>
+                <div class="kpi">
+                    <div class="kpi-title">Total Pelanggan Aktif</div>
+                    <div class="kpi-value"><span id="kpi-active">0</span></div>
+                    <div class="kpi-sub">Jumlah transaksi (count)</div>
+                </div>
+            </div>
 
-/* REVISI UI: WA Input (Ikon terintegrasi) */
-.input-icon-group .input-icon-wrap{
-    position: relative;
-    display: flex; 
-    align-items: center;
-}
-.input-icon-group .input-icon-wrap input{
-    padding-left: 40px; 
-}
-.input-icon-group .input-icon-wrap svg{
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%); 
-    width: 18px;
-    height: 18px;
-    opacity: 0.9;
-    color: var(--muted); 
-    pointer-events: none; 
-}
+            <aside class="card input-form" aria-labelledby="input-title">
+                <h2 id="input-title">Input Data Langganan</h2>
 
-/* REVISI UI: Currency Input (Prefix Rp) */
-.field.currency-input {
-    position: relative;
-}
-.field.currency-input .currency-prefix {
-    position: absolute;
-    left: 14px; 
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--muted);
-    font-size: 14px;
-    opacity: 0.8;
-}
-.field.currency-input .currency-prefix + input {
-    padding-left: 40px; 
-}
+                <form id="entryForm" class="fields" autocomplete="off" novalidate>
+                    <div class="field">
+                        <label for="nama">Nama Pembeli <span class="req">*</span></label>
+                        <input id="nama" name="nama" type="text" placeholder="Nama lengkap" required />
+                    </div>
 
+                    <div class="field input-icon-group">
+                        <label for="wa">No. WhatsApp <span class="req">*</span></label>
+                        <div class="input-icon-wrap">
+                            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M17.6 14.2c-.3-.2-1.7-.8-1.9-.9-.2-.1-.3-.2-.5.2-.1.3-.6.9-.7 1-.1.2-.3.2-.6.1C10.7 14 7 11.3 6.2 9.8c-.1-.3 0-.4.1-.6.1-.1.3-.3.5-.5.2-.2.3-.4.4-.7.1-.2 0-.4 0-.6 0-.2-.5-1.1-.7-1.5-.2-.4-.4-.3-.6-.3-.1 0-.2 0-.4 0-.1 0-.4 0-.6 0-.2 0-.5 0-.8.3-.3.3-1 1-1.1 1.1-.3.3-.7.6-1 1-.3.4-.5 1.1-.5 1.8 0 3.3 1.7 6.8 4.8 9.8 3 3 6.6 4.6 9.2 4.6 1.2 0 1.9-.2 2.4-.4.6-.3 1-1.2 1.2-2.2.2-1 .1-2.1-.4-2.7-.5-.6-1.5-1.1-1.8-1.3z"></path></svg>
+                            <input id="wa" name="wa" type="text" inputmode="tel" placeholder="08xxxxxxxxxx" required />
+                        </div>
+                    </div>
 
-/* Add catalog row */
-.add-catalog{
-    display:flex;
-    gap:8px;
-    align-items:center;
-    margin-bottom: 12px; /* Menambah sedikit jarak dari field di bawahnya */
-    margin-top: -6px; /* Mengurangi jarak dari field di atasnya agar lebih terikat */
-}
-.add-catalog input{
-    flex:1 1 auto;
-    padding:10px 12px;
-    border-radius:10px;
-    border:1px solid rgba(255,255,255,0.04);
-    background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.00));
-    color:var(--white);
-    height: 40px; /* Seragamkan tinggi input inline */
-}
-.add-catalog .btn.small{
-    height:40px;
-    padding:0 14px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    /* REVISI UI: Menggunakan style primary untuk konsistensi */
-    background: linear-gradient(90deg,var(--accent1),var(--accent2));
-    color:#031014;
-    font-weight: 600;
-}
+                    <div class="field">
+                        <label for="katalog">Katalog / Produk <span class="req">*</span></label>
+                        <select id="katalog" name="katalog" aria-label="Katalog Produk"></select>
+                    </div>
 
-/* Buttons */
-.form-actions{display:flex;gap:10px;margin-top:6px;align-items:center}
-.btn{
-    padding:10px 14px;
-    border-radius:10px;
-    border:none;
-    cursor:pointer;
-    font-weight:700;
-    /* Ubah gradient di sini atau biarkan class primary yang mengaturnya */
-    background:linear-gradient(90deg,var(--accent1),var(--accent2));
-    color:#031014;
-    position:relative;
-    overflow:hidden;
-    box-shadow:0 8px 30px rgba(138,92,255,0.06);
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    height:44px; /* REVISI UI: Seragamkan tinggi tombol */
-    transition: all .15s ease;
-    font-size: 14px; /* Seragamkan ukuran font */
-}
-.btn.small{
-    padding:8px 10px;
-    font-size:14px;
-    border-radius:10px;
-    height:40px; /* Tombol kecil sedikit lebih pendek */
-    line-height:40px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-}
-/* ... (Class button lainnya tetap sama) ... */
+                    <div class="add-catalog">
+                        <input id="newCatalogInput" placeholder="Tambah produk baru (mis. HBO Max)" />
+                        <button type="button" id="addCatalogBtn" class="btn small primary add-btn-inline">Tambah</button>
+                    </div>
 
-/* Hapus .add-btn-inline karena sudah diseragamkan di .add-catalog .btn.small */
-.add-btn-inline{
-    /* Hapus style yang conflict dengan .btn.small */
-    background:none;
-    color:none;
-    height:auto;
-    padding:auto;
-    border-radius:auto;
-}
+                    <div class="field">
+                        <label for="akun">Akun</label>
+                        <input id="akun" name="akun" type="text" placeholder="Email akun / username" />
+                    </div>
 
-/* ... (Bagian bawah CSS tetap sama) ... */
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <input id="password" name="password" type="password" placeholder="Opsional" />
+                    </div>
+
+                    <div class="field">
+                        <label for="profile">Profile & PIN</label>
+                        <input id="profile" name="profile" type="text" placeholder="mis. Profile 1 / PIN 1234" />
+                    </div>
+
+                    <div class="field">
+                        <label for="device">Device</label>
+                        <select id="device" name="device">
+                            <option value="">Pilih Device</option>
+                            <option>TV</option>
+                            <option>HP</option>
+                            <option>Laptop</option>
+                            <option>All</option>
+                        </select>
+                    </div>
+
+                    <div class="row two">
+                        <div class="field">
+                            <label for="tglBeli">Tanggal Beli</label>
+                            <input id="tglBeli" name="tglBeli" type="date" />
+                        </div>
+                        <div class="field">
+                            <label for="durasi">Durasi</label>
+                            <input id="durasi" name="durasi" type="text" placeholder="mis. 30 Hari" />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="statusBuyer">Status Buyer</label>
+                        <select id="statusBuyer" name="statusBuyer">
+                            <option value="">Pilih Status</option>
+                            <option>Reguler</option>
+                            <option>Reseller</option>
+                        </select>
+                    </div>
+
+                    <div class="row two">
+                        <div class="field currency-input">
+                            <label for="modal">Modal (Rp)</label>
+                            <input id="modal" name="modal" type="number" inputmode="numeric" min="0" placeholder="25000" />
+                            <span class="currency-prefix">Rp</span>
+                        </div>
+                        <div class="field currency-input">
+                            <label for="harga">Harga Jual (Rp)</label>
+                            <input id="harga" name="harga" type="number" inputmode="numeric" min="0" placeholder="33900" />
+                            <span class="currency-prefix">Rp</span>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button id="addBtn" class="btn primary" type="submit">+ Tambah Data</button>
+                        <button id="resetBtn" class="btn outline" type="button">Reset</button>
+                    </div>
+                </form>
+            </aside>
+
+            <section class="card table-view" aria-labelledby="table-title">
+                <div class="table-header">
+                    <div class="header-left">
+                        <h2 id="table-title">Data Langganan</h2>
+                        <p class="muted small">Pantau transaksi, profit, dan export laporan.</p>
+                    </div>
+
+                    <div class="controls">
+                        <div class="custom-select-wrapper">
+                            <select id="filterProduk" name="filterProduk" aria-label="Filter Produk"></select>
+                        </div>
+
+                        <input id="searchInput" placeholder="Cari nama / WA..." />
+
+                        <button id="exportBtn" class="export-btn" title="Export CSV" aria-label="Export CSV">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M21 21H3"/></svg>
+                            <span class="sr-only">Export</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table id="subsTable" role="table" aria-describedby="table-title">
+                        <thead>
+                            <tr>
+                                <th>Nama</th>
+                                <th>Produk</th>
+                                <th>Tanggal</th>
+                                <th>Durasi</th>
+                                <th>Modal</th>
+                                <th>Harga</th>
+                                <th>Profit</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+
+            </section>
+        </main>
+
+        <footer class="footer text-center">© 2025 SAISOKU.ID · Flat Dark Dashboard by SIVA</footer>
+    </div>
+
+    <div id="invoiceModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-card" role="document">
+            <div class="modal-header">
+                <h3 class="brand">Struk Penjualan</h3>
+                <div class="modal-actions">
+                    <button id="copyInvoiceBtn" class="btn small outline">Copy</button>
+                    <button id="printInvoiceBtn" class="btn small teal">Print</button>
+                    <button id="waInvoiceBtn" class="btn small">WA</button>
+                    <button id="closeInvoiceBtn" class="btn small outline">Tutup</button>
+                </div>
+            </div>
+            <div id="invoiceBody" class="invoice-body" tabindex="0"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast" aria-live="polite"></div>
+    <script src="script.js"></script>
+</body>
+</html>
