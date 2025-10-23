@@ -102,14 +102,16 @@
                         </div>
                         <div class="field">
                             <label for="durasi">Durasi</label>
-                            <select id="durasi" name="durasi">
-                                <option value="30 Hari">30 Hari</option>
-                                <option value="60 Hari">60 Hari</option>
-                                <option value="90 Hari">90 Hari</option>
-                                <option value="120 Hari">120 Hari</option>
-                                <option value="Custom Text">Custom Text</option>
-                            </select>
-                            <input id="customDurasiInput" type="text" placeholder="Input durasi (mis. 45 Hari atau 1 Tahun)" style="display:none; margin-top:8px;" />
+                            <div class="durasi-wrapper">
+                                <select id="durasi" name="durasi">
+                                    <option value="30 Hari">30 Hari</option>
+                                    <option value="60 Hari">60 Hari</option>
+                                    <option value="90 Hari">90 Hari</option>
+                                    <option value="120 Hari">120 Hari</option>
+                                    <option value="Custom Text">Custom Text</option>
+                                </select>
+                                <input id="customDurasiInput" type="text" placeholder="Input durasi (mis. 45 Hari atau 1 Tahun)" style="display:none;" />
+                            </div>
                         </div>
                     </div>
 
@@ -194,10 +196,11 @@
             <div class="modal-header">
                 <h3 class="brand">Struk Penjualan</h3>
                 <div class="modal-actions">
-    <button id="copyInvoiceBtn" class="btn small outline">Copy</button>
-    <button id="printInvoiceBtn" class="btn small teal">Print</button>
-    <button id="waInvoiceBtn" class="btn small primary">WA</button> <button id="closeInvoiceBtn" class="btn small outline">Tutup</button>
-</div>
+                    <button id="copyInvoiceBtn" class="btn small primary">Copy</button>
+                    <button id="printInvoiceBtn" class="btn small primary">Print</button> 
+                    <button id="waInvoiceBtn" class="btn small primary">WA</button> 
+                    <button id="closeInvoiceBtn" class="btn small outline">Tutup</button>
+                </div>
             </div>
             <div id="invoiceBody" class="invoice-body" tabindex="0"></div>
         </div>
