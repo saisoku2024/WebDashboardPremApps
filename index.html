@@ -17,7 +17,7 @@
     </header>
 
     <main class="grid">
-      <!-- KPI row -->
+      <!-- KPI row: inside grid so alignment is perfect -->
       <div class="kpi-row" style="grid-column: 1 / -1;" role="region" aria-label="KPI">
         <div class="kpi">
           <div class="kpi-title">Penjualan Hari Ini</div>
@@ -51,14 +51,10 @@
             <input id="nama" name="nama" type="text" placeholder="Nama lengkap" required />
           </div>
 
-          <!-- WA input: improved alignment & sizing -->
-          <div class="field">
+          <div class="field input-icon">
             <label for="wa">No. WhatsApp <span class="req">*</span></label>
-            <div class="wa-wrapper">
-              <div class="wa-icon" aria-hidden="true">
-                <!-- small phone icon -->
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20.6 15.5c-.4 0-1.1-.2-1.6-.4-.2-.1-.6-.2-.8 0-.9.7-1.9 1.1-3.1 1.1-3.1 0-5.6-2.5-5.6-5.6 0-1.2.4-2.2 1.1-3.1.2-.2.1-.6 0-.8-.2-.5-.4-1.2-.4-1.6 0-.5-.4-.9-.9-.9H5.4C4.6 3 3 4.6 3 6.4 3 15.1 8.9 21 17.6 21c1.8 0 3.4-1.6 3.4-2.4v-2.8c0-.5-.4-.9-.9-.9z"></path></svg>
-              </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" style="opacity:.9"><path fill="currentColor" d="M17.6 14.2c-.3-.2-1.7-.8-1.9-.9-.2-.1-.3-.2-.5.2-.1.3-.6.9-.7 1-.1.2-.3.2-.6.1C10.7 14 7 11.3 6.2 9.8c-.1-.3 0-.4.1-.6.1-.1.3-.3.5-.5.2-.2.3-.4.4-.7.1-.2 0-.4 0-.6 0-.2-.5-1.1-.7-1.5-.2-.4-.4-.3-.6-.3-.1 0-.2 0-.4 0-.1 0-.4 0-.6 0-.2 0-.5 0-.8.3-.3.3-1 1-1.1 1.1-.3.3-.7.6-1 1-.3.4-.5 1.1-.5 1.8 0 3.3 1.7 6.8 4.8 9.8 3 3 6.6 4.6 9.2 4.6 1.2 0 1.9-.2 2.4-.4.6-.3 1-1.2 1.2-2.2.2-1 .1-2.1-.4-2.7-.5-.6-1.5-1.1-1.8-1.3z"></path></svg>
               <input id="wa" name="wa" type="text" inputmode="tel" placeholder="08xxxxxxxxxx" required />
             </div>
           </div>
@@ -104,20 +100,9 @@
               <label for="tglBeli">Tanggal Beli</label>
               <input id="tglBeli" name="tglBeli" type="date" />
             </div>
-
-            <!-- Durasu dropdown + custom -->
             <div class="field">
-              <label for="durasiSelect">Durasi</label>
-              <select id="durasiSelect" name="durasiSelect" aria-label="Durasi Pembelian">
-                <option value="30 Hari">30 Hari</option>
-                <option value="60 Hari">60 Hari</option>
-                <option value="90 Hari">90 Hari</option>
-                <option value="120 Hari">120 Hari</option>
-                <option value="custom">Custom...</option>
-              </select>
-              <input id="durasiCustom" class="hidden" placeholder="Masukkan durasi, mis. 45 Hari" />
-              <!-- legacy field used by code as fallback (kept but hidden) -->
-              <input id="durasi" name="durasi" type="hidden" />
+              <label for="durasi">Durasi</label>
+              <input id="durasi" name="durasi" type="text" placeholder="mis. 30 Hari" />
             </div>
           </div>
 
@@ -189,6 +174,7 @@
             <tbody id="tableBody"></tbody>
           </table>
         </div>
+
       </section>
     </main>
 

@@ -1,4 +1,4 @@
-// CONFIG (Google Apps Script URL jika perlu)
+// CONFIG: isi APPS_SCRIPT_URL jika mau sinkron ke Google Sheets
 const APPS_SCRIPT_URL = '';
 
 // initial catalog list
@@ -40,9 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const passEl = $('password');
   const profileEl = $('profile');
   const tglEl = $('tglBeli');
-  const durasiHidden = $('durasi'); // hidden fallback
-  const durasiSelect = $('durasiSelect');
-  const durasiCustom = $('durasiCustom');
+  const durasiEl = $('durasi');
   const modalEl = $('modal');
   const hargaEl = $('harga');
   const addBtn = $('addBtn');
@@ -108,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // small custom-select helper (kept from earlier code)
+  // custom select UI: hides native select and renders dark dropdown
   function createCustomSelects() {
     const selects = Array.from(document.querySelectorAll('select'));
     selects.forEach(sel => {
@@ -299,31 +297,11 @@ document.addEventListener('DOMContentLoaded', function () {
     showToast('Produk ditambahkan');
   });
 
-  // DURASI: show/hide custom input
-  if (durasiSelect) {
-    durasiSelect.addEventListener('change', () => {
-      if (durasiSelect.value === 'custom') {
-        durasiCustom.classList.remove('hidden');
-        durasiCustom.focus();
-        durasiHidden.value = '';
-      } else {
-        durasiCustom.classList.add('hidden');
-        durasiHidden.value = durasiSelect.value;
-      }
-    });
-  }
-  if (durasiCustom) {
-    durasiCustom.addEventListener('input', () => {
-      durasiHidden.value = durasiCustom.value.trim();
-    });
-  }
-
   // init
   populateCatalogSelects();
   createCustomSelects();
   if (tglEl && !tglEl.value) tglEl.value = isoToday();
-  if (durasiSelect && !durasiSelect.value) durasiSelect.value = '30 Hari';
-  if (durasiHidden) durasiHidden.value = '30 Hari';
+  if (durasiEl && !durasiEl.value) durasiEl.value = '30 Hari';
   render();
 
   // submit
@@ -337,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const password = passEl ? passEl.value : '';
       const profile = profileEl ? profileEl.value.trim() : '';
       const tglBeli = (tglEl && tglEl.value) ? tglEl.value : isoToday();
-      const durasiVal = durasiHidden ? (durasiHidden.value || (durasiSelect ? durasiSelect.value : '')) : (durasiSelect ? durasiSelect.value : '');
+      const durasi = durasiEl ? durasiEl.value.trim() : '';
       const statusBuyer = statusSel ? statusSel.value : '';
       const modal = modalEl ? modalEl.value : '';
       const harga = hargaEl ? hargaEl.value : '';
@@ -351,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       const entry = {
         nama, wa, katalog, akun, password, profile, device: deviceSel ? deviceSel.value : '',
-        tglBeli, durasi: durasiVal, statusBuyer, modal: modal, harga: harga, created: new Date().toISOString()
+        tglBeli, durasi, statusBuyer, modal: modal, harga: harga, created: new Date().toISOString()
       };
 
       const all = load();
@@ -364,7 +342,7 @@ document.addEventListener('DOMContentLoaded', function () {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            buyerName: nama, buyerWA: wa, catalog: katalog, duration: durasiVal,
+            buyerName: nama, buyerWA: wa, catalog: katalog, duration: durasi,
             account: akun, password: password, profilePin: profile, device: deviceSel ? deviceSel.value : '',
             buyerType: statusBuyer, paymentNum: Number(harga)||0, modalNum: Number(modal)||0, dateBuy: tglBeli
           })
@@ -377,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function () {
         showToast('Transaksi ditambahkan');
         form.reset();
         if (tglEl) tglEl.value = isoToday();
-        if (durasiSelect) { durasiSelect.value = '30 Hari'; durasiHidden.value = '30 Hari'; durasiCustom.classList.add('hidden'); }
+        if (durasiEl) durasiEl.value = '30 Hari';
         if (katalogSel) { katalogSel.selectedIndex = 0; katalogSel.dispatchEvent(new Event('change',{bubbles:true})); }
         if (filterSel) { filterSel.selectedIndex = 0; filterSel.dispatchEvent(new Event('change',{bubbles:true})); }
         if (deviceSel) { deviceSel.selectedIndex = 0; deviceSel.dispatchEvent(new Event('change',{bubbles:true})); }
@@ -394,7 +372,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!confirm('Reset form? Semua input akan kosong.')) return;
       form.reset();
       if (tglEl) tglEl.value = isoToday();
-      if (durasiSelect) { durasiSelect.value = '30 Hari'; durasiHidden.value = '30 Hari'; durasiCustom.classList.add('hidden'); }
+      if (durasiEl) durasiEl.value = '30 Hari';
       if (katalogSel) { katalogSel.selectedIndex = 0; katalogSel.dispatchEvent(new Event('change',{bubbles:true})); }
       if (deviceSel) { deviceSel.selectedIndex = 0; deviceSel.dispatchEvent(new Event('change',{bubbles:true})); }
       if (statusSel) { statusSel.selectedIndex = 0; statusSel.dispatchEvent(new Event('change',{bubbles:true})); }
@@ -402,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // table actions
+  // table actions (struk/delete)
   tableBody.addEventListener('click', function (e) {
     const btn = e.target.closest('button');
     if (!btn) return;
@@ -457,12 +435,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // export
+  // export CSV
   if (exportBtn) {
     exportBtn.addEventListener('click', function () {
       const all = load();
       if (!all.length) { showToast('Tidak ada data untuk diekspor'); return; }
-      const header = ['Nama','WA','Produk','Durasi','Akun','Password','Profile','Device','Harga','Modal','Tanggal','Created'];
+      const header = ['Nama','WA','Produk','Durasi','Akun','Password','Profile','Device','Pembayaran','Modal','Tanggal','Created'];
       const rows = all.map(r => [r.nama, r.wa, r.katalog, r.durasi, r.akun, r.password, r.profile, r.device, r.harga, r.modal, r.tglBeli, r.created]);
       const csv = [header, ...rows].map(r => r.map(c => `"${String(c || '').replace(/"/g,'""')}"`).join(',')).join('\r\n');
       const blob = new Blob([csv], { type: 'text/csv' });
@@ -476,7 +454,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if (searchInput) searchInput.addEventListener('input', render);
   if (filterSel) filterSel.addEventListener('change', render);
 
-  // invoice modal handlers (keamanan, copy/print/wa)
+  // invoice modal handling
   const invoiceModal = $('invoiceModal');
   const invoiceBody = $('invoiceBody');
   const copyInvoiceBtn = $('copyInvoiceBtn');
@@ -521,7 +499,7 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.modal-backdrop').forEach(b => b.addEventListener('click', closeInvoiceModal));
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeInvoiceModal(); });
 
-  // finalize: ensure selects created
+  // ensure selects are created after populate
   populateCatalogSelects();
   setTimeout(()=> createCustomSelects(), 90);
 });
