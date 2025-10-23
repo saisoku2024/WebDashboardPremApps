@@ -553,7 +553,6 @@ document.addEventListener('DOMContentLoaded', function () {
             lines.push(`🏷️ Harga     : Rp ${formatRupiah(parseNumber(row.harga || 0))}`);
             lines.push(`🧩 Status    : ${row.statusBuyer || '-'}`);
             lines.push(`──────────`);
-            // Revisi di sini: Hapus baris "Net Profit" dan ganti dengan pesan yang lebih sesuai.
             lines.push(`Terima kasih telah berbelanja di SAISOKU.ID 🙏`);
             lines.push(`© 2025 SAISOKU.ID • ${formatDateDDMMYYYY(new Date().toISOString().slice(0,10))}`);
 

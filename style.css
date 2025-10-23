@@ -200,7 +200,7 @@ input[type="number"] {
     display:inline-flex;
     align-items:center;
     gap:8px;
-    height:44px; 
+    height:44px; /* Tinggi sama dengan input utama */
     transition: all .15s ease;
     font-size: 14px; 
     justify-content: center; 
@@ -222,8 +222,6 @@ input[type="number"] {
 .btn[disabled]{opacity:0.6;cursor:not-allowed}
 
 /* Controls, Table, Modal, Footer: Tetap sama */
-
-/* ... (lanjutan kode CSS) ... */
 .table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;flex-wrap:wrap}
 .header-left{min-width:0;display:flex;flex-direction:column;justify-content:center}
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;min-width:0}
