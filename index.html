@@ -102,7 +102,14 @@
                         </div>
                         <div class="field">
                             <label for="durasi">Durasi</label>
-                            <input id="durasi" name="durasi" type="text" placeholder="mis. 30 Hari" />
+                            <select id="durasi" name="durasi">
+                                <option value="30 Hari">30 Hari</option>
+                                <option value="60 Hari">60 Hari</option>
+                                <option value="90 Hari">90 Hari</option>
+                                <option value="120 Hari">120 Hari</option>
+                                <option value="Custom Text">Custom Text</option>
+                            </select>
+                            <input id="customDurasiInput" type="text" placeholder="Input durasi (mis. 45 Hari atau 1 Tahun)" style="display:none; margin-top:8px;" />
                         </div>
                     </div>
 

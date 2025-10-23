@@ -41,6 +41,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const profileEl = $('profile');
     const tglEl = $('tglBeli');
     const durasiEl = $('durasi');
+    const customDurasiInput = $('customDurasiInput'); // Elemen input custom
+    
     const modalEl = $('modal');
     const hargaEl = $('harga');
     const addBtn = $('addBtn');
@@ -88,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return `${dd}/${mm}/${yyyy}`;
     }
 
-    // FIX: Hapus custom select yang sudah ada sebelum membuat yang baru
+    // Hapus custom select yang sudah ada sebelum membuat yang baru
     function destroyCustomSelect(sel) {
         if (sel.dataset.customized === '1') {
             const wrapper = sel.closest('.custom-select-wrapper');
@@ -239,6 +241,24 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // --- Logic untuk Custom Durasi ---
+    function handleDurasiChange() {
+        const selectedValue = durasiEl.value;
+        if (selectedValue === 'Custom Text') {
+            if (customDurasiInput) customDurasiInput.style.display = 'block';
+            if (customDurasiInput) customDurasiInput.required = true;
+        } else {
+            if (customDurasiInput) customDurasiInput.style.display = 'none';
+            if (customDurasiInput) customDurasiInput.required = false;
+        }
+    }
+
+    if (durasiEl) {
+        durasiEl.addEventListener('change', handleDurasiChange);
+    }
+    // ---------------------------------
+
+
     let currentRenderList = [];
     function render() {
         const all = load();
@@ -351,11 +371,13 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // init
-    // FIX: createCustomSelects dihapus dari init karena sudah dipanggil di populate
     populateCatalogSelects(); 
     
+    // Set nilai default pada durasi dan panggil handler
     if (tglEl && !tglEl.value) tglEl.value = isoToday();
-    if (durasiEl && !durasiEl.value) durasiEl.value = '30 Hari';
+    if (durasiEl && !durasiEl.value) durasiEl.value = '30 Hari'; // Set default select value
+    handleDurasiChange();
+    
     render();
 
     // submit
@@ -367,8 +389,21 @@ document.addEventListener('DOMContentLoaded', function () {
             const isNamaValid = validateInput(namaEl);
             const isWaValid = validateInput(waEl);
             const isKatalogValid = validateInput(katalogSel);
+            
+            let durasiFinal = durasiEl.value;
+            let isDurasiValid = true;
 
-            if (!isNamaValid || !isWaValid || !isKatalogValid) {
+            if (durasiFinal === 'Custom Text') {
+                durasiFinal = customDurasiInput.value.trim();
+                if (!durasiFinal) {
+                    showToast('Isi durasi kustom');
+                    customDurasiInput.focus();
+                    isDurasiValid = false;
+                }
+            }
+
+
+            if (!isNamaValid || !isWaValid || !isKatalogValid || !isDurasiValid) {
                 showToast('Lengkapi data wajib (*).');
                 return;
             }
@@ -385,7 +420,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 profile: profileEl ? profileEl.value.trim() : '', 
                 device: deviceSel ? deviceSel.value : '',
                 tglBeli: (tglEl && tglEl.value) ? tglEl.value : isoToday(), 
-                durasi: durasiEl ? durasiEl.value.trim() : '', 
+                durasi: durasiFinal, // Menggunakan nilai final
                 statusBuyer: statusSel ? statusSel.value : '', 
                 modal: modalEl ? modalEl.value : '', 
                 harga: hargaEl ? hargaEl.value : '', 
@@ -407,10 +442,9 @@ document.addEventListener('DOMContentLoaded', function () {
             
             // Set ulang nilai default dan trigger change event untuk custom select
             if (tglEl) tglEl.value = isoToday();
-            if (durasiEl) durasiEl.value = '30 Hari';
             
             // Reset custom selects
-            const selectsToReset = [katalogSel, filterSel, deviceSel, statusSel];
+            const selectsToReset = [katalogSel, filterSel, deviceSel, statusSel, durasiEl]; // Tambah durasiEl
             selectsToReset.forEach(sel => {
                 if (sel) {
                     sel.selectedIndex = 0; 
@@ -421,6 +455,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
             
+            // Sembunyikan input custom durasi
+            if (customDurasiInput) customDurasiInput.value = '';
+            handleDurasiChange(); 
+
+
             // Hapus kelas invalid dari input wajib
             namaEl.closest('.field')?.classList.remove('invalid');
             waEl.closest('.field')?.classList.remove('invalid');
@@ -452,9 +491,8 @@ document.addEventListener('DOMContentLoaded', function () {
             form.reset();
             
             if (tglEl) tglEl.value = isoToday();
-            if (durasiEl) durasiEl.value = '30 Hari';
             
-            const selectsToReset = [katalogSel, deviceSel, statusSel];
+            const selectsToReset = [katalogSel, deviceSel, statusSel, durasiEl]; // Tambah durasiEl
             selectsToReset.forEach(sel => {
                 if (sel) {
                     sel.selectedIndex = 0; 
@@ -462,6 +500,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     sel.closest('.field')?.classList.remove('invalid');
                 }
             });
+
+            // Sembunyikan input custom durasi
+            if (customDurasiInput) customDurasiInput.value = '';
+            handleDurasiChange();
             
             // Hapus kelas invalid dari input wajib
             namaEl.closest('.field')?.classList.remove('invalid');
@@ -473,6 +515,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // table actions (struk/delete)
     tableBody.addEventListener('click', function (e) {
+        // ... (kode tetap sama) ...
         const btn = e.target.closest('button');
         if (!btn) return;
         const idx = Number(btn.dataset.idx);
@@ -526,7 +569,6 @@ document.addEventListener('DOMContentLoaded', function () {
             showToast('Transaksi dihapus');
         }
     });
-
     // export CSV
     if (exportBtn) {
         exportBtn.addEventListener('click', function () {
