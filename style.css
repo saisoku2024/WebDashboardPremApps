@@ -1,203 +1,309 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>SAISOKU.ID — Dashboard Premium Apps</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-    <div class="wrap">
-        <header class="header">
-            <div class="brand-wrap">
-                <h1 class="brand">Web Dashboard Premium Apps – SAISOKU.ID</h1>
-                <p class="tag">Form Input Sales • Riwayat Transaksi • Ringkasan Modal & Profit</p>
-            </div>
-        </header>
+:root{
+    --left-col: 360px;
+    --bg-900: #030616;
+    --bg-800: #061228;
+    --card: #071627;
+    --muted: #9fb0c6;
+    --accent1: #00f3ff;
+    --accent2: #8a5cff;
+    --teal: #0ea5a0;
+    --white: #e6eef8;
+    --radius: 12px;
+    --shadow: 0 10px 30px rgba(0,0,0,0.6);
+    --danger: #ff4d4f;
+    --outline-border: rgba(255,255,255,0.06);
+    --danger-outline: rgba(255,77,79,0.28);
+}
 
-        <main class="grid">
-            <div class="kpi-row" role="region" aria-label="KPI">
-                <div class="kpi">
-                    <div class="kpi-title">Penjualan Hari Ini</div>
-                    <div class="kpi-value">Rp <span id="kpi-sales">0</span></div>
-                    <div class="kpi-sub">Total penjualan hari ini (harga jual)</div>
-                </div>
-                <div class="kpi">
-                    <div class="kpi-title">Total GMV</div>
-                    <div class="kpi-value">Rp <span id="kpi-gmv">0</span></div>
-                    <div class="kpi-sub">Akumulasi (awal → akhir)</div>
-                </div>
-                <div class="kpi">
-                    <div class="kpi-title">Total Profit (All time)</div>
-                    <div class="kpi-value">Rp <span id="kpi-profit-all">0</span></div>
-                    <div class="kpi-sub">Jumlah profit = Σ(harga − modal)</div>
-                </div>
-                <div class="kpi">
-                    <div class="kpi-title">Total Pelanggan Aktif</div>
-                    <div class="kpi-value"><span id="kpi-active">0</span></div>
-                    <div class="kpi-sub">Jumlah transaksi (count)</div>
-                </div>
-            </div>
+/* Reset & base */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;background:linear-gradient(180deg,var(--bg-900) 0%, var(--bg-800) 100%);color:var(--white);-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
 
-            <aside class="card input-form" aria-labelledby="input-title">
-                <h2 id="input-title">Input Data Langganan</h2>
+/* Container */
+.wrap{max-width:1200px;margin:18px auto;padding:18px}
+.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:12px}
+.brand-wrap{display:flex;flex-direction:column;gap:6px}
+.brand{font-family:Poppins, Inter, sans-serif;font-weight:700;font-size:18px;margin:0}
+.tag{color:var(--muted);margin:0;font-size:13px;opacity:0.95}
 
-                <form id="entryForm" class="fields" autocomplete="off" novalidate>
-                    <div class="field">
-                        <label for="nama">Nama Pembeli <span class="req">*</span></label>
-                        <input id="nama" name="nama" type="text" placeholder="Nama lengkap" required />
-                    </div>
+/* KPI row */
+.kpi-row{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap:12px;
+    margin: 10px 0 12px 0;
+    align-items:stretch;
+    grid-column: 1 / -1; 
+}
+.kpi{
+    padding:12px 14px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.03);
+    box-shadow:var(--shadow);
+    background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));
+    min-height:86px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    box-sizing:border-box;
+}
+.kpi-title{font-size:12px;color:var(--muted);margin-bottom:6px}
+.kpi-value{font-size:20px;font-weight:800;color:var(--white);display:flex;align-items:baseline;gap:6px}
+.kpi-sub{font-size:12px;color:rgba(159,176,198,0.75);margin-top:6px}
 
-                    <div class="field input-icon-group">
-                        <label for="wa">No. WhatsApp <span class="req">*</span></label>
-                        <div class="input-icon-wrap">
-                            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M17.6 14.2c-.3-.2-1.7-.8-1.9-.9-.2-.1-.3-.2-.5.2-.1.3-.6.9-.7 1-.1.2-.3.2-.6.1C10.7 14 7 11.3 6.2 9.8c-.1-.3 0-.4.1-.6.1-.1.3-.3.5-.5.2-.2.3-.4.4-.7.1-.2 0-.4 0-.6 0-.2-.5-1.1-.7-1.5-.2-.4-.4-.3-.6-.3-.1 0-.2 0-.4 0-.1 0-.4 0-.6 0-.2 0-.5 0-.8.3-.3.3-1 1-1.1 1.1-.3.3-.7.6-1 1-.3.4-.5 1.1-.5 1.8 0 3.3 1.7 6.8 4.8 9.8 3 3 6.6 4.6 9.2 4.6 1.2 0 1.9-.2 2.4-.4.6-.3 1-1.2 1.2-2.2.2-1 .1-2.1-.4-2.7-.5-.6-1.5-1.1-1.8-1.3z"></path></svg>
-                            <input id="wa" name="wa" type="text" inputmode="tel" placeholder="08xxxxxxxxxx" required />
-                        </div>
-                    </div>
+/* Grid (left column + right) */
+.grid{display:grid;grid-template-columns:var(--left-col) 1fr;gap:18px;align-items:start; margin-top:6px}
 
-                    <div class="field">
-                        <label for="katalog">Katalog / Produk <span class="req">*</span></label>
-                        <select id="katalog" name="katalog" aria-label="Katalog Produk"></select>
-                    </div>
+/* Card */
+.card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:14px;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.02);box-shadow:var(--shadow);overflow:visible}
+.card h2{margin:0 0 10px 0;font-size:16px}
 
-                    <div class="add-catalog">
-                        <input id="newCatalogInput" placeholder="Tambah produk baru (mis. HBO Max)" />
-                        <button type="button" id="addCatalogBtn" class="btn small primary add-btn-inline">Tambah</button>
-                    </div>
+/* Form basics */
+.fields{
+    display:flex;
+    flex-direction:column;
+    gap: 16px; 
+}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label{font-size:13px;color:var(--muted);margin-bottom:6px}
+.field input,.field select,.controls input{
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.04);
+    background:linear-gradient(180deg,rgba(10,16,22,0.28),rgba(6,10,14,0.18));
+    color:var(--white);outline:none;
+    font-size:14px;
+    width:100%;
+    min-width:0;
+    box-sizing:border-box;
+    height: 44px; 
+}
+.field input::placeholder,.controls input::placeholder{color:rgba(230,238,248,0.25)}
 
-                    <div class="field">
-                        <label for="akun">Akun</label>
-                        <input id="akun" name="akun" type="text" placeholder="Email akun / username" />
-                    </div>
+/* WA Input (Ikon terintegrasi) */
+.input-icon-group .input-icon-wrap{
+    position: relative;
+    display: flex; 
+    align-items: center;
+}
+.input-icon-group .input-icon-wrap input{
+    padding-left: 40px; 
+}
+.input-icon-group .input-icon-wrap svg{
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%); 
+    width: 18px;
+    height: 18px;
+    opacity: 0.9;
+    color: var(--muted); 
+    pointer-events: none; 
+}
 
-                    <div class="field">
-                        <label for="password">Password</label>
-                        <input id="password" name="password" type="password" placeholder="Opsional" />
-                    </div>
+/* Currency Input (Prefix Rp) */
+.field.currency-input {
+    position: relative;
+}
+.field.currency-input .currency-prefix {
+    position: absolute;
+    left: 14px; 
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 14px;
+    opacity: 0.8;
+}
+.field.currency-input .currency-prefix + input {
+    padding-left: 40px; 
+}
 
-                    <div class="field">
-                        <label for="profile">Profile & PIN</label>
-                        <input id="profile" name="profile" type="text" placeholder="mis. Profile 1 / PIN 1234" />
-                    </div>
 
-                    <div class="field">
-                        <label for="device">Device</label>
-                        <select id="device" name="device">
-                            <option value="">Pilih Device</option>
-                            <option>TV</option>
-                            <option>HP</option>
-                            <option>Laptop</option>
-                            <option>All</option>
-                        </select>
-                    </div>
+/* Add catalog row */
+.add-catalog{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    margin-bottom: 12px; 
+    margin-top: -6px; 
+}
+.add-catalog input{
+    flex:1 1 auto;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.04);
+    background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.00));
+    color:var(--white);
+    height: 40px; 
+}
+.add-catalog .btn.small{
+    height:40px;
+    padding:0 14px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    background: linear-gradient(90deg,var(--accent1),var(--accent2));
+    color:#031014;
+    font-weight: 600;
+}
 
-                    <div class="row two">
-                        <div class="field">
-                            <label for="tglBeli">Tanggal Beli</label>
-                            <input id="tglBeli" name="tglBeli" type="date" />
-                        </div>
-                        <div class="field">
-                            <label for="durasi">Durasi</label>
-                            <input id="durasi" name="durasi" type="text" placeholder="mis. 30 Hari" />
-                        </div>
-                    </div>
+/* Buttons */
+.form-actions{display:flex;gap:10px;margin-top:6px;align-items:center}
+.btn{
+    padding:10px 14px;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+    font-weight:700;
+    background:linear-gradient(90deg,var(--accent1),var(--accent2));
+    color:#031014;
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 8px 30px rgba(138,92,255,0.06);
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    height:44px; 
+    transition: all .15s ease;
+    font-size: 14px; 
+}
+.btn.small{
+    padding:8px 10px;
+    font-size:14px;
+    border-radius:10px;
+    height:40px; 
+    line-height:40px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+}
+.btn.primary{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#031014}
+.btn.secondary{background:linear-gradient(90deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);color:var(--white)}
+.btn.outline{background:transparent;border:1px solid var(--outline-border);color:var(--white);box-shadow:none}
+.btn.teal{background:linear-gradient(90deg,var(--teal),#06b6d4);color:#052726}
+.btn[disabled]{opacity:0.6;cursor:not-allowed}
 
-                    <div class="field">
-                        <label for="statusBuyer">Status Buyer</label>
-                        <select id="statusBuyer" name="statusBuyer">
-                            <option value="">Pilih Status</option>
-                            <option>Reguler</option>
-                            <option>Reseller</option>
-                        </select>
-                    </div>
+/* Hapus .add-btn-inline karena sudah diseragamkan di .add-catalog .btn.small */
+.add-btn-inline{
+    background:none;
+    color:none;
+    height:auto;
+    padding:auto;
+    border-radius:auto;
+}
 
-                    <div class="row two">
-                        <div class="field currency-input">
-                            <label for="modal">Modal (Rp)</label>
-                            <input id="modal" name="modal" type="number" inputmode="numeric" min="0" placeholder="25000" />
-                            <span class="currency-prefix">Rp</span>
-                        </div>
-                        <div class="field currency-input">
-                            <label for="harga">Harga Jual (Rp)</label>
-                            <input id="harga" name="harga" type="number" inputmode="numeric" min="0" placeholder="33900" />
-                            <span class="currency-prefix">Rp</span>
-                        </div>
-                    </div>
+/* Controls */
+.table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;flex-wrap:wrap}
+.header-left{min-width:0;display:flex;flex-direction:column;justify-content:center}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;min-width:0}
 
-                    <div class="form-actions">
-                        <button id="addBtn" class="btn primary" type="submit">+ Tambah Data</button>
-                        <button id="resetBtn" class="btn outline" type="button">Reset</button>
-                    </div>
-                </form>
-            </aside>
+/* make filter & search equal width */
+.controls select,.controls .custom-select-wrapper,#searchInput{flex:0 0 auto;min-width:0}
+.controls .custom-select-wrapper{flex-basis:260px;flex-shrink:0}
+#searchInput{flex-basis:260px;flex-shrink:0}
 
-            <section class="card table-view" aria-labelledby="table-title">
-                <div class="table-header">
-                    <div class="header-left">
-                        <h2 id="table-title">Data Langganan</h2>
-                        <p class="muted small">Pantau transaksi, profit, dan export laporan.</p>
-                    </div>
+/* export icon-only */
+.controls .export-btn{flex:0 0 auto;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0;border-radius:8px;background:transparent;border:1px solid rgba(14,165,160,0.12);color:var(--teal);box-shadow:none;transition:transform .12s,border-color .12s,background .12s}
+.controls .export-btn svg{width:18px;height:18px;stroke:var(--teal)}
+.controls .export-btn:hover{transform:translateY(-2px);border-color:rgba(14,165,160,0.28);background:rgba(14,165,160,0.03)}
 
-                    <div class="controls">
-                        <div class="custom-select-wrapper">
-                            <select id="filterProduk" name="filterProduk" aria-label="Filter Produk"></select>
-                        </div>
+/* search input */
+#searchInput{background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.04);color:var(--white);padding:8px 10px;border-radius:10px;font-size:13px;outline:none;height:42px}
 
-                        <input id="searchInput" placeholder="Cari nama / WA..." />
+/* Table */
+.table-wrap{overflow:auto;max-height:58vh;border-radius:8px;padding:6px 0}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:800px}
+thead th{position:sticky;top:0;background:linear-gradient(180deg,rgba(8,14,18,0.9),rgba(11,19,27,0.9));padding:12px;text-align:left;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.03);z-index:2}
+tbody td{padding:12px;border-bottom:1px solid rgba(255,255,255,0.02);color:var(--white);vertical-align:middle}
+tbody tr:nth-child(even){background:linear-gradient(90deg,rgba(255,255,255,0.01),rgba(255,255,255,0.0))}
+tbody tr:hover{background:linear-gradient(90deg,rgba(0,243,255,0.02),rgba(138,92,255,0.01))}
+.empty-state{padding:18px;text-align:center;color:var(--muted)}
 
-                        <button id="exportBtn" class="export-btn" title="Export CSV" aria-label="Export CSV">
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M21 21H3"/></svg>
-                            <span class="sr-only">Export</span>
-                        </button>
-                    </div>
-                </div>
+/* column sizes + truncation */
+table td,table th{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+thead th:nth-child(1),tbody td:nth-child(1){width:18%;min-width:140px}
+thead th:nth-child(2),tbody td:nth-child(2){width:18%;min-width:140px}
+thead th:nth-child(3),tbody td:nth-child(3){width:10%;min-width:90px}
+thead th:nth-child(4),tbody td:nth-child(4){width:8%;min-width:80px}
+thead th:nth-child(5),tbody td:nth-child(5){width:9%;min-width:80px;text-align:right}
+thead th:nth-child(6),tbody td:nth-child(6){width:9%;min-width:80px;text-align:right}
+thead th:nth-child(7),tbody td:nth-child(7){width:9%;min-width:80px;text-align:right}
+thead th:nth-child(8),tbody td:nth-child(8){width:7%;min-width:70px;text-align:center}
+thead th:nth-child(9),tbody td:nth-child(9){width:6%;min-width:70px;text-align:right}
 
-                <div class="table-wrap">
-                    <table id="subsTable" role="table" aria-describedby="table-title">
-                        <thead>
-                            <tr>
-                                <th>Nama</th>
-                                <th>Produk</th>
-                                <th>Tanggal</th>
-                                <th>Durasi</th>
-                                <th>Modal</th>
-                                <th>Harga</th>
-                                <th>Profit</th>
-                                <th>Status</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody"></tbody>
-                    </table>
-                </div>
+/* action buttons */
+.action-btn{background:transparent;border:1px solid rgba(255,255,255,0.12);color:var(--white);padding:6px 8px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-right:6px}
+.action-btn:hover{transform:translateY(-2px);border-color:rgba(0,243,255,0.2)}
 
-            </section>
-        </main>
+/* modal / invoice styles */
+.modal{display:none;position:fixed;inset:0;z-index:1200;align-items:center;justify-content:center}
+.modal.open{display:flex}
+.modal-backdrop{position:absolute;inset:0;background:rgba(2,6,23,0.75);backdrop-filter:blur(2px)}
+.modal-card{position:relative;background:linear-gradient(180deg,rgba(11,19,27,0.98),rgba(6,10,14,0.98));border-radius:12px;padding:16px;width:min(780px,95%);max-height:86vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,0.6);transform:translateY(6px);opacity:0;transition:transform .18s ease,opacity .18s ease}
+.modal.open .modal-card{transform:translateY(0);opacity:1}
+.modal-header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.modal-actions{display:flex;gap:8px;align-items:center}
+.invoice-body{background:transparent;color:var(--white);padding:8px;border-radius:8px;outline:none}
+.invoice-pre{white-space:pre-wrap;font-family:monospace;font-size:14px;color:var(--white)}
 
-        <footer class="footer text-center">© 2025 SAISOKU.ID · Flat Dark Dashboard by SIVA</footer>
-    </div>
+/* toast */
+.toast{position:fixed;right:20px;bottom:20px;background:#071022;padding:12px 16px;border-radius:10px;color:var(--white);box-shadow:0 8px 22px rgba(0,0,0,0.6);display:none;z-index:9999}
 
-    <div id="invoiceModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
-        <div class="modal-backdrop"></div>
-        <div class="modal-card" role="document">
-            <div class="modal-header">
-                <h3 class="brand">Struk Penjualan</h3>
-                <div class="modal-actions">
-                    <button id="copyInvoiceBtn" class="btn small outline">Copy</button>
-                    <button id="printInvoiceBtn" class="btn small teal">Print</button>
-                    <button id="waInvoiceBtn" class="btn small">WA</button>
-                    <button id="closeInvoiceBtn" class="btn small outline">Tutup</button>
-                </div>
-            </div>
-            <div id="invoiceBody" class="invoice-body" tabindex="0"></div>
-        </div>
-    </div>
+/* focus */
+:focus{outline:2px solid rgba(0,243,255,0.12);outline-offset:2px}
+.field.invalid input{border-color:var(--danger);box-shadow:0 6px 20px rgba(255,77,79,0.06) inset}
+.field .error{color:var(--danger);font-size:12px;margin-top:6px;display:block}
 
-    <div id="toast" class="toast" aria-live="polite"></div>
-    <script src="script.js"></script>
-</body>
-</html>
+/* custom select helper kept */
+.custom-select-wrapper{position:relative;width:100%}
+.custom-select{background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.04);color:var(--white);padding:10px 14px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;height:42px;box-sizing:border-box}
+.custom-select .label{flex:1;text-align:left;font-size:14px;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.custom-select .caret{
+    transition: transform 0.15s ease; 
+    line-height: 0;
+}
+.custom-select.open .caret{
+    transform: rotate(180deg); 
+}
+
+.custom-options{position:absolute;left:0;right:0;top:calc(100% + 8px);background:linear-gradient(180deg,var(--card),rgba(11,19,27,0.98));border:1px solid rgba(255,255,255,0.03);border-radius:10px;max-height:260px;overflow:auto;box-shadow:0 12px 40px rgba(0,0,0,0.6);z-index:1200;box-sizing:border-box}
+.custom-option{padding:10px 12px;color:var(--white);cursor:pointer;font-size:14px;border-bottom:1px solid rgba(255,255,255,0.01)}
+.custom-option:hover,.custom-option.active{background:linear-gradient(90deg,rgba(0,243,255,0.03),rgba(138,92,255,0.03));color:var(--white)}
+.custom-option:last-child{border-bottom:none}
+.custom-select-hidden{position:absolute !important;left:-9999px !important;top:auto !important;width:1px !important;height:1px !important;overflow:hidden !important;opacity:0 !important;pointer-events:none !important;touch-action:none !important}
+
+/* Footer di tengah */
+.footer.text-center {
+    text-align: center;
+    padding-top: 20px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+/* responsive */
+@media (max-width:1100px){
+    .kpi-row{grid-template-columns:repeat(2,1fr)}
+    .grid{grid-template-columns:1fr}
+}
+@media (max-width:680px){
+    .table-header .controls{flex-direction:column;align-items:stretch}
+    .table-header .controls>select,
+    .table-header .controls>.custom-select-wrapper,
+    #searchInput {
+        flex: none;
+        width: 100%;
+        flex-basis: auto;
+        flex-shrink: 1; 
+    }
+    .table-header .controls .export-btn{width:100%;align-self:flex-end}
+}
+@media (max-width:520px){
+    .row{flex-direction:column}
+    .form-actions{flex-direction:column;align-items:stretch}
+    .btn{width:100%}
+    .kpi-row{gap:8px;grid-template-columns:1fr}
+}
+
+/* helper */
+.sr-only{position:absolute !important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
