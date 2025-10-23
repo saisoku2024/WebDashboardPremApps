@@ -16,31 +16,31 @@
       </div>
     </header>
 
-    <!-- KPI row -->
-    <div class="kpi-row" role="region" aria-label="KPI">
-      <div class="kpi">
-        <div class="kpi-title">Penjualan Hari Ini</div>
-        <div class="kpi-value">Rp <span id="kpi-sales">0</span></div>
-        <div class="kpi-sub">Total penjualan hari ini (harga jual)</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-title">Total GMV</div>
-        <div class="kpi-value">Rp <span id="kpi-gmv">0</span></div>
-        <div class="kpi-sub">Akumulasi (awal → akhir)</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-title">Total Profit (All time)</div>
-        <div class="kpi-value">Rp <span id="kpi-profit-all">0</span></div>
-        <div class="kpi-sub">Jumlah profit = Σ(harga − modal)</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-title">Total Pelanggan Aktif</div>
-        <div class="kpi-value"><span id="kpi-active">0</span></div>
-        <div class="kpi-sub">Jumlah transaksi (count)</div>
-      </div>
-    </div>
-
     <main class="grid">
+      <!-- KPI row: dipindah *ke dalam* .grid dan men-span kedua kolom -->
+      <div class="kpi-row" style="grid-column: 1 / -1;" role="region" aria-label="KPI">
+        <div class="kpi">
+          <div class="kpi-title">Penjualan Hari Ini</div>
+          <div class="kpi-value">Rp <span id="kpi-sales">0</span></div>
+          <div class="kpi-sub">Total penjualan hari ini (harga jual)</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-title">Total GMV</div>
+          <div class="kpi-value">Rp <span id="kpi-gmv">0</span></div>
+          <div class="kpi-sub">Akumulasi (awal → akhir)</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-title">Total Profit (All time)</div>
+          <div class="kpi-value">Rp <span id="kpi-profit-all">0</span></div>
+          <div class="kpi-sub">Jumlah profit = Σ(harga − modal)</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-title">Total Pelanggan Aktif</div>
+          <div class="kpi-value"><span id="kpi-active">0</span></div>
+          <div class="kpi-sub">Jumlah transaksi (count)</div>
+        </div>
+      </div>
+
       <!-- INPUT FORM -->
       <aside class="card input-form" aria-labelledby="input-title">
         <h2 id="input-title">Input Data Langganan</h2>
