@@ -275,6 +275,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const todayISO = isoToday();
 
+        // utility function to get expiry date
+        function getExpiryDate(tglBeli, durasi) {
+            const m = String(durasi || '').match(/(\d+)/);
+            if (!m || !tglBeli) return '';
+            const days = parseInt(m[1], 10);
+            const d = new Date(tglBeli);
+            d.setDate(d.getDate() + days);
+            return d.toISOString().slice(0, 10);
+        }
+
         all.forEach((row, originalIndex) => {
             // Calculate KPI for ALL data
             const modal = parseNumber(row.modal);
@@ -301,26 +311,53 @@ document.addEventListener('DOMContentLoaded', function () {
         // Render the filtered/searched list
         if (!currentRenderList.length) {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td colspan="9" class="empty-state">Belum ada transaksi. Isi form di kiri lalu klik <strong>Tambah Data</strong>.</td>`;
+            tr.innerHTML = `<td colspan="10" class="empty-state">Belum ada transaksi. Isi form di kiri lalu klik <strong>Tambah Data</strong>.</td>`;
             tableBody.appendChild(tr);
         } else {
+            const today = new Date(todayISO).getTime(); // Hari ini dalam timestamp
+            const oneDay = 24 * 60 * 60 * 1000;
+            
             currentRenderList.forEach((entry, idx) => {
                 const row = entry.row;
                 const modal = parseNumber(row.modal);
                 const harga = parseNumber(row.harga);
                 const profit = harga - modal;
                 totalActive += 1;
+                
+                // Kalkulasi Status Langganan
+                const expiryISO = getExpiryDate(row.tglBeli, row.durasi);
+                let statusText = 'N/A';
+                let statusClass = '';
 
+                if (expiryISO) {
+                    const expiryTime = new Date(expiryISO).getTime();
+                    const diffDays = Math.ceil((expiryTime - today) / oneDay);
+                    
+                    if (diffDays <= 0) {
+                        statusText = 'Expired';
+                        statusClass = 'status-expired';
+                    } else if (diffDays <= 7) {
+                        statusText = 'Warning';
+                        statusClass = 'status-warning';
+                    } else {
+                        statusText = 'Active';
+                        statusClass = 'status-active';
+                    }
+                } else {
+                    statusText = 'Reguler';
+                }
+                
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td title="${escapeHtml(row.nama)}">${escapeHtml(row.nama)}</td>
                     <td title="${escapeHtml(row.katalog)}">${escapeHtml(row.katalog)}</td>
                     <td title="${row.tglBeli}">${formatDateDDMMYYYY(row.tglBeli)}</td>
+                    <td title="${expiryISO || '-'}">${formatDateDDMMYYYY(expiryISO)}</td>
                     <td>${escapeHtml(row.durasi)}</td>
                     <td style="text-align:right">Rp ${formatRupiah(modal)}</td>
                     <td style="text-align:right">Rp ${formatRupiah(harga)}</td>
                     <td style="text-align:right">Rp ${formatRupiah(profit)}</td>
-                    <td style="text-align:center">${escapeHtml(row.statusBuyer)}</td>
+                    <td style="text-align:center"><span class="${statusClass}">${statusText}</span></td>
                     <td style="text-align:right">
                         <button class="action-btn action-struk" data-idx="${idx}" data-action="struk">Struk</button>
                         <button class="action-btn outline-danger" data-idx="${idx}" data-action="delete">Hapus</button>
@@ -342,13 +379,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     // --- Validation and UI Feedback ---
+    function clearValidationErrors() {
+        document.querySelectorAll('.field.invalid').forEach(el => el.classList.remove('invalid'));
+    }
+
     function validateInput(el) {
         const parentField = el.closest('.field');
         // Pengecekan untuk Select element
         const isSelect = el.tagName === 'SELECT';
         const value = el.value.trim();
+        const isValid = el.checkValidity() && value !== '' && (!isSelect || (value !== 'Pilih Produk' && value !== 'Pilih Status'));
 
-        if (el.checkValidity() && value !== '' && (!isSelect || value !== 'Pilih Produk' && value !== 'Pilih Status')) {
+        if (isValid) {
             parentField?.classList.remove('invalid');
             return true;
         }
@@ -363,7 +405,6 @@ document.addEventListener('DOMContentLoaded', function () {
         CATALOG_LIST.push(v);
         CATALOG_LIST = sortCatalog(CATALOG_LIST);
         
-        // Panggil populateCatalogSelects. Ini akan otomatis memanggil createCustomSelects()
         populateCatalogSelects();
 
         newCatalogInput.value = '';
@@ -373,9 +414,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // init
     populateCatalogSelects(); 
     
-    // Set nilai default pada durasi dan panggil handler
     if (tglEl && !tglEl.value) tglEl.value = isoToday();
-    if (durasiEl && !durasiEl.value) durasiEl.value = '30 Hari'; // Set default select value
+    if (durasiEl && !durasiEl.value) durasiEl.value = '30 Hari'; 
     handleDurasiChange();
     
     render();
@@ -384,27 +424,37 @@ document.addEventListener('DOMContentLoaded', function () {
     if (form) {
         form.addEventListener('submit', function(ev) {
             ev.preventDefault();
-            
-            // Cek validasi untuk input wajib
+            clearValidationErrors(); // Clear all errors first
+
+            // Validate required fields
             const isNamaValid = validateInput(namaEl);
             const isWaValid = validateInput(waEl);
             const isKatalogValid = validateInput(katalogSel);
             
             let durasiFinal = durasiEl.value;
             let isDurasiValid = true;
+            let customInputEl = customDurasiInput;
 
             if (durasiFinal === 'Custom Text') {
                 durasiFinal = customDurasiInput.value.trim();
+                
                 if (!durasiFinal) {
+                    // Force visual error on the custom input field
+                    customInputEl.closest('.field')?.classList.add('invalid');
                     showToast('Isi durasi kustom');
                     customDurasiInput.focus();
                     isDurasiValid = false;
+                } else {
+                    customInputEl.closest('.field')?.classList.remove('invalid');
                 }
             }
 
 
             if (!isNamaValid || !isWaValid || !isKatalogValid || !isDurasiValid) {
                 showToast('Lengkapi data wajib (*).');
+                // Scroll to the first invalid field
+                const firstInvalid = document.querySelector('.field.invalid');
+                if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return;
             }
 
@@ -420,7 +470,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 profile: profileEl ? profileEl.value.trim() : '', 
                 device: deviceSel ? deviceSel.value : '',
                 tglBeli: (tglEl && tglEl.value) ? tglEl.value : isoToday(), 
-                durasi: durasiFinal, // Menggunakan nilai final
+                durasi: durasiFinal, 
                 statusBuyer: statusSel ? statusSel.value : '', 
                 modal: modalEl ? modalEl.value : '', 
                 harga: hargaEl ? hargaEl.value : '', 
@@ -431,44 +481,34 @@ document.addEventListener('DOMContentLoaded', function () {
             all.push(entry);
             save(all);
             
-            // Operasi UI setelah data tersimpan (sinkron)
             render();
             showToast('Transaksi ditambahkan');
             
-            // Reset form dan status tombol
             form.reset();
             addBtn.disabled = false;
             addBtn.textContent = '+ Tambah Data';
             
-            // Set ulang nilai default dan trigger change event untuk custom select
             if (tglEl) tglEl.value = isoToday();
             
-            // Reset custom selects
-            const selectsToReset = [katalogSel, filterSel, deviceSel, statusSel, durasiEl]; // Tambah durasiEl
+            const selectsToReset = [katalogSel, filterSel, deviceSel, statusSel, durasiEl]; 
             selectsToReset.forEach(sel => {
                 if (sel) {
                     sel.selectedIndex = 0; 
-                    // Trigger change event untuk mengupdate tampilan custom select
                     sel.dispatchEvent(new Event('change',{bubbles:true})); 
-                    // Remove invalid class setelah reset
                     sel.closest('.field')?.classList.remove('invalid'); 
                 }
             });
             
-            // Sembunyikan input custom durasi
             if (customDurasiInput) customDurasiInput.value = '';
             handleDurasiChange(); 
 
 
-            // Hapus kelas invalid dari input wajib
             namaEl.closest('.field')?.classList.remove('invalid');
             waEl.closest('.field')?.classList.remove('invalid');
             
-            // Fokus ke tampilan tabel
             document.querySelector('.table-view').scrollIntoView({ behavior: 'smooth' });
             
 
-            // Sinkronisasi Google Apps Script (asinkron)
             if (APPS_SCRIPT_URL) {
                 fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
@@ -492,7 +532,7 @@ document.addEventListener('DOMContentLoaded', function () {
             
             if (tglEl) tglEl.value = isoToday();
             
-            const selectsToReset = [katalogSel, deviceSel, statusSel, durasiEl]; // Tambah durasiEl
+            const selectsToReset = [katalogSel, deviceSel, statusSel, durasiEl]; 
             selectsToReset.forEach(sel => {
                 if (sel) {
                     sel.selectedIndex = 0; 
@@ -501,13 +541,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
 
-            // Sembunyikan input custom durasi
             if (customDurasiInput) customDurasiInput.value = '';
             handleDurasiChange();
             
-            // Hapus kelas invalid dari input wajib
-            namaEl.closest('.field')?.classList.remove('invalid');
-            waEl.closest('.field')?.classList.remove('invalid');
+            clearValidationErrors();
 
             showToast('Form direset');
         });
@@ -526,14 +563,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (action === 'struk') {
             const startISO = row.tglBeli || isoToday();
-            let endISO = '';
-            const m = String(row.durasi || '').match(/(\d+)/);
-            if (m && startISO) {
-                const days = parseInt(m[1],10);
-                const d = new Date(startISO);
+            
+            // utility function to get expiry date
+            function getExpiryDate(tglBeli, durasi) {
+                const m = String(durasi || '').match(/(\d+)/);
+                if (!m || !tglBeli) return '';
+                const days = parseInt(m[1], 10);
+                const d = new Date(tglBeli);
                 d.setDate(d.getDate() + days);
-                endISO = d.toISOString().slice(0,10);
+                return d.toISOString().slice(0, 10);
             }
+            
+            let endISO = getExpiryDate(startISO, row.durasi);
+            
             const lines = [];
             lines.push(`🧾 STRUK PENJUALAN SAISOKU.ID`);
             lines.push(`──────────`);
@@ -543,11 +585,13 @@ document.addEventListener('DOMContentLoaded', function () {
             lines.push(`🔑 Akun      : ${row.akun || '-'}`);
             lines.push(`⚙️ Device    : ${row.device || '-'}`);
             lines.push(`──────────`);
-            if (endISO) {
-                lines.push(`📅 Beli/Klaim: ${formatDateDDMMYYYY(startISO)} → ${formatDateDDMMYYYY(endISO)}`);
+            
+            if (endISO && String(row.durasi).includes('Hari')) {
+                lines.push(`📅 Beli/Habis: ${formatDateDDMMYYYY(startISO)} → ${formatDateDDMMYYYY(endISO)}`);
             } else {
-                lines.push(`📅 Tanggal   : ${formatDateDDMMYYYY(startISO)}`);
+                 lines.push(`📅 Tanggal   : ${formatDateDDMMYYYY(startISO)}`);
             }
+            
             lines.push(`⏱️ Durasi    : ${row.durasi || '-'}`);
             lines.push(`──────────`);
             lines.push(`🏷️ Harga     : Rp ${formatRupiah(parseNumber(row.harga || 0))}`);
@@ -556,7 +600,7 @@ document.addEventListener('DOMContentLoaded', function () {
             lines.push(`Terima kasih telah berbelanja di SAISOKU.ID 🙏`);
             lines.push(`© 2025 SAISOKU.ID • ${formatDateDDMMYYYY(new Date().toISOString().slice(0,10))}`);
 
-            openInvoiceModal(lines.join('\n'), row.wa); // Tambahkan nomor WA ke modal
+            openInvoiceModal(lines.join('\n'), row.wa);
         } else if (action === 'delete') {
             if (!confirm('Hapus transaksi ini?')) return;
             const all = load();
