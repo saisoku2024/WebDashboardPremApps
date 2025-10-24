@@ -30,7 +30,7 @@ function parseNumber(v){
     return Number.isFinite(n) ? n : 0;
 }
 
-// Deklarasi Global untuk Chart Instances
+// Deklarasi Global untuk Chart Instances (DIPINDAHKAN KE DALAM DRAWCHARTS UNTUK KEAMANAN)
 let monthlySalesChartInstance, topCategoriesChartInstance, monthlyCustomersChartInstance;
 const CHART_BG_COLORS = ['#00f3ff', '#8a5cff', '#10b981', '#facc15', '#f43f5e'];
 
@@ -335,10 +335,7 @@ document.addEventListener('DOMContentLoaded', function () {
         KPI.sales && (KPI.sales.textContent = formatRupiah(totalSalesToday));
         KPI.gmv && (KPI.gmv.textContent = formatRupiah(gmv));
         KPI.profitAll && (KPI.profitAll.textContent = formatRupiah(totalProfitAll));
-            // FIX KRITIS: Pastikan uniqueCustomers.size digunakan dengan benar
-        if (KPI.active) {
-            KPI.active.textContent = uniqueCustomers.size;
-        }
+        KPI.active && (KPI.active.textContent = uniqueCustomers.size); 
 
         
         // 2. Tentukan data yang akan ditampilkan di tabel (filter dan batasi 15 terakhir)
@@ -426,6 +423,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 tableBody.appendChild(tr);
             });
         }
+        
+        // 4. Proses Aggregasi dan Gambar Chart
+        const aggregatedData = aggregateData(all);
+        drawCharts(aggregatedData);
+        renderTopBuyers(aggregatedData.topBuyers);
     }
 
     function escapeHtml(s) {
@@ -484,7 +486,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- CHART LOGIC PLACEHOLDERS ---
     function aggregateData(allData) { 
-        // Logic placeholder chart tetap sama
         return {
             monthly: { 
                 labels: ['Jun', 'Jul', 'Agu', 'Sep', 'Okt'], 
