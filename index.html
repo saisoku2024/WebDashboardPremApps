@@ -17,9 +17,14 @@
                 <h1 class="brand">Web Dashboard Premium Apps – SAISOKU.ID</h1>
                 <p class="tag">Form Input Sales • Riwayat Transaksi • Ringkasan Modal & Profit</p>
             </div>
-        </header>
+            
+            <nav id="pageNav" class="page-nav">
+                <button class="btn small primary active" data-page="input">Input & Data</button>
+                <button class="btn small primary" data-page="metrics">Analisis & Performa</button>
+            </nav>
+            </header>
 
-        <main class="grid">
+        <main id="pageOne" class="grid page active">
             <div class="kpi-row" role="region" aria-label="KPI">
                 <div class="kpi">
                     <div class="kpi-title">Penjualan Hari Ini</div>
@@ -186,8 +191,9 @@
                     </table>
                 </div>
             </section>
-
-            <section id="metricsView" class="card metrics-view grid-col-2" aria-labelledby="metrics-title">
+        </main>
+        <div id="pageTwo" class="page metrics-page" style="display:none;">
+            <section id="metricsView" class="metrics-view" aria-labelledby="metrics-title">
                 <h2 id="metrics-title">Performa & Analisis Bisnis (All Time)</h2>
                 
                 <div class="metric-grid">
@@ -233,8 +239,7 @@
                 </div>
 
             </section>
-        </main>
-
+        </div>
         <footer class="footer text-center">© 2025 SAISOKU.ID · Flat Dark Dashboard by SIVA</footer>
     </div>
 
