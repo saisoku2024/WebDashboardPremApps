@@ -18,11 +18,15 @@
     --status-active: #10b981; /* green */
     --status-expired: #f43f5e; /* red */
     --status-warning: #facc15; /* yellow */
+    
+    /* CHART COLORS */
+    --chart-sales: #00f3ff;
+    --chart-modal: #8a5cff;
+    --chart-profit: #10b981;
 }
 
 /* Reset & base */
 *{box-sizing:border-box}
-/* BLOK KRITIS: Pastikan ini utuh untuk Dark Mode dan Font */
 html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;background:linear-gradient(180deg,var(--bg-900) 0%, var(--bg-800) 100%);color:var(--white);-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
 
@@ -260,6 +264,48 @@ input[type="number"] {
     font-weight: 600;
 }
 /* --- END STATUS TABEL --- */
+
+/* --- METRICS VIEW STYLING (NEW SECTION) --- */
+.metrics-view {
+    padding: 16px;
+    margin-top: 18px;
+    margin-bottom: 30px;
+}
+.metrics-view h2 {
+    font-size: 18px;
+    margin-bottom: 16px;
+    color: var(--accent1);
+    font-family: Poppins, sans-serif;
+}
+.metrics-view h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 12px;
+}
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dua kolom utama untuk chart */
+    gap: 16px;
+    margin-bottom: 20px;
+}
+.metric-chart-wide {
+    grid-column: 1 / -1; /* Chart Sales Bulanan mengambil full width */
+}
+.metric-chart-narrow {
+    height: 320px; /* Tinggi Chart agar visualnya bagus */
+}
+.top-buyers-table {
+    margin-top: 20px;
+}
+
+@media (max-width: 900px) {
+    .metric-grid {
+        grid-template-columns: 1fr; /* Satu kolom di tablet/mobile */
+    }
+}
+/* --- END METRICS VIEW STYLING --- */
 
 
 /* Controls, Table, Modal, Footer: Tetap sama */

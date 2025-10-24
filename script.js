@@ -32,7 +32,8 @@ function parseNumber(v){
 
 document.addEventListener('DOMContentLoaded', function () {
     const $ = id => document.getElementById(id);
-
+    
+    // --- Elemen Form ---
     const form = $('entryForm');
     const namaEl = $('nama');
     const waEl = $('wa');
@@ -42,7 +43,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const tglEl = $('tglBeli');
     const durasiEl = $('durasi');
     const customDurasiInput = $('customDurasiInput'); 
-    
     const modalEl = $('modal');
     const hargaEl = $('harga');
     const addBtn = $('addBtn');
@@ -52,11 +52,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const katalogSel = $('katalog');
     const deviceSel = $('device');
     const statusSel = $('statusBuyer');
+    
+    // --- Elemen Dashboard & Tabel ---
     const filterSel = $('filterProduk');
     const searchInput = $('searchInput');
     const exportBtn = $('exportBtn');
     const tableBody = $('tableBody');
     const toastEl = $('toast');
+    const topBuyersBody = $('topBuyersBody'); // Body tabel Top Buyers
 
     const KPI = {
         sales: $('kpi-sales'),
@@ -68,6 +71,37 @@ document.addEventListener('DOMContentLoaded', function () {
     const STORAGE_KEY = 'saisoku_subs_v3_fixed_v2';
     const load = () => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch (e) { return []; } };
     const save = arr => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+
+    // --- CHART GLOBALS ---
+    let monthlySalesChart, topCategoriesChart, monthlyCustomersChart;
+    const CHART_BG_COLORS = ['#00f3ff', '#8a5cff', '#10b981', '#facc15', '#f43f5e'];
+
+    // --- CHART LOGIC PLACEHOLDERS ---
+
+    function aggregateData(allData) {
+        // Placeholder for complex aggregation logic
+        return {
+            monthly: { labels: [], sales: [], modal: [], profit: [] },
+            categories: [],
+            customers: { labels: [], uniqueCounts: [] },
+            topBuyers: []
+        };
+    }
+
+    function drawCharts(aggregatedData) {
+        // Placeholder for drawing charts using Chart.js
+        console.log("Drawing charts with aggregated data:", aggregatedData);
+        // Implementasi Chart.js akan ditambahkan di sini
+    }
+
+    function renderTopBuyers(topBuyers) {
+        // Placeholder for rendering Top Buyers table
+        console.log("Rendering Top Buyers:", topBuyers);
+        // Implementasi rendering Top Buyers table akan ditambahkan di sini
+        topBuyersBody.innerHTML = `<tr><td colspan="4" class="empty-state">Data Top Buyer belum tersedia.</td></tr>`;
+    }
+    // --- END CHART LOGIC PLACEHOLDERS ---
+
 
     function showToast(msg, ms = 1400) {
         if (!toastEl) return;
@@ -280,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const uniqueCustomers = new Set(); 
         const todayISO = isoToday();
 
-
+        // 1. Lakukan agregasi data untuk KPI dan Chart dari SEMUA DATA
         all.forEach((row, originalIndex) => {
             const modal = parseNumber(row.modal);
             const harga = parseNumber(row.harga);
@@ -295,20 +329,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (row.wa) {
                 uniqueCustomers.add(row.wa); 
             }
-
-            // Filtering untuk render list
-            const rowKatalog = String(row.katalog || '');
-            const rowNama = String(row.nama || '');
-            const rowWA = String(row.wa || '');
-            
-            if (filtro && rowKatalog !== filtro) return;
-            
-            if (q) {
-                const hay = `${rowNama} ${rowWA}`.toLowerCase();
-                if (!hay.includes(q)) return;
-            }
-            
-            currentRenderList.push({ row, originalIndex });
         });
         
         // Update KPIs (HARUS DARI SEMUA DATA)
@@ -316,9 +336,35 @@ document.addEventListener('DOMContentLoaded', function () {
         KPI.gmv && (KPI.gmv.textContent = formatRupiah(gmv));
         KPI.profitAll && (KPI.profitAll.textContent = formatRupiah(totalProfitAll));
         KPI.active && (KPI.active.textContent = uniqueCustomers.size); 
-
         
-        // Render the filtered/searched list
+        // 2. Tentukan data yang akan ditampilkan di tabel (filter dan batasi 15 terakhir)
+        let filteredList = all.filter(row => {
+            const rowKatalog = String(row.katalog || '');
+            const rowNama = String(row.nama || '');
+            const rowWA = String(row.wa || '');
+
+            // Logika Filter Produk
+            if (filtro && rowKatalog !== filtro) return false;
+            
+            // Logika Search
+            if (q) {
+                const hay = `${rowNama} ${rowWA}`.toLowerCase();
+                if (!hay.includes(q)) return false;
+            }
+            return true;
+        });
+
+        // Terapkan batas 15 transaksi terakhir: Balik urutan dan ambil 15
+        filteredList.reverse();
+        const limitedList = filteredList.slice(0, 15);
+        
+        // Simpan index dari list yang dibatasi
+        limitedList.reverse().forEach(row => { // Balik lagi agar yang terbaru di bawah
+            const originalIndex = all.indexOf(row);
+            currentRenderList.push({ row, originalIndex });
+        });
+        
+        // 3. Render tabel utama
         if (!currentRenderList.length) {
             const tr = document.createElement('tr');
             tr.innerHTML = `<td colspan="10" class="empty-state">Belum ada transaksi. Isi form di kiri lalu klik <strong>Tambah Data</strong>.</td>`;
@@ -375,13 +421,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 tableBody.appendChild(tr);
             });
         }
+        
+        // 4. Proses Aggregasi dan Gambar Chart
+        const aggregatedData = aggregateData(all);
+        drawCharts(aggregatedData);
+        renderTopBuyers(aggregatedData.topBuyers);
     }
 
     function escapeHtml(s) {
         return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
     }
     
-    // --- Validation and UI Feedback ---
+    // --- VALIDATION LOGIC ---
     function clearValidationErrors() {
         document.querySelectorAll('.field.invalid').forEach(el => el.classList.remove('invalid'));
     }
@@ -393,12 +444,10 @@ document.addEventListener('DOMContentLoaded', function () {
         
         let value = el.value.trim();
         
-        // Cek jika ini select kustom
         if (el.id === 'katalog' && el.selectedIndex > 0) {
             value = el.options[el.selectedIndex]?.text;
         }
 
-        // Handle custom durasi validation separately if its NOT active (only validate if needed)
         if (isCustomDurasi && durasiEl.value !== 'Custom Text') {
             parentField?.classList.remove('invalid');
             return true;
@@ -448,7 +497,6 @@ document.addEventListener('DOMContentLoaded', function () {
             ev.preventDefault();
             clearValidationErrors(); 
 
-            // Validasi Field Wajib
             const isNamaValid = validateInput(namaEl);
             const isWaValid = validateInput(waEl);
             const isKatalogValid = validateInput(katalogSel);
@@ -597,16 +645,15 @@ document.addEventListener('DOMContentLoaded', function () {
             lines.push(`⚙️ Device    : ${row.device || '-'}`);
             lines.push(`──────────`);
             
-            lines.push(`📅 Buy Date  : ${formatDateDDMMYYYY(startISO)}`); // Perubahan label
+            lines.push(`📅 Buy Date  : ${formatDateDDMMYYYY(startISO)}`); 
             
             if (endISO && String(row.durasi).toLowerCase().includes('hari')) {
-                lines.push(`📅 Exp Date  : ${formatDateDDMMYYYY(endISO)}`); // Tambahkan Exp Date terpisah
+                lines.push(`📅 Exp Date  : ${formatDateDDMMYYYY(endISO)}`); 
             }
             
             lines.push(`⏱️ Durasi    : ${row.durasi || '-'}`);
             lines.push(`──────────`);
             lines.push(`🏷️ Harga     : Rp ${formatRupiah(parseNumber(row.harga || 0))}`);
-            // BARIS MODAL DAN PROFIT DIHAPUS
             lines.push(`🧩 Status    : ${row.statusBuyer || '-'}`);
             lines.push(`──────────`);
             lines.push(`Terima kasih telah berbelanja di SAISOKU.ID 🙏`);
@@ -696,5 +743,11 @@ document.addEventListener('DOMContentLoaded', function () {
     if (closeInvoiceBtn) closeInvoiceBtn.addEventListener('click', closeInvoiceModal);
     document.querySelectorAll('.modal-backdrop').forEach(b => b.addEventListener('click', closeInvoiceModal));
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeInvoiceModal(); });
+
+    // --- CHART LOGIC PLACEHOLDERS ---
+    const aggregatedData = aggregateData(all);
+    drawCharts(aggregatedData);
+    renderTopBuyers(aggregatedData.topBuyers);
+    // --- END CHART LOGIC PLACEHOLDERS ---
 
 });
