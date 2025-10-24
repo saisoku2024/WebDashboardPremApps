@@ -268,8 +268,10 @@ input[type="number"] {
 /* --- METRICS VIEW STYLING (NEW SECTION) --- */
 .metrics-view {
     padding: 16px;
-    margin-top: 18px;
+    margin-top: 24px; /* Margin bawah tabel, dorong ke bawah */
     margin-bottom: 30px;
+    /* PENTING: Memastikan section ini melintasi kedua kolom grid utama */
+    grid-column: 1 / -1; 
 }
 .metrics-view h2 {
     font-size: 18px;
@@ -299,10 +301,16 @@ input[type="number"] {
 .top-buyers-table {
     margin-top: 20px;
 }
+.chart-container {
+    height: 100%;
+}
 
 @media (max-width: 900px) {
     .metric-grid {
         grid-template-columns: 1fr; /* Satu kolom di tablet/mobile */
+    }
+    .metric-chart-narrow {
+        height: 280px;
     }
 }
 /* --- END METRICS VIEW STYLING --- */
