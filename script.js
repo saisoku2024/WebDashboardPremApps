@@ -82,6 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
             monthly: { 
                 labels: ['Jun', 'Jul', 'Agu', 'Sep', 'Okt'], 
                 sales: [30000, 45000, 60000, 80000, 95000], 
+                modal: [15000, 20000, 30000, 40000, 45000],
                 profit: [12000, 18000, 25000, 32000, 39000] 
             },
             categories: [
@@ -106,19 +107,23 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function drawCharts(aggregatedData) {
-        // Hancurkan instance chart yang lama jika ada
+        if (typeof Chart === 'undefined') return; // Pastikan Chart.js dimuat
+
         if (monthlySalesChartInstance) monthlySalesChartInstance.destroy();
         if (topCategoriesChartInstance) topCategoriesChartInstance.destroy();
         if (monthlyCustomersChartInstance) monthlyCustomersChartInstance.destroy();
 
-        const chartOptions = {
+        const globalOptions = {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { labels: { color: 'var(--muted)' } } },
-            scales: {
-                x: { ticks: { color: 'var(--muted)' }, grid: { color: 'rgba(255,255,255,0.1)' } },
-                y: { ticks: { color: 'var(--muted)', callback: (v) => formatRupiah(v) }, grid: { color: 'rgba(255,255,255,0.1)' } },
+            plugins: { 
+                legend: { labels: { color: 'var(--muted)', font: { size: 10 } } },
+                tooltip: { callbacks: { label: (context) => `${context.dataset.label || ''}: Rp ${formatRupiah(context.parsed.y || context.parsed)}` } }
             }
+        };
+        const commonScales = {
+            x: { ticks: { color: 'var(--muted)' }, grid: { color: 'rgba(255,255,255,0.08)' } },
+            y: { ticks: { color: 'var(--muted)', callback: (v) => `Rp ${formatRupiah(v)}` }, grid: { color: 'rgba(255,255,255,0.08)' } },
         };
 
         // 1. Grafik Sales, Modal & Profit Bulanan (Bar Chart)
@@ -130,10 +135,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     labels: aggregatedData.monthly.labels,
                     datasets: [
                         { label: 'Sales (GMV)', data: aggregatedData.monthly.sales, backgroundColor: 'var(--chart-sales)', yAxisID: 'y' },
+                        { label: 'Modal', data: aggregatedData.monthly.modal, backgroundColor: 'var(--chart-modal)', yAxisID: 'y' },
                         { label: 'Profit', data: aggregatedData.monthly.profit, backgroundColor: 'var(--chart-profit)', yAxisID: 'y' }
                     ]
                 },
-                options: chartOptions
+                options: { ...globalOptions, scales: commonScales }
             });
         }
         
@@ -151,7 +157,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { position: 'right', labels: { color: 'var(--muted)' } } }
+                    plugins: { legend: { position: 'right', labels: { color: 'var(--muted)', font: { size: 10 } } },
+                                tooltip: { callbacks: { label: (context) => `${context.label}: Rp ${formatRupiah(context.parsed)}` } }
+                    }
                 }
             });
         }
@@ -172,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         tension: 0.3
                     }]
                 },
-                options: chartOptions
+                options: { ...globalOptions, scales: commonScales }
             });
         }
     }
@@ -465,12 +473,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         // Terapkan batas 15 transaksi terakhir: Balik urutan dan ambil 15
-        // DIBALIK AGAR YANG TERBARU DI ATAS (sesuai tampilan table)
         filteredList.reverse();
         const limitedList = filteredList.slice(0, 15);
         
         // Simpan index dari list yang dibatasi
-        // Balik lagi agar urutan di tabel (HTML) tetap dari atas ke bawah
         limitedList.reverse().forEach(row => { 
             const originalIndex = all.indexOf(row);
             currentRenderList.push({ row, originalIndex });

@@ -52,9 +52,12 @@ input[type="number"] {
     display:grid; 
     grid-template-columns:var(--left-col) 1fr; 
     gap:18px;
-    /* FIX: Diganti 'start' agar elemen metrik menempel di bawah tabel */
     align-items:start; 
     margin-top:6px
+}
+/* PENEMPATAN EKSPLISIT KOLOM 2 */
+.grid > .grid-col-2 {
+    grid-column: 2;
 }
 
 /* KPI row */
@@ -269,9 +272,8 @@ input[type="number"] {
 /* --- METRICS VIEW STYLING (NEW SECTION) --- */
 .metrics-view {
     padding: 16px;
-    margin-top: 18px; /* Jarak antara card tabel dan card metrics */
+    margin-top: 18px; 
     margin-bottom: 30px;
-    /* FIX: Hapus grid-column: 1 / -1; AGAR OTOMATIS MASUK KOLOM 2 */
 }
 .metrics-view h2 {
     font-size: 18px;
