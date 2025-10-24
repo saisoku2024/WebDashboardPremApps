@@ -13,6 +13,7 @@ let CATALOG_LIST = [
     "Spotify Premium",
     "Vidio Platinum",
     "VIU Premium",
+    "WeTV VIP",
     "Youtube Premium"
 ];
 
@@ -382,7 +383,6 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // --- Validation and UI Feedback ---
     function clearValidationErrors() {
-        // Hapus semua kelas invalid
         document.querySelectorAll('.field.invalid').forEach(el => el.classList.remove('invalid'));
     }
 
@@ -394,12 +394,11 @@ document.addEventListener('DOMContentLoaded', function () {
         let value = el.value.trim();
         
         // Cek jika ini select kustom
-        if (el.id === 'katalog') {
+        if (el.id === 'katalog' && el.selectedIndex > 0) {
             value = el.options[el.selectedIndex]?.text;
-            if (value === 'Pilih Produk') value = ''; 
         }
 
-        // Handle custom durasi validation separately if its active
+        // Handle custom durasi validation separately if its NOT active (only validate if needed)
         if (isCustomDurasi && durasiEl.value !== 'Custom Text') {
             parentField?.classList.remove('invalid');
             return true;
@@ -415,13 +414,11 @@ document.addEventListener('DOMContentLoaded', function () {
         return false;
     }
 
-
     // add catalog
     addCatalogBtn.addEventListener('click', () => {
         const v = (newCatalogInput.value || '').trim();
         if (!v) { newCatalogInput.focus(); return; }
         
-        // Cek jika sudah ada (case-insensitive)
         if (CATALOG_LIST.some(item => item.toLowerCase() === v.toLowerCase())) {
             showToast('Produk sudah ada');
             return;
@@ -493,9 +490,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const all = load();
             
-            // Mencari index yang tepat untuk melakukan splice agar array tetap konsisten
-            // Karena kita harus menjaga `originalIndex` tetap valid setelah hapus, 
-            // kita gunakan pendekatan array.push dan re-render.
             all.push(entry);
             save(all);
             
@@ -596,25 +590,24 @@ document.addEventListener('DOMContentLoaded', function () {
             const lines = [];
             lines.push(`🧾 STRUK PENJUALAN SAISOKU.ID`);
             lines.push(`──────────`);
-            lines.push(`👤 Nama      : ${row.nama || '-'}`);
-            lines.push(`📱 Buyer WA  : ${row.wa || '-'}`);
-            lines.push(`🎬 Produk    : ${row.katalog || '-'}`);
-            lines.push(`🔑 Akun      : ${row.akun || '-'}`);
-            lines.push(`⚙️ Device    : ${row.device || '-'}`);
+            lines.push(`👤 Nama      : ${row.nama || '-'}`);
+            lines.push(`📱 Buyer WA  : ${row.wa || '-'}`);
+            lines.push(`🎬 Produk    : ${row.katalog || '-'}`);
+            lines.push(`🔑 Akun      : ${row.akun || '-'}`);
+            lines.push(`⚙️ Device    : ${row.device || '-'}`);
             lines.push(`──────────`);
+            
+            lines.push(`📅 Buy Date  : ${formatDateDDMMYYYY(startISO)}`); // Perubahan label
             
             if (endISO && String(row.durasi).toLowerCase().includes('hari')) {
-                lines.push(`📅 Beli/Habis: ${formatDateDDMMYYYY(startISO)} → ${formatDateDDMMYYYY(endISO)}`);
-            } else {
-                 lines.push(`📅 Tanggal   : ${formatDateDDMMYYYY(startISO)}`);
+                lines.push(`📅 Exp Date  : ${formatDateDDMMYYYY(endISO)}`); // Tambahkan Exp Date terpisah
             }
             
-            lines.push(`⏱️ Durasi    : ${row.durasi || '-'}`);
+            lines.push(`⏱️ Durasi    : ${row.durasi || '-'}`);
             lines.push(`──────────`);
-            lines.push(`🏷️ Harga     : Rp ${formatRupiah(parseNumber(row.harga || 0))}`);
-            lines.push(`💰 Modal     : Rp ${formatRupiah(parseNumber(row.modal || 0))}`);
-            lines.push(`✨ Net Profit: Rp ${formatRupiah(parseNumber(row.harga) - parseNumber(row.modal))}`);
-            lines.push(`🧩 Status    : ${row.statusBuyer || '-'}`);
+            lines.push(`🏷️ Harga     : Rp ${formatRupiah(parseNumber(row.harga || 0))}`);
+            // BARIS MODAL DAN PROFIT DIHAPUS
+            lines.push(`🧩 Status    : ${row.statusBuyer || '-'}`);
             lines.push(`──────────`);
             lines.push(`Terima kasih telah berbelanja di SAISOKU.ID 🙏`);
             lines.push(`© 2025 SAISOKU.ID • ${formatDateDDMMYYYY(new Date().toISOString().slice(0,10))}`);
