@@ -13,7 +13,6 @@ let CATALOG_LIST = [
     "Spotify Premium",
     "Vidio Platinum",
     "VIU Premium",
-    "WeTV VIP",
     "Youtube Premium"
 ];
 
@@ -297,13 +296,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 totalSalesToday += harga;
             }
             if (row.wa) {
-                uniqueCustomers.add(row.wa); // Tambahkan nomor WA ke Set
+                uniqueCustomers.add(row.wa); 
             }
 
             // Filtering untuk render list
-            if (filtro && row.katalog !== filtro) return;
+            // FIX KRITIS: Tambahkan default string agar .includes tidak error pada data lama
+            const rowKatalog = String(row.katalog || '');
+            const rowNama = String(row.nama || '');
+            const rowWA = String(row.wa || '');
+            
+            if (filtro && rowKatalog !== filtro) return;
+            
             if (q) {
-                const hay = `${row.nama || ''} ${row.wa || ''}`.toLowerCase();
+                const hay = `${rowNama} ${rowWA}`.toLowerCase();
                 if (!hay.includes(q)) return;
             }
             
