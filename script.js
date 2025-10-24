@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let totalSalesToday = 0; 
         let gmv = 0;
         let totalProfitAll = 0;
-        const uniqueCustomers = new Set(); // Set untuk menghitung pelanggan unik
+        const uniqueCustomers = new Set(); 
         const todayISO = isoToday();
 
 
@@ -310,6 +310,13 @@ document.addEventListener('DOMContentLoaded', function () {
             // Data yang akan dirender (sudah difilter)
             currentRenderList.push({ row, originalIndex });
         });
+        
+        // Update KPIs (HARUS DARI SEMUA DATA, BUKAN DATA FILTERED)
+        KPI.sales && (KPI.sales.textContent = formatRupiah(totalSalesToday));
+        KPI.gmv && (KPI.gmv.textContent = formatRupiah(gmv));
+        KPI.profitAll && (KPI.profitAll.textContent = formatRupiah(totalProfitAll));
+        KPI.active && (KPI.active.textContent = uniqueCustomers.size); // FIX: Menggunakan uniqueCustomers.size
+
         
         // Render the filtered/searched list
         if (!currentRenderList.length) {
@@ -368,13 +375,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 tableBody.appendChild(tr);
             });
         }
-
-        // Update KPIs
-        KPI.sales && (KPI.sales.textContent = formatRupiah(totalSalesToday));
-        KPI.gmv && (KPI.gmv.textContent = formatRupiah(gmv));
-        KPI.profitAll && (KPI.profitAll.textContent = formatRupiah(totalProfitAll));
-        // FIX: KPI Pelanggan Aktif kini menggunakan jumlah pelanggan unik dari SEMUA DATA
-        KPI.active && (KPI.active.textContent = uniqueCustomers.size); 
     }
 
     function escapeHtml(s) {
@@ -427,9 +427,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (form) {
         form.addEventListener('submit', function(ev) {
             ev.preventDefault();
-            clearValidationErrors(); // Clear all errors first
+            clearValidationErrors(); 
 
-            // Validate required fields
             const isNamaValid = validateInput(namaEl);
             const isWaValid = validateInput(waEl);
             const isKatalogValid = validateInput(katalogSel);
