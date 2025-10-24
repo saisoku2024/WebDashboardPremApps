@@ -13,6 +13,7 @@ let CATALOG_LIST = [
     "Spotify Premium",
     "Vidio Platinum",
     "VIU Premium",
+    "WeTV VIP",
     "Youtube Premium"
 ];
 
@@ -289,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const harga = parseNumber(row.harga);
             const profit = harga - modal;
             
-            // Perhitungan KPI berdasarkan SEMUA DATA (Sudah Benar)
+            // Perhitungan KPI berdasarkan SEMUA DATA
             gmv += harga;
             totalProfitAll += profit;
             if ((row.tglBeli || '').slice(0,10) === todayISO) {
@@ -300,29 +301,25 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             // Filtering untuk render list
-            // FIX KRITIS: Pastikan semua field yang digunakan untuk filter/search adalah STRING yang aman
             const rowKatalog = String(row.katalog || '');
             const rowNama = String(row.nama || '');
             const rowWA = String(row.wa || '');
             
-            // Logika Filter Produk: Tampilkan jika filter kosong ATAU katalog match
             if (filtro && rowKatalog !== filtro) return;
             
-            // Logika Search: Tampilkan jika query kosong ATAU query match dengan nama/wa
             if (q) {
                 const hay = `${rowNama} ${rowWA}`.toLowerCase();
                 if (!hay.includes(q)) return;
             }
             
-            // Data yang akan dirender (sudah difilter)
             currentRenderList.push({ row, originalIndex });
         });
         
-        // Update KPIs (HARUS DARI SEMUA DATA, BUKAN DATA FILTERED)
+        // Update KPIs (HARUS DARI SEMUA DATA)
         KPI.sales && (KPI.sales.textContent = formatRupiah(totalSalesToday));
         KPI.gmv && (KPI.gmv.textContent = formatRupiah(gmv));
         KPI.profitAll && (KPI.profitAll.textContent = formatRupiah(totalProfitAll));
-        KPI.active && (KPI.active.textContent = uniqueCustomers.size); // KPI Pelanggan Aktif selalu benar
+        KPI.active && (KPI.active.textContent = uniqueCustomers.size); 
 
         
         // Render the filtered/searched list
@@ -390,14 +387,15 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // --- Validation and UI Feedback ---
     function clearValidationErrors() {
+        // Hapus semua kelas invalid
         document.querySelectorAll('.field.invalid').forEach(el => el.classList.remove('invalid'));
     }
 
     function validateInput(el) {
         const parentField = el.closest('.field');
-        // Pengecekan untuk Select element
         const isSelect = el.tagName === 'SELECT';
         const value = el.value.trim();
+        // Validasi: field harus diisi dan (jika select) bukan nilai default 'Pilih Produk'/'Pilih Status'
         const isValid = el.checkValidity() && value !== '' && (!isSelect || (value !== 'Pilih Produk' && value !== 'Pilih Status'));
 
         if (isValid) {
@@ -436,6 +434,7 @@ document.addEventListener('DOMContentLoaded', function () {
             ev.preventDefault();
             clearValidationErrors(); 
 
+            // Validasi Field Wajib
             const isNamaValid = validateInput(namaEl);
             const isWaValid = validateInput(waEl);
             const isKatalogValid = validateInput(katalogSel);
@@ -447,8 +446,10 @@ document.addEventListener('DOMContentLoaded', function () {
             if (durasiFinal === 'Custom Text') {
                 durasiFinal = customDurasiInput.value.trim();
                 
+                // Validasi Durasi Kustom
                 if (!durasiFinal) {
-                    customInputEl.closest('.field')?.classList.add('invalid');
+                    // Beri class invalid pada custom input agar error message durasi muncul
+                    customInputEl.closest('.field')?.classList.add('invalid'); 
                     showToast('Isi durasi kustom');
                     customDurasiInput.focus();
                     isDurasiValid = false;
