@@ -138,7 +138,6 @@ document.addEventListener('DOMContentLoaded', function () {
         selects.forEach(sel => {
             if (sel.dataset.customized === '1') return; // Sudah dibuat
             
-            // Logika pembuatan custom select seperti sebelumnya
             const parent = sel.parentNode;
             const wrapper = document.createElement('div');
             wrapper.className = 'custom-select-wrapper';
@@ -260,6 +259,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     let currentRenderList = [];
+    
+    // utility function to get expiry date
+    function getExpiryDate(tglBeli, durasi) {
+        const m = String(durasi || '').match(/(\d+)/);
+        if (!m || !tglBeli) return '';
+        const days = parseInt(m[1], 10);
+        const d = new Date(tglBeli);
+        d.setDate(d.getDate() + days);
+        return d.toISOString().slice(0, 10);
+    }
+
     function render() {
         const all = load();
         const filtro = filterSel && filterSel.value ? filterSel.value : '';
@@ -267,44 +277,37 @@ document.addEventListener('DOMContentLoaded', function () {
         tableBody.innerHTML = '';
         currentRenderList = [];
 
-        // KPI calculation variables
+        // Perhitungan KPI ALL TIME
         let totalSalesToday = 0; 
         let gmv = 0;
         let totalProfitAll = 0;
-        let totalActive = 0;
-
+        const uniqueCustomers = new Set(); // Set untuk menghitung pelanggan unik
         const todayISO = isoToday();
 
-        // utility function to get expiry date
-        function getExpiryDate(tglBeli, durasi) {
-            const m = String(durasi || '').match(/(\d+)/);
-            if (!m || !tglBeli) return '';
-            const days = parseInt(m[1], 10);
-            const d = new Date(tglBeli);
-            d.setDate(d.getDate() + days);
-            return d.toISOString().slice(0, 10);
-        }
 
         all.forEach((row, originalIndex) => {
-            // Calculate KPI for ALL data
             const modal = parseNumber(row.modal);
             const harga = parseNumber(row.harga);
             const profit = harga - modal;
             
+            // Perhitungan KPI berdasarkan SEMUA DATA
             gmv += harga;
             totalProfitAll += profit;
             if ((row.tglBeli || '').slice(0,10) === todayISO) {
                 totalSalesToday += harga;
             }
+            if (row.wa) {
+                uniqueCustomers.add(row.wa); // Tambahkan nomor WA ke Set
+            }
 
-            // Filtering for render list
+            // Filtering untuk render list
             if (filtro && row.katalog !== filtro) return;
             if (q) {
                 const hay = `${row.nama || ''} ${row.wa || ''}`.toLowerCase();
                 if (!hay.includes(q)) return;
             }
             
-            // This is the list currently displayed
+            // Data yang akan dirender (sudah difilter)
             currentRenderList.push({ row, originalIndex });
         });
         
@@ -314,7 +317,7 @@ document.addEventListener('DOMContentLoaded', function () {
             tr.innerHTML = `<td colspan="10" class="empty-state">Belum ada transaksi. Isi form di kiri lalu klik <strong>Tambah Data</strong>.</td>`;
             tableBody.appendChild(tr);
         } else {
-            const today = new Date(todayISO).getTime(); // Hari ini dalam timestamp
+            const today = new Date(todayISO).getTime(); 
             const oneDay = 24 * 60 * 60 * 1000;
             
             currentRenderList.forEach((entry, idx) => {
@@ -322,14 +325,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 const modal = parseNumber(row.modal);
                 const harga = parseNumber(row.harga);
                 const profit = harga - modal;
-                totalActive += 1;
                 
                 // Kalkulasi Status Langganan
                 const expiryISO = getExpiryDate(row.tglBeli, row.durasi);
                 let statusText = 'N/A';
                 let statusClass = '';
 
-                if (expiryISO) {
+                if (expiryISO && String(row.durasi).includes('Hari')) {
                     const expiryTime = new Date(expiryISO).getTime();
                     const diffDays = Math.ceil((expiryTime - today) / oneDay);
                     
@@ -371,7 +373,8 @@ document.addEventListener('DOMContentLoaded', function () {
         KPI.sales && (KPI.sales.textContent = formatRupiah(totalSalesToday));
         KPI.gmv && (KPI.gmv.textContent = formatRupiah(gmv));
         KPI.profitAll && (KPI.profitAll.textContent = formatRupiah(totalProfitAll));
-        KPI.active && (KPI.active.textContent = totalActive);
+        // FIX: KPI Pelanggan Aktif kini menggunakan jumlah pelanggan unik dari SEMUA DATA
+        KPI.active && (KPI.active.textContent = uniqueCustomers.size); 
     }
 
     function escapeHtml(s) {
@@ -439,7 +442,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 durasiFinal = customDurasiInput.value.trim();
                 
                 if (!durasiFinal) {
-                    // Force visual error on the custom input field
                     customInputEl.closest('.field')?.classList.add('invalid');
                     showToast('Isi durasi kustom');
                     customDurasiInput.focus();
@@ -452,7 +454,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (!isNamaValid || !isWaValid || !isKatalogValid || !isDurasiValid) {
                 showToast('Lengkapi data wajib (*).');
-                // Scroll to the first invalid field
                 const firstInvalid = document.querySelector('.field.invalid');
                 if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return;
@@ -564,7 +565,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (action === 'struk') {
             const startISO = row.tglBeli || isoToday();
             
-            // utility function to get expiry date
             function getExpiryDate(tglBeli, durasi) {
                 const m = String(durasi || '').match(/(\d+)/);
                 if (!m || !tglBeli) return '';
