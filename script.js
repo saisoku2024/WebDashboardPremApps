@@ -289,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const harga = parseNumber(row.harga);
             const profit = harga - modal;
             
-            // Perhitungan KPI berdasarkan SEMUA DATA
+            // Perhitungan KPI berdasarkan SEMUA DATA (Sudah Benar)
             gmv += harga;
             totalProfitAll += profit;
             if ((row.tglBeli || '').slice(0,10) === todayISO) {
@@ -300,13 +300,15 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             // Filtering untuk render list
-            // FIX KRITIS: Tambahkan default string agar .includes tidak error pada data lama
+            // FIX KRITIS: Pastikan semua field yang digunakan untuk filter/search adalah STRING yang aman
             const rowKatalog = String(row.katalog || '');
             const rowNama = String(row.nama || '');
             const rowWA = String(row.wa || '');
             
+            // Logika Filter Produk: Tampilkan jika filter kosong ATAU katalog match
             if (filtro && rowKatalog !== filtro) return;
             
+            // Logika Search: Tampilkan jika query kosong ATAU query match dengan nama/wa
             if (q) {
                 const hay = `${rowNama} ${rowWA}`.toLowerCase();
                 if (!hay.includes(q)) return;
@@ -320,7 +322,7 @@ document.addEventListener('DOMContentLoaded', function () {
         KPI.sales && (KPI.sales.textContent = formatRupiah(totalSalesToday));
         KPI.gmv && (KPI.gmv.textContent = formatRupiah(gmv));
         KPI.profitAll && (KPI.profitAll.textContent = formatRupiah(totalProfitAll));
-        KPI.active && (KPI.active.textContent = uniqueCustomers.size); // FIX: Menggunakan uniqueCustomers.size
+        KPI.active && (KPI.active.textContent = uniqueCustomers.size); // KPI Pelanggan Aktif selalu benar
 
         
         // Render the filtered/searched list
