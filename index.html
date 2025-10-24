@@ -23,110 +23,243 @@
                 <button class="btn small primary" data-page="pageTwo">Analisis & Performa</button>
             </nav>
             </header>
-        
-        ```
 
-### 2. `style.css` (Fix Rata Kanan Navigasi)
+        <main id="pageOne" class="grid page active">
+            <div class="kpi-row" role="region" aria-label="KPI">
+                <div class="kpi">
+                    <div class="kpi-title">Penjualan Hari Ini</div>
+                    <div class="kpi-value">Rp <span id="kpi-sales">0</span></div>
+                    <div class="kpi-sub">Total penjualan hari ini (harga jual)</div>
+                </div>
+                <div class="kpi">
+                    <div class="kpi-title">Total GMV</div>
+                    <div class="kpi-value">Rp <span id="kpi-gmv">0</span></div>
+                    <div class="kpi-sub">Akumulasi (awal → akhir)</div>
+                </div>
+                <div class="kpi">
+                    <div class="kpi-title">Total Profit (All time)</div>
+                    <div class="kpi-value">Rp <span id="kpi-profit-all">0</span></div>
+                    <div class="kpi-sub">Jumlah profit = Σ(harga − modal)</div>
+                </div>
+                <div class="kpi">
+                    <div class="kpi-title">Total Pelanggan Aktif</div>
+                    <div class="kpi-value"><span id="kpi-active">0</span></div>
+                    <div class="kpi-sub">Jumlah transaksi (count)</div>
+                </div>
+            </div>
 
-**(Perubahan: Mengubah *display* header menjadi *Flex* yang menempatkan `page-nav` di ujung kanan.)**
+            <aside class="card input-form" aria-labelledby="input-title">
+                <h2 id="input-title">Input Data Langganan</h2>
+                
+                <form id="entryForm" class="fields" autocomplete="off" novalidate>
+                    <div class="field">
+                        <label for="nama">Nama Pembeli <span class="req">*</span></label>
+                        <input id="nama" name="nama" type="text" placeholder="Nama lengkap" required />
+                        <span class="error">Nama Pembeli wajib diisi.</span>
+                    </div>
 
-```css
-:root{
-    --left-col: 360px;
-    --bg-900: #030616;
-    --bg-800: #061228;
-    --card: #071627;
-    --muted: #9fb0c6;
-    --accent1: #00f3ff;
-    --accent2: #8a5cff;
-    --teal: #0ea5a0;
-    --white: #e6eef8;
-    --radius: 12px;
-    --shadow: 0 10px 30px rgba(0,0,0,0.6);
-    --danger: #ff4d4f;
-    --outline-border: rgba(255,255,255,0.06);
-    --danger-outline: rgba(255,77,79,0.28);
-    
-    /* VARIABEL BARU UNTUK STATUS */
-    --status-active: #10b981; /* green */
-    --status-expired: #f43f5e; /* red */
-    --status-warning: #facc15; /* yellow */
-    
-    /* CHART COLORS */
-    --chart-sales: #00f3ff;
-    --chart-modal: #8a5cff;
-    --chart-profit: #10b981;
-}
+                    <div class="field input-icon-group">
+                        <label for="wa">No. WhatsApp <span class="req">*</span></label>
+                        <div class="input-icon-wrap">
+                            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M17.6 14.2c-.3-.2-1.7-.8-1.9-.9-.2-.1-.3-.2-.5.2-.1.3-.6.9-.7 1-.1.2-.3.2-.6.1C10.7 14 7 11.3 6.2 9.8c-.1-.3 0-.4.1-.6.1-.1.3-.3.5-.5.2-.2.3-.4.4-.7.1-.2 0-.4 0-.6 0-.2-.5-1.1-.7-1.5-.2-.4-.4-.3-.6-.3-.1 0-.2 0-.4 0-.1 0-.4 0-.6 0-.2 0-.5 0-.8.3-.3.3-1 1-1.1 1.1-.3.3-.7.6-1 1-.3.4-.5 1.1-.5 1.8 0 3.3 1.7 6.8 4.8 9.8 3 3 6.6 4.6 9.2 4.6 1.2 0 1.9-.2 2.4-.4.6-.3 1-1.2 1.2-2.2.2-1 .1-2.1-.4-2.7-.5-.6-1.5-1.1-1.8-1.3z"></path></svg>
+                            <input id="wa" name="wa" type="text" inputmode="tel" placeholder="08xxxxxxxxxx" required />
+                        </div>
+                        <span class="error">Nomor WhatsApp wajib diisi.</span>
+                    </div>
 
-/* Reset & base */
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;background:linear-gradient(180deg,var(--bg-900) 0%, var(--bg-800) 100%);color:var(--white);-webkit-font-smoothing:antialiased}
-a{color:inherit;text-decoration:none}
+                    <div class="field">
+                        <label for="katalog">Katalog / Produk <span class="req">*</span></label>
+                        <select id="katalog" name="katalog" aria-label="Katalog Produk"></select>
+                        <span class="error">Pilih salah satu produk.</span>
+                    </div>
 
-/* HILANGKAN SPINNER (Tombol panah) pada input type="number" */
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-input[type="number"] {
-    -moz-appearance: textfield;
-}
+                    <div class="add-catalog">
+                        <input id="newCatalogInput" placeholder="Tambah produk baru (mis. HBO Max)" />
+                        <button type="button" id="addCatalogBtn" class="btn small primary add-btn-inline">Tambah</button>
+                    </div>
 
-/* Container */
-.wrap{max-width:1200px;margin:18px auto;padding:18px}
-.header{
-    display:flex;
-    justify-content:space-between; /* KRITIS: Pindah ke ujung */
-    align-items:flex-start;
-    margin-bottom:6px;
-    gap:12px;
-    flex-wrap: wrap;
-}
+                    <div class="field">
+                        <label for="akun">Akun</label>
+                        <input id="akun" name="akun" type="text" placeholder="Email akun / username" />
+                    </div>
 
-/* NAVIGASI PAGE BARU */
-.page-nav {
-    display: flex;
-    gap: 8px;
-    padding-top: 4px;
-    margin-left: auto; /* KRITIS: Dorong ke kanan */
-}
-.page-nav button.primary.active {
-    box-shadow: 0 0 0 2px var(--accent1) inset;
-    background: linear-gradient(90deg,var(--accent1),var(--accent2));
-    color: #031014;
-    font-weight: 700;
-}
-.page-nav button.primary:not(.active) {
-    background: var(--bg-800);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: var(--white);
-    box-shadow: none;
-}
-/* Memastikan page containers tersembunyi */
-.page {
-    width: 100%; 
-    margin-top: 0;
-}
-#pageTwo {
-    padding-top: 20px;
-    padding-bottom: 20px;
-    display: none; /* FIX: Atur display di CSS */
-}
-#pageTwo.active {
-    display: block !important;
-}
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <input id="password" name="password" type="password" placeholder="Opsional" />
+                    </div>
 
+                    <div class="field">
+                        <label for="profile">Profile & PIN</label>
+                        <input id="profile" name="profile" type="text" placeholder="mis. Profile 1 / PIN 1234" />
+                    </div>
 
-/* Grid (left column + right) - KRITIS */
-#pageOne.grid {
-    display:grid; 
-    grid-template-columns:var(--left-col) 1fr; 
-    gap:18px;
-    align-items:start; 
-}
-.grid > .grid-col-2 {
-    grid-column: 2; 
-}
+                    <div class="field">
+                        <label for="device">Device</label>
+                        <select id="device" name="device">
+                            <option value="">Pilih Device</option>
+                            <option>TV</option>
+                            <option>HP</option>
+                            <option>Laptop</option>
+                            <option>All</option>
+                        </select>
+                    </div>
 
-/* ... (sisa kode CSS tetap sama) ... */
+                    <div class="row two">
+                        <div class="field">
+                            <label for="tglBeli">Tanggal Beli</label>
+                            <input id="tglBeli" name="tglBeli" type="date" />
+                        </div>
+                        <div class="field">
+                            <label for="durasi">Durasi</label>
+                            <div class="durasi-wrapper">
+                                <select id="durasi" name="durasi">
+                                    <option value="30 Hari">30 Hari</option>
+                                    <option value="60 Hari">60 Hari</option>
+                                    <option value="90 Hari">90 Hari</option>
+                                    <option value="120 Hari">120 Hari</option>
+                                    <option value="Custom Text">Custom Text</option>
+                                </select>
+                                <input id="customDurasiInput" type="text" placeholder="Input durasi (mis. 45 Hari atau 1 Tahun)" style="display:none;" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="statusBuyer">Status Buyer</label>
+                        <select id="statusBuyer" name="statusBuyer">
+                            <option value="">Pilih Status</option>
+                            <option>Reguler</option>
+                            <option>Reseller</option>
+                        </select>
+                    </div>
+
+                    <div class="row two">
+                        <div class="field currency-input">
+                            <label for="modal">Modal (Rp)</label>
+                            <input id="modal" name="modal" type="number" inputmode="numeric" min="0" placeholder="25000" />
+                            <span class="currency-prefix">Rp</span>
+                        </div>
+                        <div class="field currency-input">
+                            <label for="harga">Harga Jual (Rp)</label>
+                            <input id="harga" name="harga" type="number" inputmode="numeric" min="0" placeholder="33900" />
+                            <span class="currency-prefix">Rp</span>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button id="addBtn" class="btn primary" type="submit">+ Tambah Data</button>
+                        <button id="resetBtn" class="btn outline" type="button">Reset</button>
+                    </div>
+                </form>
+            </aside>
+
+            <section class="card table-view grid-col-2" aria-labelledby="table-title">
+                <div class="table-header">
+                    <div class="header-left">
+                        <h2 id="table-title">Data Langganan (15 Transaksi Terbaru)</h2>
+                        <p class="muted small">Pantau transaksi, profit, dan export laporan.</p>
+                    </div>
+
+                    <div class="controls">
+                        <div class="custom-select-wrapper">
+                            <select id="filterProduk" name="filterProduk" aria-label="Filter Produk"></select>
+                        </div>
+                        <input id="searchInput" placeholder="Cari nama / WA..." />
+                        <button id="exportBtn" class="export-btn" title="Export CSV" aria-label="Export CSV">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M21 21H3"/></svg>
+                            <span class="sr-only">Export</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table id="subsTable" role="table" aria-describedby="table-title">
+                        <thead>
+                            <tr>
+                                <th>Nama</th>
+                                <th>Produk</th>
+                                <th>Tanggal Beli</th>
+                                <th>Tanggal Habis</th>
+                                <th>Durasi</th>
+                                <th>Modal</th>
+                                <th>Harga</th>
+                                <th>Profit</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+        <div id="pageTwo" class="page metrics-page" style="display:none;">
+            <section id="metricsView" class="metrics-view" aria-labelledby="metrics-title">
+                <h2 id="metrics-title">Performa & Analisis Bisnis (All Time)</h2>
+                
+                <div class="metric-grid">
+                    
+                    <div class="card metric-chart-wide">
+                        <h3>Sales, Modal & Profit Bulanan</h3>
+                        <div class="chart-container">
+                            <canvas id="monthlySalesChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card metric-chart-narrow">
+                        <h3>Top 5 Kategori Produk (Berdasarkan GMV)</h3>
+                        <div class="chart-container">
+                            <canvas id="topCategoriesChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card metric-chart-narrow">
+                        <h3>Pelanggan Unik Aktif Bulanan</h3>
+                        <div class="chart-container">
+                            <canvas id="monthlyCustomersChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card top-buyers-table">
+                    <h3>Top 5 Pembeli (Berdasarkan Total GMV)</h3>
+                    <div class="table-wrap">
+                        <table id="topBuyersTable" role="table" aria-describedby="metrics-title">
+                            <thead>
+                                <tr>
+                                    <th>Nama</th>
+                                    <th>No. WA</th>
+                                    <th>Total GMV</th>
+                                    <th>Total Transaksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topBuyersBody">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+        <footer class="footer text-center">© 2025 SAISOKU.ID · Flat Dark Dashboard by SIVA</footer>
+    </div>
+
+    <div id="invoiceModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-card" role="document">
+            <div class="modal-header">
+                <h3 class="brand">Struk Penjualan</h3>
+                <div class="modal-actions">
+                    <button id="copyInvoiceBtn" class="btn small primary">Copy</button>
+                    <button id="printInvoiceBtn" class="btn small primary">Print</button> 
+                    <button id="waInvoiceBtn" class="btn small primary">WA</button> 
+                    <button id="closeInvoiceBtn" class="btn small outline">Tutup</button>
+                </div>
+            </div>
+            <div id="invoiceBody" class="invoice-body" tabindex="0"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast" aria-live="polite"></div>
+    <script src="script.js"></script>
+</body>
+</html>
