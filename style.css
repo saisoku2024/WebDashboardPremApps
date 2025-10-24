@@ -45,7 +45,7 @@ input[type="number"] {
 .header{
     display:flex;
     justify-content:space-between; 
-    align-items:flex-start;
+    align-items:center; /* FIX: Menyelaraskan vertikal di tengah */
     margin-bottom:6px;
     gap:12px;
     flex-wrap: wrap;
