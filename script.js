@@ -32,8 +32,7 @@ function parseNumber(v){
 
 document.addEventListener('DOMContentLoaded', function () {
     const $ = id => document.getElementById(id);
-    
-    // --- Elemen Form ---
+
     const form = $('entryForm');
     const namaEl = $('nama');
     const waEl = $('wa');
@@ -43,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const tglEl = $('tglBeli');
     const durasiEl = $('durasi');
     const customDurasiInput = $('customDurasiInput'); 
+    
     const modalEl = $('modal');
     const hargaEl = $('harga');
     const addBtn = $('addBtn');
@@ -53,13 +53,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const deviceSel = $('device');
     const statusSel = $('statusBuyer');
     
-    // --- Elemen Dashboard & Tabel ---
     const filterSel = $('filterProduk');
     const searchInput = $('searchInput');
     const exportBtn = $('exportBtn');
     const tableBody = $('tableBody');
     const toastEl = $('toast');
-    const topBuyersBody = $('topBuyersBody'); // Body tabel Top Buyers
+    const topBuyersBody = $('topBuyersBody');
 
     const KPI = {
         sales: $('kpi-sales'),
@@ -73,34 +72,130 @@ document.addEventListener('DOMContentLoaded', function () {
     const save = arr => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
 
     // --- CHART GLOBALS ---
-    let monthlySalesChart, topCategoriesChart, monthlyCustomersChart;
+    let monthlySalesChartInstance, topCategoriesChartInstance, monthlyCustomersChartInstance;
     const CHART_BG_COLORS = ['#00f3ff', '#8a5cff', '#10b981', '#facc15', '#f43f5e'];
 
-    // --- CHART LOGIC PLACEHOLDERS ---
-
+    // --- CHART AGGREGATION AND DRAWING ---
     function aggregateData(allData) {
-        // Placeholder for complex aggregation logic
+        // --- DATA PLACEHOLDER UNTUK DEMO CHART LAYOUT ---
         return {
-            monthly: { labels: [], sales: [], modal: [], profit: [] },
-            categories: [],
-            customers: { labels: [], uniqueCounts: [] },
-            topBuyers: []
+            monthly: { 
+                labels: ['Jun', 'Jul', 'Agu', 'Sep', 'Okt'], 
+                sales: [30000, 45000, 60000, 80000, 95000], 
+                profit: [12000, 18000, 25000, 32000, 39000] 
+            },
+            categories: [
+                { label: 'Netflix', value: 50000 },
+                { label: 'Canva', value: 30000 },
+                { label: 'Spotify', value: 15000 },
+                { label: 'HBO Max', value: 10000 },
+                { label: 'Lainnya', value: 8000 }
+            ],
+            topBuyers: [
+                { nama: 'Ayu', wa: '0811xxxx', gmv: 520000, count: 8 },
+                { nama: 'Budi', wa: '0812xxxx', gmv: 350000, count: 5 },
+                { nama: 'Cindy', wa: '0857xxxx', gmv: 180000, count: 3 },
+                { nama: 'Dion', wa: '0878xxxx', gmv: 150000, count: 2 },
+                { nama: 'Emi', wa: '0813xxxx', gmv: 120000, count: 2 },
+            ],
+            customers: { 
+                labels: ['Jun', 'Jul', 'Agu', 'Sep', 'Okt'], 
+                uniqueCounts: [10, 15, 18, 22, 25] 
+            }
         };
     }
 
     function drawCharts(aggregatedData) {
-        // Placeholder for drawing charts using Chart.js
-        console.log("Drawing charts with aggregated data:", aggregatedData);
-        // Implementasi Chart.js akan ditambahkan di sini
+        // Hancurkan instance chart yang lama jika ada
+        if (monthlySalesChartInstance) monthlySalesChartInstance.destroy();
+        if (topCategoriesChartInstance) topCategoriesChartInstance.destroy();
+        if (monthlyCustomersChartInstance) monthlyCustomersChartInstance.destroy();
+
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: 'var(--muted)' } } },
+            scales: {
+                x: { ticks: { color: 'var(--muted)' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                y: { ticks: { color: 'var(--muted)', callback: (v) => formatRupiah(v) }, grid: { color: 'rgba(255,255,255,0.1)' } },
+            }
+        };
+
+        // 1. Grafik Sales, Modal & Profit Bulanan (Bar Chart)
+        const ctxSales = $('monthlySalesChart');
+        if (ctxSales) {
+            monthlySalesChartInstance = new Chart(ctxSales, {
+                type: 'bar',
+                data: {
+                    labels: aggregatedData.monthly.labels,
+                    datasets: [
+                        { label: 'Sales (GMV)', data: aggregatedData.monthly.sales, backgroundColor: 'var(--chart-sales)', yAxisID: 'y' },
+                        { label: 'Profit', data: aggregatedData.monthly.profit, backgroundColor: 'var(--chart-profit)', yAxisID: 'y' }
+                    ]
+                },
+                options: chartOptions
+            });
+        }
+        
+        // 2. Grafik Top 5 Kategori (Doughnut Chart)
+        const ctxCategories = $('topCategoriesChart');
+        if (ctxCategories) {
+            topCategoriesChartInstance = new Chart(ctxCategories, {
+                type: 'doughnut',
+                data: {
+                    labels: aggregatedData.categories.map(c => c.label),
+                    datasets: [{
+                        data: aggregatedData.categories.map(c => c.value),
+                        backgroundColor: CHART_BG_COLORS,
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { color: 'var(--muted)' } } }
+                }
+            });
+        }
+
+        // 3. Grafik Pelanggan Unik Aktif Bulanan (Line Chart)
+        const ctxCustomers = $('monthlyCustomersChart');
+        if (ctxCustomers) {
+            monthlyCustomersChartInstance = new Chart(ctxCustomers, {
+                type: 'line',
+                data: {
+                    labels: aggregatedData.customers.labels,
+                    datasets: [{
+                        label: 'Pelanggan Unik',
+                        data: aggregatedData.customers.uniqueCounts,
+                        borderColor: 'var(--chart-modal)',
+                        backgroundColor: 'rgba(138, 92, 255, 0.2)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: chartOptions
+            });
+        }
     }
 
     function renderTopBuyers(topBuyers) {
-        // Placeholder for rendering Top Buyers table
-        console.log("Rendering Top Buyers:", topBuyers);
-        // Implementasi rendering Top Buyers table akan ditambahkan di sini
-        topBuyersBody.innerHTML = `<tr><td colspan="4" class="empty-state">Data Top Buyer belum tersedia.</td></tr>`;
+        topBuyersBody.innerHTML = '';
+        if (!topBuyers.length) {
+             topBuyersBody.innerHTML = `<tr><td colspan="4" class="empty-state">Belum ada data Top Buyer.</td></tr>`;
+             return;
+        }
+
+        topBuyers.forEach(buyer => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${escapeHtml(buyer.nama)}</td>
+                <td>${escapeHtml(buyer.wa)}</td>
+                <td style="text-align:right">Rp ${formatRupiah(buyer.gmv)}</td>
+                <td style="text-align:right">${buyer.count}</td>
+            `;
+            topBuyersBody.appendChild(tr);
+        });
     }
-    // --- END CHART LOGIC PLACEHOLDERS ---
+    // --- END CHART AGGREGATION AND DRAWING ---
 
 
     function showToast(msg, ms = 1400) {
@@ -314,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const uniqueCustomers = new Set(); 
         const todayISO = isoToday();
 
-        // 1. Lakukan agregasi data untuk KPI dan Chart dari SEMUA DATA
+
         all.forEach((row, originalIndex) => {
             const modal = parseNumber(row.modal);
             const harga = parseNumber(row.harga);
@@ -329,6 +424,20 @@ document.addEventListener('DOMContentLoaded', function () {
             if (row.wa) {
                 uniqueCustomers.add(row.wa); 
             }
+
+            // Filtering untuk render list
+            const rowKatalog = String(row.katalog || '');
+            const rowNama = String(row.nama || '');
+            const rowWA = String(row.wa || '');
+            
+            if (filtro && rowKatalog !== filtro) return;
+            
+            if (q) {
+                const hay = `${rowNama} ${rowWA}`.toLowerCase();
+                if (!hay.includes(q)) return;
+            }
+            
+            currentRenderList.push({ row, originalIndex });
         });
         
         // Update KPIs (HARUS DARI SEMUA DATA)
@@ -336,6 +445,7 @@ document.addEventListener('DOMContentLoaded', function () {
         KPI.gmv && (KPI.gmv.textContent = formatRupiah(gmv));
         KPI.profitAll && (KPI.profitAll.textContent = formatRupiah(totalProfitAll));
         KPI.active && (KPI.active.textContent = uniqueCustomers.size); 
+
         
         // 2. Tentukan data yang akan ditampilkan di tabel (filter dan batasi 15 terakhir)
         let filteredList = all.filter(row => {
@@ -355,15 +465,18 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         // Terapkan batas 15 transaksi terakhir: Balik urutan dan ambil 15
+        // DIBALIK AGAR YANG TERBARU DI ATAS (sesuai tampilan table)
         filteredList.reverse();
         const limitedList = filteredList.slice(0, 15);
         
         // Simpan index dari list yang dibatasi
-        limitedList.reverse().forEach(row => { // Balik lagi agar yang terbaru di bawah
+        // Balik lagi agar urutan di tabel (HTML) tetap dari atas ke bawah
+        limitedList.reverse().forEach(row => { 
             const originalIndex = all.indexOf(row);
             currentRenderList.push({ row, originalIndex });
         });
-        
+
+
         // 3. Render tabel utama
         if (!currentRenderList.length) {
             const tr = document.createElement('tr');
