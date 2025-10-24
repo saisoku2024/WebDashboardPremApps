@@ -52,7 +52,8 @@ input[type="number"] {
     display:grid; 
     grid-template-columns:var(--left-col) 1fr; 
     gap:18px;
-    align-items:start; 
+    /* FIX: Diganti menjadi 'stretch' agar semua item dalam row yang sama tingginya sama */
+    align-items:stretch; 
     margin-top:6px
 }
 
@@ -268,7 +269,7 @@ input[type="number"] {
 /* --- METRICS VIEW STYLING (NEW SECTION) --- */
 .metrics-view {
     padding: 16px;
-    margin-top: 24px; /* Margin bawah tabel, dorong ke bawah */
+    margin-top: 24px; 
     margin-bottom: 30px;
     /* PENTING: Memastikan section ini melintasi kedua kolom grid utama */
     grid-column: 1 / -1; 
@@ -296,7 +297,7 @@ input[type="number"] {
     grid-column: 1 / -1; /* Chart Sales Bulanan mengambil full width */
 }
 .metric-chart-narrow {
-    height: 320px; /* Tinggi Chart agar visualnya bagus */
+    height: 320px; 
 }
 .top-buyers-table {
     margin-top: 20px;
@@ -307,7 +308,7 @@ input[type="number"] {
 
 @media (max-width: 900px) {
     .metric-grid {
-        grid-template-columns: 1fr; /* Satu kolom di tablet/mobile */
+        grid-template-columns: 1fr; 
     }
     .metric-chart-narrow {
         height: 280px;
