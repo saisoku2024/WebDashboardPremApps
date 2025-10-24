@@ -13,7 +13,6 @@ let CATALOG_LIST = [
     "Spotify Premium",
     "Vidio Platinum",
     "VIU Premium",
-    "WeTV VIP",
     "Youtube Premium"
 ];
 
@@ -95,9 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (sel.dataset.customized === '1') {
             const wrapper = sel.closest('.custom-select-wrapper');
             if (wrapper) {
-                // Pindahkan select asli kembali ke parent sebelum wrapper
                 wrapper.parentNode.insertBefore(sel, wrapper);
-                // Hapus wrapper
                 wrapper.remove();
             }
             sel.classList.remove('custom-select-hidden');
@@ -108,7 +105,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function populateCatalogSelects() {
-        // Hapus elemen custom select lama sebelum membuat opsi baru
         destroyCustomSelect(katalogSel);
         destroyCustomSelect(filterSel);
         
@@ -128,7 +124,6 @@ document.addEventListener('DOMContentLoaded', function () {
             filterSel.appendChild(o);
         });
         
-        // Panggil ulang create custom select setelah populate
         createCustomSelects(); 
     }
     
@@ -136,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function createCustomSelects() {
         const selects = Array.from(document.querySelectorAll('select'));
         selects.forEach(sel => {
-            if (sel.dataset.customized === '1') return; // Sudah dibuat
+            if (sel.dataset.customized === '1') return;
             
             const parent = sel.parentNode;
             const wrapper = document.createElement('div');
@@ -342,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 let statusText = 'N/A';
                 let statusClass = '';
 
-                if (expiryISO && String(row.durasi).includes('Hari')) {
+                if (expiryISO && String(row.durasi).toLowerCase().includes('hari')) {
                     const expiryTime = new Date(expiryISO).getTime();
                     const diffDays = Math.ceil((expiryTime - today) / oneDay);
                     
@@ -394,9 +389,23 @@ document.addEventListener('DOMContentLoaded', function () {
     function validateInput(el) {
         const parentField = el.closest('.field');
         const isSelect = el.tagName === 'SELECT';
-        const value = el.value.trim();
-        // Validasi: field harus diisi dan (jika select) bukan nilai default 'Pilih Produk'/'Pilih Status'
-        const isValid = el.checkValidity() && value !== '' && (!isSelect || (value !== 'Pilih Produk' && value !== 'Pilih Status'));
+        const isCustomDurasi = el.id === 'customDurasiInput'; 
+        
+        let value = el.value.trim();
+        
+        // Cek jika ini select kustom
+        if (el.id === 'katalog') {
+            value = el.options[el.selectedIndex]?.text;
+            if (value === 'Pilih Produk') value = ''; 
+        }
+
+        // Handle custom durasi validation separately if its active
+        if (isCustomDurasi && durasiEl.value !== 'Custom Text') {
+            parentField?.classList.remove('invalid');
+            return true;
+        }
+
+        const isValid = el.checkValidity() && value !== '';
 
         if (isValid) {
             parentField?.classList.remove('invalid');
@@ -406,10 +415,18 @@ document.addEventListener('DOMContentLoaded', function () {
         return false;
     }
 
+
     // add catalog
     addCatalogBtn.addEventListener('click', () => {
         const v = (newCatalogInput.value || '').trim();
         if (!v) { newCatalogInput.focus(); return; }
+        
+        // Cek jika sudah ada (case-insensitive)
+        if (CATALOG_LIST.some(item => item.toLowerCase() === v.toLowerCase())) {
+            showToast('Produk sudah ada');
+            return;
+        }
+        
         CATALOG_LIST.push(v);
         CATALOG_LIST = sortCatalog(CATALOG_LIST);
         
@@ -441,21 +458,10 @@ document.addEventListener('DOMContentLoaded', function () {
             
             let durasiFinal = durasiEl.value;
             let isDurasiValid = true;
-            let customInputEl = customDurasiInput;
 
             if (durasiFinal === 'Custom Text') {
+                isDurasiValid = validateInput(customDurasiInput);
                 durasiFinal = customDurasiInput.value.trim();
-                
-                // Validasi Durasi Kustom
-                if (!durasiFinal) {
-                    // Beri class invalid pada custom input agar error message durasi muncul
-                    customInputEl.closest('.field')?.classList.add('invalid'); 
-                    showToast('Isi durasi kustom');
-                    customDurasiInput.focus();
-                    isDurasiValid = false;
-                } else {
-                    customInputEl.closest('.field')?.classList.remove('invalid');
-                }
             }
 
 
@@ -486,6 +492,10 @@ document.addEventListener('DOMContentLoaded', function () {
             };
 
             const all = load();
+            
+            // Mencari index yang tepat untuk melakukan splice agar array tetap konsisten
+            // Karena kita harus menjaga `originalIndex` tetap valid setelah hapus, 
+            // kita gunakan pendekatan array.push dan re-render.
             all.push(entry);
             save(all);
             
@@ -586,23 +596,25 @@ document.addEventListener('DOMContentLoaded', function () {
             const lines = [];
             lines.push(`🧾 STRUK PENJUALAN SAISOKU.ID`);
             lines.push(`──────────`);
-            lines.push(`👤 Nama      : ${row.nama || '-'}`);
-            lines.push(`📱 Buyer WA  : ${row.wa || '-'}`);
-            lines.push(`🎬 Produk    : ${row.katalog || '-'}`);
-            lines.push(`🔑 Akun      : ${row.akun || '-'}`);
-            lines.push(`⚙️ Device    : ${row.device || '-'}`);
+            lines.push(`👤 Nama      : ${row.nama || '-'}`);
+            lines.push(`📱 Buyer WA  : ${row.wa || '-'}`);
+            lines.push(`🎬 Produk    : ${row.katalog || '-'}`);
+            lines.push(`🔑 Akun      : ${row.akun || '-'}`);
+            lines.push(`⚙️ Device    : ${row.device || '-'}`);
             lines.push(`──────────`);
             
-            if (endISO && String(row.durasi).includes('Hari')) {
+            if (endISO && String(row.durasi).toLowerCase().includes('hari')) {
                 lines.push(`📅 Beli/Habis: ${formatDateDDMMYYYY(startISO)} → ${formatDateDDMMYYYY(endISO)}`);
             } else {
-                 lines.push(`📅 Tanggal   : ${formatDateDDMMYYYY(startISO)}`);
+                 lines.push(`📅 Tanggal   : ${formatDateDDMMYYYY(startISO)}`);
             }
             
-            lines.push(`⏱️ Durasi    : ${row.durasi || '-'}`);
+            lines.push(`⏱️ Durasi    : ${row.durasi || '-'}`);
             lines.push(`──────────`);
-            lines.push(`🏷️ Harga     : Rp ${formatRupiah(parseNumber(row.harga || 0))}`);
-            lines.push(`🧩 Status    : ${row.statusBuyer || '-'}`);
+            lines.push(`🏷️ Harga     : Rp ${formatRupiah(parseNumber(row.harga || 0))}`);
+            lines.push(`💰 Modal     : Rp ${formatRupiah(parseNumber(row.modal || 0))}`);
+            lines.push(`✨ Net Profit: Rp ${formatRupiah(parseNumber(row.harga) - parseNumber(row.modal))}`);
+            lines.push(`🧩 Status    : ${row.statusBuyer || '-'}`);
             lines.push(`──────────`);
             lines.push(`Terima kasih telah berbelanja di SAISOKU.ID 🙏`);
             lines.push(`© 2025 SAISOKU.ID • ${formatDateDDMMYYYY(new Date().toISOString().slice(0,10))}`);
@@ -681,9 +693,11 @@ document.addEventListener('DOMContentLoaded', function () {
         // Aturan WA: Jika diawali 0, ganti 62
         if (wa.startsWith('0')) {
             wa = '62' + wa.substring(1);
+        } else if (wa.startsWith('+62')) {
+            wa = wa.substring(1); // Hapus +
         }
 
-        const url = `https://wa.me/${wa}?text=${text}`; // FIX: Menambahkan nomor WA ke URL
+        const url = `https://wa.me/${wa}?text=${text}`; 
         window.open(url, '_blank');
     });
     if (closeInvoiceBtn) closeInvoiceBtn.addEventListener('click', closeInvoiceModal);
