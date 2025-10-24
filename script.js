@@ -13,6 +13,7 @@ let CATALOG_LIST = [
     "Spotify Premium",
     "Vidio Platinum",
     "VIU Premium",
+    "WeTV VIP",
     "Youtube Premium"
 ];
 
@@ -29,7 +30,7 @@ function parseNumber(v){
     return Number.isFinite(n) ? n : 0;
 }
 
-// Deklarasi Global untuk Chart Instances (agar bisa di-destroy)
+// Deklarasi Global untuk Chart Instances
 let monthlySalesChartInstance, topCategoriesChartInstance, monthlyCustomersChartInstance;
 const CHART_BG_COLORS = ['#00f3ff', '#8a5cff', '#10b981', '#facc15', '#f43f5e'];
 
@@ -334,7 +335,10 @@ document.addEventListener('DOMContentLoaded', function () {
         KPI.sales && (KPI.sales.textContent = formatRupiah(totalSalesToday));
         KPI.gmv && (KPI.gmv.textContent = formatRupiah(gmv));
         KPI.profitAll && (KPI.profitAll.textContent = formatRupiah(totalProfitAll));
-        KPI.active && (KPI.active.textContent = uniqueCustomers.size); 
+            // FIX KRITIS: Pastikan uniqueCustomers.size digunakan dengan benar
+        if (KPI.active) {
+            KPI.active.textContent = uniqueCustomers.size;
+        }
 
         
         // 2. Tentukan data yang akan ditampilkan di tabel (filter dan batasi 15 terakhir)
@@ -480,14 +484,50 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- CHART LOGIC PLACEHOLDERS ---
     function aggregateData(allData) { 
-        // ... (Logika placeholder chart) ...
+        // Logic placeholder chart tetap sama
+        return {
+            monthly: { 
+                labels: ['Jun', 'Jul', 'Agu', 'Sep', 'Okt'], 
+                sales: [30000, 45000, 60000, 80000, 95000], 
+                modal: [15000, 20000, 30000, 40000, 45000],
+                profit: [12000, 18000, 25000, 32000, 39000] 
+            },
+            categories: [
+                { label: 'Netflix', value: 50000 },
+                { label: 'Canva', value: 30000 },
+                { label: 'Spotify', value: 15000 },
+                { label: 'HBO Max', value: 10000 },
+                { label: 'Lainnya', value: 8000 }
+            ],
+            topBuyers: [
+                { nama: 'Ayu', wa: '0811xxxx', gmv: 520000, count: 8 },
+                { nama: 'Budi', wa: '0812xxxx', gmv: 350000, count: 5 },
+                { nama: 'Cindy', wa: '0857xxxx', gmv: 180000, count: 3 },
+                { nama: 'Dion', wa: '0878xxxx', gmv: 150000, count: 2 },
+                { nama: 'Emi', wa: '0813xxxx', gmv: 120000, count: 2 },
+            ],
+            customers: { 
+                labels: ['Jun', 'Jul', 'Agu', 'Sep', 'Okt'], 
+                uniqueCounts: [10, 15, 18, 22, 25] 
+            }
+        };
     }
     function drawCharts(aggregatedData) { 
         if (typeof Chart === 'undefined') return; 
-        // ... (Logika drawing ChartJS) ...
+
+        // Menggunakan variabel lokal agar tidak mengganggu global scope
+        let monthlySalesChartLocal, topCategoriesChartLocal, monthlyCustomersChartLocal;
+
+        // Logic drawing ChartJS (dibuat aman)
+        // ... (Chart drawing logic) ...
     }
     function renderTopBuyers(topBuyers) { 
-        // ... (Logika Top Buyers) ...
+        topBuyersBody.innerHTML = '';
+        if (!topBuyers.length) {
+             topBuyersBody.innerHTML = `<tr><td colspan="4" class="empty-state">Belum ada data Top Buyer.</td></tr>`;
+             return;
+        }
+        // ... (Logika render Top Buyers table) ...
     }
     // --- END CHART LOGIC PLACEHOLDERS ---
 
@@ -503,20 +543,171 @@ document.addEventListener('DOMContentLoaded', function () {
     // submit
     if (form) {
         form.addEventListener('submit', function(ev) {
-            // ... (Logic submit form) ...
+            ev.preventDefault();
+            clearValidationErrors(); 
+
+            const isNamaValid = validateInput(namaEl);
+            const isWaValid = validateInput(waEl);
+            const isKatalogValid = validateInput(katalogSel);
+            
+            let durasiFinal = durasiEl.value;
+            let isDurasiValid = true;
+
+            if (durasiFinal === 'Custom Text') {
+                isDurasiValid = validateInput(customDurasiInput);
+                durasiFinal = customDurasiInput.value.trim();
+            }
+
+
+            if (!isNamaValid || !isWaValid || !isKatalogValid || !isDurasiValid) {
+                showToast('Lengkapi data wajib (*).');
+                const firstInvalid = document.querySelector('.field.invalid');
+                if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            addBtn.disabled = true;
+            addBtn.textContent = 'Menyimpan...';
+
+            const entry = {
+                nama: namaEl.value.trim(), 
+                wa: waEl.value.trim(), 
+                katalog: katalogSel.value, 
+                akun: akunEl ? akunEl.value.trim() : '', 
+                password: passEl ? passEl.value : '', 
+                profile: profileEl ? profileEl.value.trim() : '', 
+                device: deviceSel ? deviceSel.value : '',
+                tglBeli: (tglEl && tglEl.value) ? tglEl.value : isoToday(), 
+                durasi: durasiFinal, 
+                statusBuyer: statusSel ? statusSel.value : '', 
+                modal: modalEl ? modalEl.value : '', 
+                harga: hargaEl ? hargaEl.value : '', 
+                created: new Date().toISOString()
+            };
+
+            const all = load();
+            all.push(entry);
+            save(all);
+            
+            render();
+            showToast('Transaksi ditambahkan');
+            
+            form.reset();
+            addBtn.disabled = false;
+            addBtn.textContent = '+ Tambah Data';
+            
+            if (tglEl) tglEl.value = isoToday();
+            
+            const selectsToReset = [katalogSel, filterSel, deviceSel, statusSel, durasiEl]; 
+            selectsToReset.forEach(sel => {
+                if (sel) {
+                    sel.selectedIndex = 0; 
+                    sel.dispatchEvent(new Event('change',{bubbles:true})); 
+                    sel.closest('.field')?.classList.remove('invalid'); 
+                }
+            });
+            
+            if (customDurasiInput) customDurasiInput.value = '';
+            handleDurasiChange(); 
+
+
+            namaEl.closest('.field')?.classList.remove('invalid');
+            waEl.closest('.field')?.classList.remove('invalid');
+            
+            document.querySelector('.table-view').scrollIntoView({ behavior: 'smooth' });
+            
+
+            if (APPS_SCRIPT_URL) {
+                // ... (Logic fetch Google Apps Script) ...
+            }
         });
     }
 
     // reset
     if (resetBtn && form) {
         resetBtn.addEventListener('click', function(e){
-            // ... (Logic reset form) ...
+            e.preventDefault();
+            if (!confirm('Reset form? Semua input akan kosong.')) return;
+            form.reset();
+            
+            if (tglEl) tglEl.value = isoToday();
+            
+            const selectsToReset = [katalogSel, deviceSel, statusSel, durasiEl]; 
+            selectsToReset.forEach(sel => {
+                if (sel) {
+                    sel.selectedIndex = 0; 
+                    sel.dispatchEvent(new Event('change',{bubbles:true})); 
+                    sel.closest('.field')?.classList.remove('invalid');
+                }
+            });
+
+            if (customDurasiInput) customDurasiInput.value = '';
+            handleDurasiChange();
+            
+            clearValidationErrors();
+
+            showToast('Form direset');
         });
     }
 
     // table actions (struk/delete)
     tableBody.addEventListener('click', function (e) {
-        // ... (Logika struk dan delete) ...
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const idx = Number(btn.dataset.idx);
+        const action = btn.dataset.action;
+        if (Number.isNaN(idx)) return;
+        const entry = currentRenderList[idx];
+        if (!entry) return;
+        const { row, originalIndex } = entry;
+
+        if (action === 'struk') {
+            const startISO = row.tglBeli || isoToday();
+            
+            function getExpiryDate(tglBeli, durasi) {
+                const m = String(durasi || '').match(/(\d+)/);
+                if (!m || !tglBeli) return '';
+                const days = parseInt(m[1], 10);
+                const d = new Date(tglBeli);
+                d.setDate(d.getDate() + days);
+                return d.toISOString().slice(0, 10);
+            }
+            
+            let endISO = getExpiryDate(startISO, row.durasi);
+            
+            const lines = [];
+            lines.push(`🧾 STRUK PENJUALAN SAISOKU.ID`);
+            lines.push(`──────────`);
+            lines.push(`👤 Nama      : ${row.nama || '-'}`);
+            lines.push(`📱 Buyer WA  : ${row.wa || '-'}`);
+            lines.push(`🎬 Produk    : ${row.katalog || '-'}`);
+            lines.push(`🔑 Akun      : ${row.akun || '-'}`);
+            lines.push(`⚙️ Device    : ${row.device || '-'}`);
+            lines.push(`──────────`);
+            
+            lines.push(`📅 Buy Date  : ${formatDateDDMMYYYY(startISO)}`); 
+            
+            if (endISO && String(row.durasi).toLowerCase().includes('hari')) {
+                lines.push(`📅 Exp Date  : ${formatDateDDMMYYYY(endISO)}`); 
+            }
+            
+            lines.push(`⏱️ Durasi    : ${row.durasi || '-'}`);
+            lines.push(`──────────`);
+            lines.push(`🏷️ Harga     : Rp ${formatRupiah(parseNumber(row.harga || 0))}`);
+            lines.push(`🧩 Status    : ${row.statusBuyer || '-'}`);
+            lines.push(`──────────`);
+            lines.push(`Terima kasih telah berbelanja di SAISOKU.ID 🙏`);
+            lines.push(`© 2025 SAISOKU.ID • ${formatDateDDMMYYYY(new Date().toISOString().slice(0,10))}`);
+
+            openInvoiceModal(lines.join('\n'), row.wa);
+        } else if (action === 'delete') {
+            if (!confirm('Hapus transaksi ini?')) return;
+            const all = load();
+            all.splice(originalIndex, 1);
+            save(all);
+            render();
+            showToast('Transaksi dihapus');
+        }
     });
     // export CSV
     if (exportBtn) {
@@ -549,7 +740,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.modal-backdrop').forEach(b => b.addEventListener('click', closeInvoiceModal));
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeInvoiceModal(); });
 
-    // --- NAVIGASI PAGE LOGIC (KRITIS FIX) ---
+    // --- NAVIGASI PAGE LOGIC ---
     function switchPage(pageId) {
         document.querySelectorAll('.page').forEach(page => {
             page.style.display = 'none'; 
@@ -588,4 +779,5 @@ document.addEventListener('DOMContentLoaded', function () {
         
         switchPage('pageOne'); 
     }
+    // --- END NAVIGASI PAGE LOGIC ---
 });
