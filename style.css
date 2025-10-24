@@ -52,8 +52,8 @@ input[type="number"] {
     display:grid; 
     grid-template-columns:var(--left-col) 1fr; 
     gap:18px;
-    /* FIX: Diganti menjadi 'stretch' agar semua item dalam row yang sama tingginya sama */
-    align-items:stretch; 
+    /* FIX: Diganti 'start' agar elemen metrik menempel di bawah tabel */
+    align-items:start; 
     margin-top:6px
 }
 
@@ -269,10 +269,9 @@ input[type="number"] {
 /* --- METRICS VIEW STYLING (NEW SECTION) --- */
 .metrics-view {
     padding: 16px;
-    margin-top: 24px; 
+    margin-top: 18px; /* Jarak antara card tabel dan card metrics */
     margin-bottom: 30px;
-    /* PENTING: Memastikan section ini melintasi kedua kolom grid utama */
-    grid-column: 1 / -1; 
+    /* FIX: Hapus grid-column: 1 / -1; AGAR OTOMATIS MASUK KOLOM 2 */
 }
 .metrics-view h2 {
     font-size: 18px;
@@ -294,7 +293,7 @@ input[type="number"] {
     margin-bottom: 20px;
 }
 .metric-chart-wide {
-    grid-column: 1 / -1; /* Chart Sales Bulanan mengambil full width */
+    grid-column: 1 / -1; /* Chart Sales Bulanan mengambil full width di dalam metric-grid */
 }
 .metric-chart-narrow {
     height: 320px; 
