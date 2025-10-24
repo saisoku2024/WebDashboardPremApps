@@ -44,7 +44,7 @@ input[type="number"] {
 .wrap{max-width:1200px;margin:18px auto;padding:18px}
 .header{
     display:flex;
-    justify-content:space-between;
+    justify-content:space-between; 
     align-items:flex-start;
     margin-bottom:6px;
     gap:12px;
@@ -56,7 +56,7 @@ input[type="number"] {
     display: flex;
     gap: 8px;
     padding-top: 4px;
-    margin-left: 20px; 
+    margin-left: auto; 
 }
 .page-nav button.primary.active {
     box-shadow: 0 0 0 2px var(--accent1) inset;
@@ -70,15 +70,18 @@ input[type="number"] {
     color: var(--white);
     box-shadow: none;
 }
-/* Menjamin hanya page yang aktif yang tampil */
+/* Memastikan page containers tersembunyi */
 .page {
-    width: 100%; /* Penting agar container page mengambil 100% lebar wrap */
+    width: 100%; 
     margin-top: 0;
-    /* FIX KRITIS: Memastikan halaman non-grid (pageTwo) tersembunyi */
 }
 #pageTwo {
     padding-top: 20px;
     padding-bottom: 20px;
+    display: none; 
+}
+#pageTwo.active {
+    display: block !important;
 }
 
 
@@ -87,19 +90,11 @@ input[type="number"] {
     display:grid; 
     grid-template-columns:var(--left-col) 1fr; 
     gap:18px;
-    align-items:start; /* FIX: start untuk menempatkan metrics di bawah elemen terpendek */
+    align-items:start; 
 }
 .grid > .grid-col-2 {
-    grid-column: 2; /* Menempatkan Tabel Data di kolom 2 */
+    grid-column: 2; 
 }
-/* Memastikan Metrics View tidak terganggu oleh grid di Page Two */
-#pageTwo {
-    display: none; 
-}
-#pageTwo.active {
-    display: block !important;
-}
-
 
 /* KPI row */
 .kpi-row{
@@ -315,6 +310,7 @@ input[type="number"] {
     padding: 16px;
     margin-top: 18px; 
     margin-bottom: 30px;
+    /* FIX: Hapus grid-column: 1 / -1; karena metricsView tidak lagi di main grid */
 }
 .metrics-view h2 {
     font-size: 18px;
