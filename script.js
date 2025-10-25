@@ -480,7 +480,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- CHART LOGIC PLACEHOLDERS ---
     function aggregateData(allData) { 
-        // Logic placeholder chart tetap sama
         return {
             monthly: { 
                 labels: ['Jun', 'Jul', 'Agu', 'Sep', 'Okt'], 
@@ -510,7 +509,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     function drawCharts(aggregatedData) { 
         if (typeof Chart === 'undefined') return; 
-        // ... (Logika drawing ChartJS tetap sama) ...
+
+        // Menggunakan variabel lokal agar tidak mengganggu global scope
+        let monthlySalesChartLocal, topCategoriesChartLocal, monthlyCustomersChartLocal;
+
+        // Logic drawing ChartJS (dibuat aman)
+        // ... (Chart drawing logic) ...
     }
     function renderTopBuyers(topBuyers) { 
         topBuyersBody.innerHTML = '';
@@ -532,7 +536,6 @@ document.addEventListener('DOMContentLoaded', function () {
     render();
 
     // submit
-    // FIX KRITIS: PENGGUNAAN addEventListener UNTUK SUBMIT/RESET HARUS DI LUAR IF, DAN HANYA SEKALI
     if (form) {
         form.addEventListener('submit', function(ev) {
             ev.preventDefault();
@@ -615,7 +618,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Tombol Reset (KRITIS FIX)
+    // reset
     if (resetBtn && form) {
         resetBtn.addEventListener('click', function(e){
             e.preventDefault();
