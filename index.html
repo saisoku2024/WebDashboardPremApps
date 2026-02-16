@@ -22,7 +22,7 @@
                 <button class="btn small primary active" data-page="pageOne">Input & Data</button>
                 <button class="btn small primary" data-page="pageTwo">Analisis & Performa</button>
             </nav>
-            </header>
+        </header>
 
         <main id="pageOne" class="grid page active">
             <div class="kpi-row" role="region" aria-label="KPI">
@@ -192,12 +192,12 @@
                 </div>
             </section>
         </main>
+
         <main id="pageTwo" class="page metrics-page" style="display:none;">
             <section id="metricsView" class="metrics-view" aria-labelledby="metrics-title">
                 <h2 id="metrics-title">Performa & Analisis Bisnis (All Time)</h2>
                 
                 <div class="metric-grid">
-                    
                     <div class="card metric-chart-wide">
                         <h3>Sales, Modal & Profit Bulanan</h3>
                         <div class="chart-container">
@@ -232,14 +232,13 @@
                                     <th>Total Transaksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="topBuyersBody">
-                                </tbody>
+                            <tbody id="topBuyersBody"></tbody>
                         </table>
                     </div>
                 </div>
-
             </section>
         </main>
+
         <footer class="footer text-center">© 2025 SAISOKU.ID · Flat Dark Dashboard by SIVA</footer>
     </div>
 
@@ -260,6 +259,8 @@
     </div>
 
     <div id="toast" class="toast" aria-live="polite"></div>
-    <script src="script.js"></script>
+
+    <!-- PERUBAHAN PENTING: module agar import supabase jalan -->
+    <script type="module" src="script.js"></script>
 </body>
 </html>
