@@ -1,3 +1,9 @@
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabaseUrl = "https://dqvmcpbxdkybnsnxpaqx.supabase.co"
+const supabaseKey = "sb_publishable_wS5kxHmPN6jvZDxusUygTg_AquncKRI"
+const supabase = createClient(supabaseUrl,supabaseKey)
+
 // CONFIG: isi APPS_SCRIPT_URL jika mau sinkron ke Google Sheets
 const APPS_SCRIPT_URL = '';
 
